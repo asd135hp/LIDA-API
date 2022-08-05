@@ -1,0 +1,67 @@
+{
+  "test1": {
+    "sensor": {
+      "name": ["Temperature", "Moisture", "Carbon dioxide", "Oxygen"],
+      "type": ["Temperature", "Moisture", "Carbon dioxide", "Oxygen"],
+      "isRunning": [false, true],
+      "sampleSize": 16
+    },
+    "sensorData": {
+      "sensorName": "sensor.name",
+      "value": "random",
+      "timeStamp": "1609459200-1640995200",
+      "sampleSize": 100
+    },
+    "actuator": {
+      "name": ["Motor", "Air pump"],
+      "type": ["Motor", "Air pump"],
+      "isRunning": [false, true],
+      "sampleSize": 8
+    },
+    "actuatorCommands": {
+      "actuatorName": "actuator.name",
+      "timesPerDay": [1, 2, 3],
+      "timeStamp": "1609459200-1640995200",
+      "toggleCommand": { "state": [false, true] },
+      "motorCommand": { "duration": "random", "isClockwise": [false, true] },
+      "sampleSize": 100
+    },
+    "sensorLogs": {
+      "content": ["Sensor \"sensor.name\" is working properly"],
+      "sampleSize": 100
+    },
+    "actuatorLogs": {
+      "content": ["Actuator \"actuator.name\" is working properly"],
+      "sampleSize": 100
+    },
+    "dataSaving": {
+      "sensor": {
+        "sensor": {
+          "name": ["Temperature", "Moisture", "Carbon dioxide", "Oxygen"],
+          "type": ["Temperature", "Moisture", "Carbon dioxide", "Oxygen"],
+          "isRunning": [false, true],
+          "sampleSize": 16
+        },
+        "sensorData": {
+          "sensorName": "sensor.name",
+          "value": "random",
+          "sampleSize": 100
+        },
+        "sampleSize": 10,
+        "timeStamp": "1609459200-1640995200"
+      },
+      "logs": {
+        "sensor": {
+          "content": ["Sensor \"sensor.name\" is working properly"],
+          "sampleSize": 100
+        },
+        "actuator": {
+          "content": ["Actuator \"actuator.name\" is working properly"],
+          "sampleSize": 100
+        },
+        "sampleSize": 10,
+        "timeStamp": "1609459200-1640995200"
+      }
+    }
+  }
+}

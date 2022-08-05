@@ -1,0 +1,64 @@
+{
+  "timezone": "utc",
+  "schemaName": "lida",
+  "apiPath": "api/v1",
+  "test": {
+    "setupThrowsError": true,
+    "account": {
+      "email": "doanquoctrungvn@gmail.com",
+      "password": "123456789"
+    }
+  },
+  "compression": {
+    "fileExtension": "zip"
+  },
+  "limit": {
+    "logLines": 100,
+    "sensor": 100,
+    "actuator": 100
+  },
+  "firebase": {
+    "storage": {
+      "development": {
+        "realtimeUrl": "development/query",
+        "storageFolder": "snapshots/development",
+        "firestoreDocPath": "lida/development"
+      },
+      "production": {
+        "realtimeUrl": "production/query",
+        "storageFolder": "snapshots/production",
+        "firestoreDocPath": "lida/production"
+      },
+      "test": {
+        "realtimeUrl": "test/query",
+        "storageFolder": "snapshots/test",
+        "firestoreDocPath": "lida/test"
+      }
+    }
+  },
+  "logger": {
+    "level": "info",
+    "defaultMeta": {
+      "service": "user-service"
+    },
+    "transport": {
+      "errorLog": {
+        "filename": "error.log",
+        "level": "error",
+        "maxsize": 52428800,
+        "maxFiles": 1
+      },
+      "infoLog": {
+        "filename": "info.log",
+        "maxsize": 1048576,
+        "maxFiles": 3
+      },
+      "debugLog": {
+        "filename": "debug.log",
+        "level": "debug",
+        "maxsize": 52428800,
+        "maxFiles": 4
+      }
+    }
+  }
+}

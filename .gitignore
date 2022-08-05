@@ -1,0 +1,25 @@
+*.terraform
+*.terraform.lock.hcl
+*variables.tf
+*terraform.tfstate.backup
+*terraform.tfstate
+Ops/key.json
+node_modules
+!.eslint*
+*.map
+.vscode
+dist
+!jest.config.js
+.env
+*.log
+automation/*.log
+yarn.lock
+
+# Protected resources like API keys or Google Service Account details
+protected
+
+# Just a temporary folder to test what could not be seen when testing
+temp
+
+# Test cases, which is really big
+src/controller/__tests__/testcases.json

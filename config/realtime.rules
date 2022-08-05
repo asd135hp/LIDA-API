@@ -1,0 +1,43 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "$environment":{
+      "query": {
+        "sensors": {
+          ".indexOn": ["type", "name"],
+          "$sensorKey": {
+            ".indexOn": ["type", "name"]
+          }
+        },
+        "sensorData": {
+          ".indexOn": ["sensorName", "timeStamp"],
+          "$sensorDataKey": {
+            ".indexOn": ["sensorName", "timeStamp"]
+          }
+        },
+        "actuators": {
+          ".indexOn": ["type", "name"],
+          "$actuatorKey": {
+            ".indexOn": ["type", "name"]
+          }
+        },
+        "actuatorCommand": {
+          ".indexOn": ["timeStamp", "id"],
+          "$actuatorCommandKey": {
+            ".indexOn": ["timeStamp", "id"]
+          }
+        },
+        "logs": {
+          ".indexOn": ["timeStamp"],
+          "$logType": {
+            ".indexOn": ["timeStamp"],
+            "$logKey": {
+              ".indexOn": ["timeStamp"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,22 +2,15 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class User {
     constructor(userData, accessToken) {
-        this._name = userData.displayName;
-        this._email = userData.email;
-        this._emailVerified = userData.emailVerified;
-        this._phoneNumber = userData.phoneNumber;
-        this._photoURL = userData.photoURL;
-        this._isLoggedOut = false;
-        this._accessToken = accessToken;
+        this.displayName = userData.displayName;
+        this.email = userData.email;
+        this.emailVerified = userData.emailVerified;
+        this.phoneNumber = userData.phoneNumber;
+        this.photoURL = userData.photoURL;
+        this.isLoggedOut = false;
+        this.accessToken = accessToken;
     }
-    get displayName() { return this._name; }
-    get email() { return this._email; }
-    get emailVerified() { return this._emailVerified; }
-    get phoneNumber() { return this._phoneNumber; }
-    get photoURL() { return this._photoURL; }
-    get isLoggedOut() { return this._isLoggedOut; }
-    get accessToken() { return this._accessToken; }
-    logOut() { this._isLoggedOut = true; }
+    logOut() { this.isLoggedOut = true; }
     toUpdateRequest() {
         return {
             email: this.email,

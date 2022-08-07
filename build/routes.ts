@@ -217,6 +217,13 @@ const models: TsoaRoute.Models = {
     "User": {
         "dataType": "refObject",
         "properties": {
+            "displayName": {"dataType":"string","required":true},
+            "email": {"dataType":"string","required":true},
+            "phoneNumber": {"dataType":"string","required":true},
+            "photoURL": {"dataType":"string","required":true},
+            "isLoggedOut": {"dataType":"boolean","required":true},
+            "emailVerified": {"dataType":"boolean","required":true},
+            "accessToken": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },

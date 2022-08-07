@@ -376,7 +376,38 @@
 				"additionalProperties": false
 			},
 			"User": {
-				"properties": {},
+				"properties": {
+					"displayName": {
+						"type": "string"
+					},
+					"email": {
+						"type": "string"
+					},
+					"phoneNumber": {
+						"type": "string"
+					},
+					"photoURL": {
+						"type": "string"
+					},
+					"isLoggedOut": {
+						"type": "boolean"
+					},
+					"emailVerified": {
+						"type": "boolean"
+					},
+					"accessToken": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"displayName",
+					"email",
+					"phoneNumber",
+					"photoURL",
+					"isLoggedOut",
+					"emailVerified",
+					"accessToken"
+				],
 				"type": "object",
 				"additionalProperties": false
 			}

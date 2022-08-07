@@ -17,12 +17,22 @@ exports.dbConnection = (() => {
 })();
 exports.logger = winston_1.default.createLogger({
     level: constants_config_json_1.default.logger.level,
+    levels: constants_config_json_1.default.logger.levels,
     format: winston_1.default.format.json(),
     defaultMeta: constants_config_json_1.default.logger.defaultMeta,
-    transports: [
-        new winston_1.default.transports.File(constants_config_json_1.default.logger.transport.errorLog),
-        new winston_1.default.transports.File(constants_config_json_1.default.logger.transport.debugLog),
-    ],
+    transports: (() => {
+        if (process.env.NODE_ENV === 'production')
+            return [
+                new winston_1.default.transports.Console({
+                    level: "info",
+                    format: winston_1.default.format.combine(winston_1.default.format.prettyPrint({ colorize: true }), winston_1.default.format.simple()),
+                })
+            ];
+        return [
+            new winston_1.default.transports.File(constants_config_json_1.default.logger.transport.errorLog),
+            new winston_1.default.transports.File(constants_config_json_1.default.logger.transport.debugLog),
+        ];
+    })(),
 });
 exports.firebasePathConfig = (() => {
     if (process.env.NODE_ENV === 'test')

@@ -27,16 +27,29 @@ export const dbConnection = (()=>{
 
 export const logger = winston.createLogger({
   level: config.logger.level,
+  levels: config.logger.levels,
   format: winston.format.json(),
   defaultMeta: config.logger.defaultMeta,
-  transports: [
-    //
-    // - Write all logs with importance level of `error` or less to `error.log`
-    // - Write all logs with importance level of `debug` or less to `debug.log`
-    //
-    new winston.transports.File(config.logger.transport.errorLog),
-    new winston.transports.File(config.logger.transport.debugLog),
-  ],
+  transports: (()=>{
+    if(process.env.NODE_ENV === 'production') return [
+      new winston.transports.Console({
+        level: "info",
+        format: winston.format.combine(
+          winston.format.prettyPrint({ colorize: true }),
+          winston.format.simple()
+        ),
+      })
+    ]
+
+    return [
+      //
+      // - Write all logs with importance level of `error` or less to `error.log`
+      // - Write all logs with importance level of `debug` or less to `debug.log`
+      //
+      new winston.transports.File(config.logger.transport.errorLog),
+      new winston.transports.File(config.logger.transport.debugLog),
+    ]
+  })(),
 })
 
 export const firebasePathConfig = (()=>{

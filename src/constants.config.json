@@ -38,6 +38,15 @@
   },
   "logger": {
     "level": "info",
+    "levels": {
+      "critical": 0,
+      "error": 1,
+      "warn": 2,
+      "info": 3,
+      "debug": 4,
+      "trace": 5,
+      "silly": 6
+    },
     "defaultMeta": {
       "service": "user-service"
     },
@@ -50,8 +59,9 @@
       },
       "infoLog": {
         "filename": "info.log",
-        "maxsize": 1048576,
-        "maxFiles": 3
+        "level": "info",
+        "maxsize": 52428800,
+        "maxFiles": 2
       },
       "debugLog": {
         "filename": "debug.log",

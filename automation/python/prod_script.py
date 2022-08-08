@@ -85,17 +85,18 @@ class BuildScript:
         end_message="Finished testing with Jest"
       )
 
-      try:
-        subprocess.run(["git", "add", "-A"])
-        subprocess.run(["git", "commit", "-m", "Commit staged by a Python script"])
-        self.push_to_heroku_container()
-      finally:
-        # return to the previous commit for secret removal out of future commits
-        main_github_repo, repo_branch, repo_name = "https://github.com/asd135hp/LIDA-API", "master", "LIDA-API"
-        
-        # safe guard, does not cost much
-        subprocess.run(["git", "remote", "add", repo_name, main_github_repo])
-        subprocess.run(["git", "push", repo_name, repo_branch])
+      if namespace.run_all or namespace.run_server:
+        try:
+          subprocess.run(["git", "add", "-A"])
+          subprocess.run(["git", "commit", "-m", "Commit staged by a Python script"])
+          self.push_to_heroku_container()
+        finally:
+          # return to the previous commit for secret removal out of future commits
+          main_github_repo, repo_branch, repo_name = "https://github.com/asd135hp/LIDA-API", "master", "LIDA-API"
+          
+          # safe guard, does not cost much
+          subprocess.run(["git", "remote", "add", repo_name, main_github_repo])
+          subprocess.run(["git", "push", repo_name, repo_branch])
 
     except Exception as e:
       print("Could not proceed further due to following error occurred:")

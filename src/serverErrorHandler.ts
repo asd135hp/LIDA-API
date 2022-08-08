@@ -3,7 +3,7 @@ import { ValidateError } from "tsoa";
 import { logger } from "./constants";
 
 function validationError(err: ValidateError, req: Request){
-  logger.error(`Caught Validation Error for ${req.path}: ${err.fields}`);
+  logger.error(`Caught Validation Error for ${req.path}: ${JSON.stringify(err.fields)}\nMessage named ${err.name}: ${err.message}`);
   return {
     message: "Validation Failed",
     details: err?.fields,

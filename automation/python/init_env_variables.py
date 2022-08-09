@@ -3,6 +3,7 @@ from io import TextIOWrapper
 import os
 import json
 import re
+from constants import app_name
 
 raw_path = os.path.dirname(os.path.realpath(__file__))
 dir_path = raw_path.replace("\\automation\\python", "")
@@ -39,7 +40,7 @@ if __name__ == '__main__':
   dotenv_fp.reconfigure(write_through=True)
 
   # must have env vars
-  add_env_var_local("NODE_ENV", "production", dotenv_fp)
+  add_env_var_local("NODE_ENV", "testing", dotenv_fp)
   
   vars = {}
   for file_name in os.listdir(f"{dir_path}\\protected"):
@@ -75,7 +76,7 @@ if __name__ == '__main__':
 
     # make API request to fix application config vars
     proc = subprocess.check_output([
-      "curl", "-n", "-X", "PATCH", "https://api.heroku.com/apps/lida-344814/config-vars",
+      "curl", "-n", "-X", "PATCH", f"https://api.heroku.com/apps/{app_name}/config-vars",
       "-d", json.dumps(vars, skipkeys=True),
       "-H", "Content-Type: application/json",
       "-H", "Accept: application/vnd.heroku+json; version=3",

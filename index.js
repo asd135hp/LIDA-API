@@ -14,7 +14,6 @@ const view_1 = __importDefault(require("./src/view"));
 const constants_1 = require("./src/constants");
 const apiSetup_1 = __importDefault(require("./src/apiSetup"));
 const serverErrorHandler_1 = __importDefault(require("./src/serverErrorHandler"));
-const pushTempContent_1 = require("./temp/pushTempContent");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 5000;
 app.use(express_1.default.json());
@@ -34,7 +33,6 @@ const server = app.listen(port, () => {
     (0, apiSetup_1.default)(server);
     constants_1.logger.info("Finished setting up API");
     constants_1.logger.info(`Express: Listening on port ${port}`);
-    (0, pushTempContent_1.pushTempContent)();
 });
 server.on("connect", () => {
     constants_1.logger.info("A user logged in");

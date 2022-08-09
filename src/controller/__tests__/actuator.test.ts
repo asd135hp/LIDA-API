@@ -14,28 +14,29 @@ describe("Test actuator actions - Integration test", ()=>{
   beforeAll(async ()=>{
     setup.init()
 
-    for(const val of testCase.actuators) {
-      const event = await CommandFacade.actuator.addActuator(setup.getAccessToken(), val)
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // primitive testing
+    // for(const val of testCase.actuators) {
+    //   const event = await CommandFacade.actuator.addActuator(setup.getAccessToken(), val)
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
 
-    for(const val of testCase.actuatorCommands) {
-      const event = await CommandFacade.actuator.addActuatorCommand(setup.getAccessToken(), val.actuatorName, val)
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // for(const val of testCase.actuatorCommands) {
+    //   const event = await CommandFacade.actuator.addActuatorCommand(setup.getAccessToken(), val.actuatorName, val)
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
   }, timeOut * Math.max(testCase.actuatorCommands.length, testCase.actuators.length))
 
   afterAll(async ()=>{
-    const fs = persistentFirebaseConnection.firestoreService as FirebaseFirestoreService
-    const rt = persistentFirebaseConnection.realtimeService
+    // const fs = persistentFirebaseConnection.firestoreService as FirebaseFirestoreService
+    // const rt = persistentFirebaseConnection.realtimeService
 
-    await fs.deleteCollection("actuators");
-    await fs.deleteCollection("actuatorCommand");
-    await rt.deleteContent("actuators")
-    await rt.deleteContent("actuatorCommand")
-    await rt.deleteContent("actuatorCommandId")
+    // await fs.deleteCollection("actuators");
+    // await fs.deleteCollection("actuatorCommand");
+    // await rt.deleteContent("actuators")
+    // await rt.deleteContent("actuatorCommand")
+    // await rt.deleteContent("actuatorCommandId")
     
     await setup.tearDown()
   }, timeOut * 4)

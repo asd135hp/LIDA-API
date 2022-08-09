@@ -40,7 +40,7 @@ class BuildScript:
     print(end_message)
 
   def push_to_heroku_container(self):
-    app_name = "lida-344814"
+    app_name = "lida-344814-testing"
     try:
       subprocess.check_output(["git", "push", "heroku", "master"])
     except subprocess.CalledProcessError:

@@ -19,24 +19,25 @@ describe("Test sensor actions - Integration test", ()=>{
   beforeAll(async ()=>{
     await setup.init()
 
-    for(const val of testCase.sensorLogs) {
-      const event = await CommandFacade.logs.addSensorLog(setup.getAccessToken(), val)
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // primitive testing
+    // for(const val of testCase.sensorLogs) {
+    //   const event = await CommandFacade.logs.addSensorLog(setup.getAccessToken(), val)
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
 
-    for(const val of testCase.actuatorLogs) {
-      const event = await CommandFacade.logs.addActuatorLog(setup.getAccessToken(), val)
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // for(const val of testCase.actuatorLogs) {
+    //   const event = await CommandFacade.logs.addActuatorLog(setup.getAccessToken(), val)
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
   }, timeOut * Math.max(testCase.sensorLogs.length, testCase.actuatorLogs.length))
 
   afterAll(async ()=>{
-    await persistentFirebaseConnection.firestoreService.runTransaction("logs/sensor", deleteLogs)
-    await persistentFirebaseConnection.firestoreService.runTransaction("logs/actuator", deleteLogs)
+    // await persistentFirebaseConnection.firestoreService.runTransaction("logs/sensor", deleteLogs)
+    // await persistentFirebaseConnection.firestoreService.runTransaction("logs/actuator", deleteLogs)
 
-    await persistentFirebaseConnection.realtimeService.deleteContent("logs")
+    // await persistentFirebaseConnection.realtimeService.deleteContent("logs")
 
     await setup.tearDown()
   }, timeOut * 4)

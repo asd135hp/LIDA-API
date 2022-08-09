@@ -12,15 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const constants_1 = require("../../constants");
-const databaseErrorEvent_1 = __importDefault(require("../../model/v1/events/databaseErrorEvent"));
 const binarySearch_1 = __importDefault(require("../../utility/binarySearch"));
 const helper_1 = require("../../utility/helper");
 const testSetup_1 = __importDefault(require("../../utility/testSetup"));
-const commandFacade_1 = __importDefault(require("../commandFacade"));
 const queryFacade_1 = __importDefault(require("../queryFacade"));
 const dataSavingService_1 = __importDefault(require("../v1/services/firebaseFreetier/dataSavingService"));
-const firebaseService_1 = require("../v1/services/firebaseFreetier/firebaseService");
 const testcases_json_1 = __importDefault(require("./testcases.json"));
 describe("Data saving test - Integration test", () => {
     const setup = new testSetup_1.default();
@@ -28,22 +24,8 @@ describe("Data saving test - Integration test", () => {
     const templateStartDate = 1609459200;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.init();
-        let [startDate, unixDay] = [templateStartDate, 3600 * 24];
-        constants_1.logger.info("Uploading data to the server");
-        for (const dataByDay of testcases_json_1.default.dataSaving.sensor) {
-            const event = yield commandFacade_1.default.dataSaving.saveSensorSnapshot(setup.getAccessToken(), JSON.stringify(dataByDay.sensor), JSON.stringify(dataByDay.sensorData), startDate, startDate += unixDay);
-            if (constants_1.TEST_SETUP_THROWS_ERROR && event instanceof databaseErrorEvent_1.default)
-                throw new Error("An error is raised: " + event.content.error);
-        }
-        startDate = templateStartDate;
-        for (const dataByDay of testcases_json_1.default.dataSaving.logs) {
-            const event = yield commandFacade_1.default.dataSaving.saveLogSnapshot(setup.getAccessToken(), JSON.stringify(dataByDay.actuator), JSON.stringify(dataByDay.sensor), startDate, startDate += unixDay);
-            if (constants_1.TEST_SETUP_THROWS_ERROR && event instanceof databaseErrorEvent_1.default)
-                throw new Error("An error is raised: " + event.content.error);
-        }
     }), timeOut * (testcases_json_1.default.dataSaving.sensor.length + testcases_json_1.default.dataSaving.logs.length));
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
-        yield firebaseService_1.persistentFirebaseConnection.storageService.deleteFolderFromStorage("");
         yield setup.tearDown();
     }), timeOut * 2);
     const dataSaving = queryFacade_1.default.dataSaving;

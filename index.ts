@@ -10,6 +10,7 @@ import index from "./src/view";
 import { COOKIE_SECRET, logger, SESSION_SECRET } from "./src/constants";
 import apiSetup from "./src/apiSetup";
 import serverErrorHandler from "./src/serverErrorHandler"
+import { pushTempContent } from "./temp/pushTempContent"
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -41,6 +42,8 @@ const server = app.listen(port, ()=>{
   apiSetup(server)
   logger.info("Finished setting up API")
   logger.info(`Express: Listening on port ${port}`)
+
+  pushTempContent()
 })
 
 server.on("connect", ()=>{

@@ -15,27 +15,28 @@ describe("Test sensor actions - Integration test", ()=>{
   beforeAll(async ()=>{
     await setup.init()
 
-    for(const val of testCase.sensors) {
-      const event = await CommandFacade.sensor.addSensor(setup.getAccessToken(), val)
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // primitive testing
+    // for(const val of testCase.sensors) {
+    //   const event = await CommandFacade.sensor.addSensor(setup.getAccessToken(), val)
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
 
-    for(const val of testCase.sensorData) {
-      const event = await CommandFacade.sensor.addSensorData(setup.getAccessToken(), val.sensorName, val)
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // for(const val of testCase.sensorData) {
+    //   const event = await CommandFacade.sensor.addSensorData(setup.getAccessToken(), val.sensorName, val)
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
   }, timeOut * Math.max(testCase.sensorData.length, testCase.sensors.length))
 
   afterAll(async ()=>{
-    const fs = persistentFirebaseConnection.firestoreService as FirebaseFirestoreService
-    const rt = persistentFirebaseConnection.realtimeService
+    // const fs = persistentFirebaseConnection.firestoreService as FirebaseFirestoreService
+    // const rt = persistentFirebaseConnection.realtimeService
 
-    await fs.deleteCollection("sensors");
-    await fs.deleteCollection("sensorData");
-    await rt.deleteContent("sensors")
-    await rt.deleteContent("sensorData")
+    // await fs.deleteCollection("sensors");
+    // await fs.deleteCollection("sensorData");
+    // await rt.deleteContent("sensors")
+    // await rt.deleteContent("sensorData")
     
     await setup.tearDown()
   }, timeOut * (testCase.sensorData.length + testCase.sensors.length) / 2)

@@ -17,32 +17,33 @@ describe("Data saving test - Integration test", ()=>{
   beforeAll(async ()=>{
     await setup.init()
 
-    let [startDate, unixDay] = [templateStartDate, 3600 * 24];
-    logger.info("Uploading data to the server")
-    for(const dataByDay of testCase.dataSaving.sensor){
-      const event = await CommandFacade.dataSaving.saveSensorSnapshot(
-        setup.getAccessToken(),
-        JSON.stringify(dataByDay.sensor), JSON.stringify(dataByDay.sensorData),
-        startDate, startDate += unixDay
-      )
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // primitive testing
+    // let [startDate, unixDay] = [templateStartDate, 3600 * 24];
+    // logger.info("Uploading data to the server")
+    // for(const dataByDay of testCase.dataSaving.sensor){
+    //   const event = await CommandFacade.dataSaving.saveSensorSnapshot(
+    //     setup.getAccessToken(),
+    //     JSON.stringify(dataByDay.sensor), JSON.stringify(dataByDay.sensorData),
+    //     startDate, startDate += unixDay
+    //   )
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
 
-    startDate = templateStartDate
-    for(const dataByDay of testCase.dataSaving.logs){
-      const event = await CommandFacade.dataSaving.saveLogSnapshot(
-        setup.getAccessToken(), 
-        JSON.stringify(dataByDay.actuator), JSON.stringify(dataByDay.sensor),
-        startDate, startDate += unixDay
-      )
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // startDate = templateStartDate
+    // for(const dataByDay of testCase.dataSaving.logs){
+    //   const event = await CommandFacade.dataSaving.saveLogSnapshot(
+    //     setup.getAccessToken(), 
+    //     JSON.stringify(dataByDay.actuator), JSON.stringify(dataByDay.sensor),
+    //     startDate, startDate += unixDay
+    //   )
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
   }, timeOut * (testCase.dataSaving.sensor.length + testCase.dataSaving.logs.length))
 
   afterAll(async ()=>{
-    await persistentFirebaseConnection.storageService.deleteFolderFromStorage("")
+    // await persistentFirebaseConnection.storageService.deleteFolderFromStorage("")
     await setup.tearDown()
   }, timeOut * 2)
 

@@ -11,12 +11,6 @@ import DataSavingModel from "./controller/v1/model/dataSavingModel";
 
 // routing subscribers and publishers
 export default function apiSetup(server?: Server){
-  if(process.env.NODE_ENV == 'development') {
-    logger.add(new winston.transports.Console({
-      format: winston.format.simple(),
-    }));
-  }
-
   // publishers - subscribers (in the diagram for backend)
   const start = new CommandFacade();
   const commandBus = new CommandBus(start);

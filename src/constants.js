@@ -21,7 +21,7 @@ exports.logger = winston_1.default.createLogger({
     format: winston_1.default.format.json(),
     defaultMeta: constants_config_json_1.default.logger.defaultMeta,
     transports: (() => {
-        if (process.env.NODE_ENV === 'production')
+        if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'testing')
             return [
                 new winston_1.default.transports.Console({
                     level: "info",

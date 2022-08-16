@@ -34,14 +34,18 @@ const models = {
         },
         "additionalProperties": false,
     },
-    "ToggleCommand": {
+    "ActuatorConfigType": {
+        "dataType": "refEnum",
+        "enums": [0, 1, 2],
+    },
+    "ToggleConfig": {
         "dataType": "refObject",
         "properties": {
             "state": { "dataType": "boolean", "required": true },
         },
         "additionalProperties": false,
     },
-    "MotorCommand": {
+    "MotorConfig": {
         "dataType": "refObject",
         "properties": {
             "duration": { "dataType": "double", "required": true },
@@ -49,15 +53,15 @@ const models = {
         },
         "additionalProperties": false,
     },
-    "ActuatorCommandDTO": {
+    "ActuatorConfigDTO": {
         "dataType": "refObject",
         "properties": {
-            "id": { "dataType": "double", "required": true },
             "actuatorName": { "dataType": "string", "required": true },
             "timeStamp": { "dataType": "double", "required": true },
-            "timesPerDay": { "dataType": "double", "required": true },
-            "toggleCommand": { "ref": "ToggleCommand" },
-            "motorCommand": { "dataType": "array", "array": { "dataType": "refObject", "ref": "MotorCommand" } },
+            "type": { "ref": "ActuatorConfigType", "required": true },
+            "timesPerDay": { "dataType": "double" },
+            "toggleConfig": { "ref": "ToggleConfig" },
+            "motorConfig": { "dataType": "array", "array": { "dataType": "refObject", "ref": "MotorConfig" } },
         },
         "additionalProperties": false,
     },
@@ -151,13 +155,13 @@ const models = {
         },
         "additionalProperties": false,
     },
-    "ActuatorCommand": {
+    "ActuatorConfig": {
         "dataType": "refObject",
         "properties": {
             "timeStamp": { "dataType": "double", "required": true },
-            "toggleCommand": { "ref": "ToggleCommand" },
-            "motorCommand": { "dataType": "array", "array": { "dataType": "refObject", "ref": "MotorCommand" } },
-            "timesPerDay": { "dataType": "double", "required": true },
+            "toggleConfig": { "ref": "ToggleConfig" },
+            "motorConfig": { "dataType": "array", "array": { "dataType": "refObject", "ref": "MotorConfig" } },
+            "timesPerDay": { "dataType": "double" },
         },
         "additionalProperties": false,
     },
@@ -234,23 +238,22 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/actuator/command/all/get/:limitToFirst', authenticateMiddleware([{ "api_key": [] }]), function ActuatorReadMethods_getActuatorCommands(request, response, next) {
+    app.get('/api/v1/actuator/config/get', authenticateMiddleware([{ "api_key": [] }]), function ActuatorReadMethods_getActuatorConfigs(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-            limitToFirst: { "in": "path", "name": "limitToFirst", "required": true, "dataType": "double" },
         };
         let validatedArgs = [];
         try {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new actuatorReadMethods_1.ActuatorReadMethods();
-            const promise = controller.getActuatorCommands.apply(controller, validatedArgs);
+            const promise = controller.getActuatorConfigs.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {
             return next(err);
         }
     });
-    app.get('/api/v1/actuator/command/oldest/get', authenticateMiddleware([{ "api_key": [] }]), function ActuatorReadMethods_getOldestActuatorCommand(request, response, next) {
+    app.get('/api/v1/actuator/config/proposed/get', authenticateMiddleware([{ "api_key": [] }]), function ActuatorReadMethods_getProposedActuatorConfigs(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -258,7 +261,7 @@ function RegisterRoutes(app) {
         try {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new actuatorReadMethods_1.ActuatorReadMethods();
-            const promise = controller.getOldestActuatorCommand.apply(controller, validatedArgs);
+            const promise = controller.getProposedActuatorConfigs.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {
@@ -425,33 +428,34 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/actuator/:actuatorName/command/add', authenticateMiddleware([{ "api_key": [] }]), function ActuatorWriteMethods_addActuatorCommand(request, response, next) {
+    app.post('/api/v1/actuator/:actuatorName/config/update', authenticateMiddleware([{ "api_key": [] }]), function ActuatorWriteMethods_updateActuatorConfig(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             actuatorName: { "in": "path", "name": "actuatorName", "required": true, "dataType": "string" },
-            actuatorCommand: { "in": "body-prop", "name": "actuatorCommand", "required": true, "ref": "ActuatorCommand" },
+            actuatorConfig: { "in": "body-prop", "name": "actuatorConfig", "required": true, "ref": "ActuatorConfig" },
         };
         let validatedArgs = [];
         try {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new actuatorWriteMethods_1.ActuatorWriteMethods();
-            const promise = controller.addActuatorCommand.apply(controller, validatedArgs);
+            const promise = controller.updateActuatorConfig.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {
             return next(err);
         }
     });
-    app.patch('/api/v1/actuator/command/:id/resolve', authenticateMiddleware([{ "api_key": [] }]), function ActuatorWriteMethods_resolveActuatorCommand(request, response, next) {
+    app.patch('/api/v1/actuator/:actuatorName/config/proposed/update', authenticateMiddleware([{ "api_key": [] }]), function ActuatorWriteMethods_updateProposedActuatorConfig(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-            id: { "in": "path", "name": "id", "required": true, "dataType": "double" },
+            actuatorName: { "in": "path", "name": "actuatorName", "required": true, "dataType": "string" },
+            actuatorConfig: { "in": "body-prop", "name": "actuatorConfig", "required": true, "ref": "ActuatorConfig" },
         };
         let validatedArgs = [];
         try {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new actuatorWriteMethods_1.ActuatorWriteMethods();
-            const promise = controller.resolveActuatorCommand.apply(controller, validatedArgs);
+            const promise = controller.updateProposedActuatorConfig.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {

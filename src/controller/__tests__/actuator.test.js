@@ -15,13 +15,28 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commandFacade_1 = __importDefault(require("../commandFacade"));
 const queryFacade_1 = __importDefault(require("../queryFacade"));
 const testcases_json_1 = __importDefault(require("./testcases.json"));
+const databaseErrorEvent_1 = __importDefault(require("../../model/v1/events/databaseErrorEvent"));
+const constants_1 = require("../../constants");
 const testSetup_1 = __importDefault(require("../../utility/testSetup"));
 describe("Test actuator actions - Integration test", () => {
     const setup = new testSetup_1.default();
     const timeOut = testSetup_1.default.TIME_OUT;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         setup.init();
-    }), timeOut * Math.max(testcases_json_1.default.actuatorCommands.length, testcases_json_1.default.actuators.length));
+        for (const val of testcases_json_1.default.actuators) {
+            const event = yield commandFacade_1.default.actuator.addActuator(setup.getAccessToken(), val);
+            if (constants_1.TEST_SETUP_THROWS_ERROR && event instanceof databaseErrorEvent_1.default)
+                throw new Error("An error is raised: " + event.content.error);
+        }
+        for (const val of testcases_json_1.default.actuatorConfigs) {
+            const event = yield commandFacade_1.default.actuator.updateActuatorConfig(setup.getAccessToken(), val.actuatorName, val);
+            const proposedEvent = yield commandFacade_1.default.actuator.updateProposedActuatorConfig(setup.getAccessToken(), val.actuatorName, val);
+            if (constants_1.TEST_SETUP_THROWS_ERROR
+                && event instanceof databaseErrorEvent_1.default
+                && proposedEvent instanceof databaseErrorEvent_1.default)
+                throw new Error("An error is raised: " + event.content.error);
+        }
+    }), timeOut * Math.max(testcases_json_1.default.actuatorConfigs.length, testcases_json_1.default.actuators.length));
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.tearDown();
     }), timeOut * 4);
@@ -50,18 +65,28 @@ describe("Test actuator actions - Integration test", () => {
             throw new Error("Wrong type");
         expect(result[0].toJson()).toStrictEqual(testcases_json_1.default.actuators[randomIndex]);
     }), timeOut);
-    test("should get actuator commands from the database", () => __awaiter(void 0, void 0, void 0, function* () {
-        const result = yield actuatorRead.getActuatorCommands(setup.getAccessToken());
-        expect(result.length).toBe(testcases_json_1.default.actuatorCommands.length);
-        expect(result.length).toBeGreaterThan(0);
+    const on2_check = (list, other_list) => list.map(dto => {
+        const temp = other_list.find(val => val.actuatorName === dto.actuatorName);
+        if (!temp || temp.timeStamp !== dto.timeStamp)
+            return false;
+        if (temp.toggleConfig) {
+            expect(temp.toggleConfig).toStrictEqual(dto.toggleConfig);
+            return true;
+        }
+        if (temp.motorConfig && temp.timesPerDay) {
+            expect(temp.motorConfig).toStrictEqual(dto.motorConfig);
+            expect(temp.timesPerDay).toBe(dto.timesPerDay);
+            return true;
+        }
+        return false;
+    }).filter(x => x).length === list.length;
+    test("should get actuator configurations from the database", () => __awaiter(void 0, void 0, void 0, function* () {
+        const result = yield actuatorRead.getActuatorConfigs(setup.getAccessToken());
+        expect(on2_check(result, testcases_json_1.default.actuatorConfigs)).toBe(true);
     }), timeOut);
-    test("should resolve the oldest actuator command from the database", () => __awaiter(void 0, void 0, void 0, function* () {
-        const result = yield actuatorRead.getOldestActuatorCommand(setup.getAccessToken());
-        yield commandFacade_1.default.actuator.resolveActuatorCommand(setup.getAccessToken(), result.id);
-        const newCommand = yield actuatorRead.getOldestActuatorCommand(setup.getAccessToken());
-        expect(newCommand).not.toBe(result);
-        const newCommandList = yield actuatorRead.getActuatorCommands(setup.getAccessToken());
-        expect(newCommandList).not.toBe(testcases_json_1.default.actuatorCommands.length);
-    }));
+    test("should get actuator configurations from the database", () => __awaiter(void 0, void 0, void 0, function* () {
+        const result = yield actuatorRead.getProposedActuatorConfigs(setup.getAccessToken());
+        expect(on2_check(result, testcases_json_1.default.actuatorConfigs)).toBe(true);
+    }), timeOut);
 });
 //# sourceMappingURL=actuator.test.js.map

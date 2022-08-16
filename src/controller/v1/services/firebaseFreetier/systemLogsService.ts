@@ -79,9 +79,11 @@ const getLog = async(oldestTimestamp: number, path: string): Promise<any[]> => {
       ref.orderByChild("timeStamp").limitToLast(LOG_LINES),
       json => json.timeStamp >= oldestTimestamp
     )).unwrapOr([])
+    const len = temp.length
 
-    // merge old data with new data
-    result = result.slice(result.length - 1 - temp.length).concat(temp)
+    // merge old data with new data if it is below the threshold
+    if(len < LOG_LINES) result = result.slice(result.length - LOG_LINES + len).concat(temp)
+    else result = temp
   })
 
   return result

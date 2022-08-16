@@ -18,16 +18,15 @@ const databaseAddEvent_1 = __importDefault(require("../../../../model/v1/events/
 const databaseUpdateEvent_1 = __importDefault(require("../../../../model/v1/events/databaseUpdateEvent"));
 const firebaseService_1 = require("./firebaseService");
 const option_1 = require("../../../../model/patterns/option");
-const filterDatabaseEvent_1 = require("../../../../utility/filterDatabaseEvent");
-const databaseErrorEvent_1 = __importDefault(require("../../../../model/v1/events/databaseErrorEvent"));
 const shorthandOps_1 = require("../../../../utility/shorthandOps");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const realtimeActuator = "actuators";
-const realtimeActuatorCommand = "actuatorCommand";
-const commandIdKey = "actuatorCommandId";
+const realtimeActuatorConfig = "actuatorConfig";
+const realtimeActuatorConfigProposed = "actuatorConfigProposed";
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
 const firestoreActuator = "actuators";
-const firestoreActuatorCommand = "actuatorCommand";
+const firestoreActuatorConfig = "actuatorConfig";
+const firestoreActuatorConfigProposed = "actuatorConfigProposed";
 class ActuatorService {
     constructor(publisher) {
         this.publisher = publisher;
@@ -59,20 +58,24 @@ class ActuatorService {
             return result.map(arr => (0, option_1.Some)(actuatorDto_1.ActuatorDTO.fromJson(arr[0])));
         });
     }
-    getActuatorCommands(limitToFirst) {
+    getActuatorConfig() {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeActuatorCommand, "timeStamp", { limitToFirst });
-            constants_1.logger.debug(`${limitToFirst || ("All " + result.unwrapOr([]).length)} actuator command(s): ${result}`);
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeActuatorConfig);
+            constants_1.logger.debug(`Actuator config(s): ${result}`);
             return result.map(arr => {
-                const newArr = arr.map(json => actuatorDto_1.ActuatorCommandDTO.fromJson(json));
+                const newArr = arr.map(json => actuatorDto_1.ActuatorConfigDTO.fromJson(json));
                 return (0, option_1.Some)(newArr);
             });
         });
     }
-    getOldestActuatorCommand() {
+    getProposedActuatorConfig() {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield this.getActuatorCommands(1);
-            return result.map(arr => (0, option_1.Some)(arr.pop()));
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeActuatorConfigProposed);
+            constants_1.logger.debug(`Proposed actuator config(s): ${result}`);
+            return result.map(arr => {
+                const newArr = arr.map(json => actuatorDto_1.ActuatorConfigDTO.fromJson(json));
+                return (0, option_1.Some)(newArr);
+            });
         });
     }
     addActuator(actuator) {
@@ -137,91 +140,72 @@ class ActuatorService {
             }, databaseUpdateEvent_1.default);
         });
     }
-    addActuatorCommand(actuatorName, actuatorCommand) {
+    updateActuatorConfig(actuatorName, actuatorConfig) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield realtime.runTransaction(val => typeof (val) === 'number' ? val + 1 : 1, commandIdKey);
+            const updateContent = Object.assign({ actuatorName }, actuatorConfig);
             return yield (0, shorthandOps_1.createWriteEvent)({
-                data: Object.assign({ actuatorName }, actuatorCommand),
+                data: updateContent,
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const result = yield firestore.queryCollection(firestoreActuator, collectionRef => collectionRef.where("name", "==", actuatorName).get());
-                            if (result.empty)
-                                return Promise.reject("404Specified name does not match with anything in the database");
-                            yield firestore.addContentToCollection(firestoreActuatorCommand, Object.assign(Object.assign({ id: (yield realtime.getContent(commandIdKey)).val(), actuatorName }, actuatorCommand), { resolved: false }));
+                            const docPath = `${firestoreActuatorConfig}/${actuatorName}`;
+                            const result = yield firestore.getDocument(docPath);
+                            if (!result.exists) {
+                                yield firestore.setDocument(docPath, updateContent);
+                                return;
+                            }
+                            yield firestore.updateDocument(docPath, updateContent);
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const id = (yield realtime.getContent(commandIdKey)).val();
-                            if (typeof (id) !== 'number') {
-                                constants_1.logger.error("Could not get command id from firebase firestore storages");
-                                return Promise.reject("500Server side error");
+                            const path = `${realtimeActuatorConfig}/${actuatorName}`;
+                            const content = yield realtime.getContent(path);
+                            if (!content.exists()) {
+                                yield realtime.setContent(updateContent, path);
+                                return;
                             }
-                            yield realtime.pushContent(Object.assign({ id, actuatorName }, actuatorCommand), realtimeActuatorCommand);
+                            yield realtime.updateContent(updateContent, path);
                         });
                     }
                 },
                 publisher: this.publisher,
-                serverLogErrorMsg: "ActuatorService: DatabaseEvent filtration leads to all error ~ 190"
+                serverLogErrorMsg: "ActuatorService: DatabaseEvent filtration leads to all error ~ 225"
             }, databaseUpdateEvent_1.default);
         });
     }
-    resolveActuatorCommand(id) {
+    updateProposedActuatorConfig(actuatorName, actuatorConfig) {
         return __awaiter(this, void 0, void 0, function* () {
-            constants_1.logger.info(`Resolving an actuator command with id of ${id}`);
+            const updateContent = Object.assign({ actuatorName }, actuatorConfig);
             return yield (0, shorthandOps_1.createWriteEvent)({
-                data: id,
+                data: updateContent,
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const result = yield firestore.queryCollection(firestoreActuatorCommand, collectionRef => collectionRef.where("id", "==", id).get());
-                            if (result.empty)
-                                return Promise.reject(`404No actuator command is matched with id of ${id}`);
-                            yield firestore.runTransaction("", (_, t) => __awaiter(this, void 0, void 0, function* () {
-                                t.update(result.docs[0].ref, { resolved: true });
-                            }));
+                            const docPath = `${firestoreActuatorConfigProposed}/${actuatorName}`;
+                            const result = yield firestore.getDocument(docPath);
+                            if (!result.exists) {
+                                yield firestore.setDocument(docPath, updateContent);
+                                return;
+                            }
+                            yield firestore.updateDocument(docPath, updateContent);
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield realtime.getContent(realtimeActuatorCommand, (ref) => __awaiter(this, void 0, void 0, function* () {
-                                let isValid = false;
-                                let key = "";
-                                yield ref.orderByChild("id").equalTo(id).once('value', snapshot => {
-                                    constants_1.logger.info("Actuator service - Resolve command: Snapshot:" + snapshot.val());
-                                    if (isValid = snapshot.exists())
-                                        snapshot.forEach(child => { key = child.key; });
-                                });
-                                if (isValid && key) {
-                                    yield realtime.deleteContent(`${realtimeActuatorCommand}/${key}`);
-                                    return;
-                                }
-                                Promise.reject("404Wrong command id or the command has already been resolved");
-                            }));
+                            const path = `${realtimeActuatorConfigProposed}/${actuatorName}`;
+                            const content = yield realtime.getContent(path);
+                            if (!content.exists()) {
+                                yield realtime.setContent(updateContent, path);
+                                return;
+                            }
+                            yield realtime.updateContent(updateContent, path);
                         });
                     }
                 },
                 publisher: this.publisher,
-                serverLogErrorMsg: "ActuatorService: DatabaseEvent filtration leads to all error ~ 190"
+                serverLogErrorMsg: "ActuatorService: DatabaseEvent filtration leads to all error ~ 272"
             }, databaseUpdateEvent_1.default);
-            const event = new databaseUpdateEvent_1.default({
-                id,
-                protected: {
-                    firestore(_) {
-                        return __awaiter(this, void 0, void 0, function* () {
-                        });
-                    },
-                    realtime() {
-                        return __awaiter(this, void 0, void 0, function* () {
-                        });
-                    }
-                }
-            });
-            return (0, filterDatabaseEvent_1.filterDatabaseEvent)(yield this.publisher.notifyAsync(event)).unwrapOrElse(() => {
-                constants_1.logger.error("ActuatorService: DatabaseEvent filtration leads to all error ~ 299");
-                return new databaseErrorEvent_1.default("The action is failed to be executed", 400);
-            });
         });
     }
 }

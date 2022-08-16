@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { DATABASE_TIMEZONE } from "../../../constants";
 import { IterableJson, JsonConvertible } from "../../json";
-import { MotorCommand, ToggleCommand } from "../write/actuators";
+import { MotorConfig, ToggleConfig } from "../write/actuators";
 
 export class ActuatorDTO implements JsonConvertible {
   name: string;
@@ -30,49 +30,58 @@ export class ActuatorDTO implements JsonConvertible {
   }
 }
 
-export class ActuatorCommandDTO implements JsonConvertible {
-  id: number;
+export enum ActuatorConfigType {
+  TOGGLE,
+  MOTOR,
+  NONE
+}
+
+export class ActuatorConfigDTO implements JsonConvertible {
   actuatorName: string;
   timeStamp: number;
-  timesPerDay: number;
-  toggleCommand?: ToggleCommand;
-  motorCommand?: MotorCommand[];
-
+  type: ActuatorConfigType
+  timesPerDay?: number;
+  toggleConfig?: ToggleConfig;
+  motorConfig?: MotorConfig[];
+  
   constructor(
-    id: number, actuatorName: string,
+    actuatorName: string,
     timeStamp: number, timesPerDay: number,
-    toggleCommand: ToggleCommand, motorCommand: MotorCommand[]
+    toggleConfig: ToggleConfig, motorConfig: MotorConfig[]
   ){
-    this.id = id;
     this.actuatorName = actuatorName;
     this.timeStamp = timeStamp;
-    this.toggleCommand = toggleCommand;
-    this.motorCommand = motorCommand;
+    this.toggleConfig = toggleConfig;
+    this.motorConfig = motorConfig;
     this.timesPerDay = timesPerDay
+
+    // ensure that the type is correct for hardware side usage
+    if((timesPerDay === 0 || !motorConfig) && toggleConfig) this.type = ActuatorConfigType.TOGGLE
+    else if(!toggleConfig && timesPerDay > 0 && motorConfig) this.type = ActuatorConfigType.MOTOR
+    else this.type = ActuatorConfigType.NONE
   }
 
   toJson(): IterableJson {
     const json: IterableJson = {
-      id: this.id,
       actuatorName: this.actuatorName,
       timeStamp: this.timeStamp,
-      timesPerDay: this.timesPerDay
+      timesPerDay: this.timesPerDay,
+      type: this.type
     }
 
-    if(!this.motorCommand) json.toggleCommand = this.toggleCommand
-    if(!this.toggleCommand) json.motorCommand = this.motorCommand
+    if(!this.motorConfig) json.toggleConfig = this.toggleConfig
+    if(!this.toggleConfig) json.motorConfig = this.motorConfig
     return json
   }
 
   static fromJson(actuatorJson: IterableJson): JsonConvertible {
     const unixNow = DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
-    return new ActuatorCommandDTO(
-      typeof(actuatorJson.id) === 'number' ? actuatorJson.id : -1,
+    return new ActuatorConfigDTO(
       typeof(actuatorJson.actuatorName) === 'string' ? actuatorJson.actuatorName : "",
       typeof(actuatorJson.timeStamp) === 'number' ? actuatorJson.timeStamp : unixNow,
       typeof(actuatorJson.timesPerDay) === 'number' ? actuatorJson.timesPerDay : 0,
-      typeof(actuatorJson.toggleCommand) === 'object' ? actuatorJson.toggleCommand : null,
-      typeof(actuatorJson.motorCommand) === 'object' ? actuatorJson.motorCommand : null
+      typeof(actuatorJson.toggleConfig) === 'object' ? actuatorJson.toggleConfig : null,
+      typeof(actuatorJson.motorConfig) === 'object' ? actuatorJson.motorConfig : null
     )
   }
 }

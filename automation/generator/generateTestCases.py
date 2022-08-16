@@ -12,30 +12,18 @@ import json
 def chooseRandomlyInList(l: list):
   return l[randint(0, len(l) - 1)]
 
-def getUniqueNameFromList(targetList: list, outList: list, startRange: int, endRange: int, append = True):
-  name = chooseRandomlyInList(targetList)
-  uniqueName = name + str(randint(startRange, endRange))
-  while uniqueName in outList:
-    uniqueName = name + str(randint(startRange, endRange))
-  
-  if append: outList.append(uniqueName)
-  return uniqueName
-
 class Test1:
   def __init__(self):
     self.sensorNames = []
     self.actuatorNames = []
 
-  def sensor(self, template, generateFromKnownList = False):
+  def sensor(self, template):
     sampleSize = template["sampleSize"]
+    self.sensorNames = template["name"]
     return [{
-      "name": getUniqueNameFromList(template["name"], self.sensorNames, 1, sampleSize)
-        if not generateFromKnownList
-        else self.sensorNames[i],
-      "type": chooseRandomlyInList(template["type"])
-        if not generateFromKnownList
-        else sub("\d+", "", self.sensorNames[i]),
-      "isRunning": chooseRandomlyInList(template["isRunning"])
+      "name": template["name"][i],
+      "type": chooseRandomlyInList(template["type"]),
+      "isRunning": True#chooseRandomlyInList(template["isRunning"])
     } for i in range(0, sampleSize)]
 
   def sensorData(self, template):
@@ -47,40 +35,36 @@ class Test1:
       "timeStamp": randint(startDate, endDate)
     } for _ in range(0, sampleSize)]
 
-  def actuator(self, template, generateFromKnownList = False):
+  def actuator(self, template):
     sampleSize = template["sampleSize"]
+    self.actuatorNames = template["name"]
     return [{
-      "name": getUniqueNameFromList(template["name"], self.actuatorNames, 1, sampleSize)
-        if not generateFromKnownList
-        else self.actuatorNames[i],
-      "type": chooseRandomlyInList(template["type"])
-        if not generateFromKnownList
-        else sub("\d+", "", self.sensorNames[i]),
+      "name": template["name"][i],
+      "type": chooseRandomlyInList(template["type"]),
       "isRunning": chooseRandomlyInList(template["isRunning"])
     } for i in range(0, sampleSize)]
     
-  def actuatorCommands(self, template):
+  def actuatorConfig(self, template):
     result = []
-    sampleSize = template["sampleSize"]
     startDate, endDate = list(map(lambda x: int(x), template["timeStamp"].split('-')))
-    for _ in range(0, sampleSize):
-      commandDict = {
-        "actuatorName": chooseRandomlyInList(self.actuatorNames),
-        "timesPerDay": chooseRandomlyInList(template["timesPerDay"]),
+    for i in range(0, len(self.actuatorNames)):
+      configDict = {
+        "actuatorName": self.actuatorNames[i],
         "timeStamp": randint(startDate, endDate)
       }
 
       if randint(0, 1) == 0:
-        commandDict["toggleCommand"] = {
-          "state": chooseRandomlyInList(template["toggleCommand"]["state"])
+        configDict["toggleConfig"] = {
+          "state": chooseRandomlyInList(template["toggleConfig"]["state"])
         }
       else:
-        commandDict["motorCommand"] = [{
+        configDict["timesPerDay"] = chooseRandomlyInList(template["timesPerDay"])
+        configDict["motorConfig"] = [{
           "duration": randint(1, 10),
-          "isClockwise": chooseRandomlyInList(template["motorCommand"]["isClockwise"])
+          "isClockwise": chooseRandomlyInList(template["motorConfig"]["isClockwise"])
         } for _ in range(0, randint(1, 3))]
 
-      result.append(commandDict)
+      result.append(configDict)
 
     return result
 
@@ -97,7 +81,7 @@ class Test1:
       if currentEndDate > endDate: break
       template["sensorData"]["timeStamp"] = "{0}-{1}".format(startDate, currentEndDate)
       result.append({
-        "sensor": self.sensor(template["sensor"], True),
+        "sensor": self.sensor(template["sensor"]),
         "sensorData": self.sensorData(template["sensorData"])
       })
       startDate = currentEndDate + 1
@@ -150,7 +134,7 @@ class Test1:
         "sensors": self.sensor(template["sensor"]),
         "sensorData": self.sensorData(template["sensorData"]),
         "actuators": self.actuator(template["actuator"]),
-        "actuatorCommands": self.actuatorCommands(template["actuatorCommands"]),
+        "actuatorConfigs": self.actuatorConfig(template["actuatorConfigs"]),
         "sensorLogs": self.logs(template["sensorLogs"], self.getSensorLogs),
         "actuatorLogs": self.logs(template["actuatorLogs"], self.getActuatorLogs),
         "dataSaving": {

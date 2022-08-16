@@ -6,6 +6,7 @@ import FirebaseFirestoreService from "../database/firebase/services/firebaseFire
 import { persistentFirebaseConnection } from "../v1/services/firebaseFreetier/firebaseService";
 import { TEST_SETUP_THROWS_ERROR } from "../../constants";
 import TestSetup from "../../utility/testSetup";
+import { ActuatorConfigDTO } from "../../model/v1/read/actuatorDto";
 
 describe("Test actuator actions - Integration test", ()=>{
   const setup = new TestSetup()
@@ -15,18 +16,32 @@ describe("Test actuator actions - Integration test", ()=>{
     setup.init()
 
     // primitive testing
-    // for(const val of testCase.actuators) {
-    //   const event = await CommandFacade.actuator.addActuator(setup.getAccessToken(), val)
-    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-    //     throw new Error("An error is raised: " + event.content.error)
-    // }
+    for(const val of testCase.actuators) {
+      const event = await CommandFacade.actuator.addActuator(setup.getAccessToken(), val)
+      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+        throw new Error("An error is raised: " + event.content.error)
+    }
 
-    // for(const val of testCase.actuatorCommands) {
-    //   const event = await CommandFacade.actuator.addActuatorCommand(setup.getAccessToken(), val.actuatorName, val)
-    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-    //     throw new Error("An error is raised: " + event.content.error)
-    // }
-  }, timeOut * Math.max(testCase.actuatorCommands.length, testCase.actuators.length))
+    for(const val of testCase.actuatorConfigs) {
+      const event = await CommandFacade.actuator.updateActuatorConfig(
+        setup.getAccessToken(),
+        val.actuatorName,
+        val
+      )
+      const proposedEvent = await CommandFacade.actuator.updateProposedActuatorConfig(
+        setup.getAccessToken(),
+        val.actuatorName,
+        val
+      )
+      
+      if(TEST_SETUP_THROWS_ERROR
+      && event instanceof DatabaseErrorEvent
+      && proposedEvent instanceof DatabaseErrorEvent)
+        throw new Error("An error is raised: " + event.content.error)
+    }
+
+
+  }, timeOut * Math.max(testCase.actuatorConfigs.length, testCase.actuators.length))
 
   afterAll(async ()=>{
     // const fs = persistentFirebaseConnection.firestoreService as FirebaseFirestoreService
@@ -68,22 +83,31 @@ describe("Test actuator actions - Integration test", ()=>{
     expect(result[0].toJson()).toStrictEqual(testCase.actuators[randomIndex])
   }, timeOut)
 
-  // actuator data
+  // actuator config
 
-  test("should get actuator commands from the database", async ()=>{
-    const result = await actuatorRead.getActuatorCommands(setup.getAccessToken())
-    expect(result.length).toBe(testCase.actuatorCommands.length)
-    expect(result.length).toBeGreaterThan(0)
+  const on2_check = (list: ActuatorConfigDTO[], other_list: any[]) =>
+    list.map(dto => {
+      const temp = other_list.find(val => val.actuatorName === dto.actuatorName)
+      if(!temp || temp.timeStamp !== dto.timeStamp) return false
+      if(temp.toggleConfig) {
+        expect(temp.toggleConfig).toStrictEqual(dto.toggleConfig)
+        return true
+      }
+      if(temp.motorConfig && temp.timesPerDay) {
+        expect(temp.motorConfig).toStrictEqual(dto.motorConfig)
+        expect(temp.timesPerDay).toBe(dto.timesPerDay)
+        return true
+      }
+      return false
+    }).filter(x => x).length === list.length
+
+  test("should get actuator configurations from the database", async ()=>{
+    const result = await actuatorRead.getActuatorConfigs(setup.getAccessToken())
+    expect(on2_check(result, testCase.actuatorConfigs)).toBe(true)
   }, timeOut)
 
-  test("should resolve the oldest actuator command from the database", async ()=>{
-    const result = await actuatorRead.getOldestActuatorCommand(setup.getAccessToken())
-    await CommandFacade.actuator.resolveActuatorCommand(setup.getAccessToken(), result.id)
-
-    const newCommand = await actuatorRead.getOldestActuatorCommand(setup.getAccessToken())
-    expect(newCommand).not.toBe(result)
-
-    const newCommandList = await actuatorRead.getActuatorCommands(setup.getAccessToken())
-    expect(newCommandList).not.toBe(testCase.actuatorCommands.length)
-  })
+  test("should get actuator configurations from the database", async ()=>{
+    const result = await actuatorRead.getProposedActuatorConfigs(setup.getAccessToken())
+    expect(on2_check(result, testCase.actuatorConfigs)).toBe(true)
+  }, timeOut)
 })

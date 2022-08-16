@@ -4,7 +4,7 @@ import {
 import { logger } from "../../../../constants";
 import { apiPath } from "../../../../constants.config.json"
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
-import { Actuator, ActuatorCommand, UpdatingActuator } from "../../../../model/v1/write/actuators";
+import { Actuator, ActuatorConfig, UpdatingActuator } from "../../../../model/v1/write/actuators";
 import ActuatorService from "../../services/firebaseFreetier/actuatorService";
 import SystemLogsService from "../../services/firebaseFreetier/systemLogsService";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
@@ -60,16 +60,16 @@ export class ActuatorWriteMethods extends Controller {
     return getEvent(event)
   }
   
-  @Post("{actuatorName}/command/add")
-  async addActuatorCommand(
+  @Post("{actuatorName}/config/update")
+  async updateActuatorConfig(
     @Query() accessToken: string,
     @Path() actuatorName: string,
-    @BodyProp() actuatorCommand: ActuatorCommand
+    @BodyProp() actuatorConfig: ActuatorConfig
   ): Promise<DatabaseEvent> {
-    logger.info(`ActuatorWriteMethods: Adding actuator command to the database for actuator "${actuatorName}"`)
+    logger.info(`ActuatorWriteMethods: Updating config for actuator "${actuatorName}"`)
 
     // return appropriate status code from internal system
-    const event = await this.service.addActuatorCommand(actuatorName, actuatorCommand)
+    const event = await this.service.updateActuatorConfig(actuatorName, actuatorConfig)
     if(event instanceof DatabaseErrorEvent){
       this.setStatus(event.content.values.statusCode)
     }
@@ -77,15 +77,16 @@ export class ActuatorWriteMethods extends Controller {
     return getEvent(event)
   }
 
-  @Patch("command/{id}/resolve")
-  async resolveActuatorCommand(
+  @Patch("{actuatorName}/config/proposed/update")
+  async updateProposedActuatorConfig(
     @Query() accessToken: string,
-    @Path() id: number
+    @Path() actuatorName: string,
+    @BodyProp() actuatorConfig: ActuatorConfig
   ): Promise<DatabaseEvent> {
-    logger.info("ActuatorWriteMethods: Resolving actuator command to the database")
+    logger.info(`ActuatorWriteMethods: Updating config for actuator "${actuatorName}"`)
 
     // return appropriate status code from internal system
-    const event = await this.service.resolveActuatorCommand(id)
+    const event = await this.service.updateProposedActuatorConfig(actuatorName, actuatorConfig)
     if(event instanceof DatabaseErrorEvent){
       this.setStatus(event.content.values.statusCode)
     }

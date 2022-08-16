@@ -1,5 +1,5 @@
-import { ActuatorDTO, ActuatorCommandDTO } from "../../../../model/v1/read/actuatorDto";
-import { Actuator, ActuatorCommand, UpdatingActuator } from "../../../../model/v1/write/actuators";
+import { ActuatorDTO, ActuatorConfigDTO } from "../../../../model/v1/read/actuatorDto";
+import { Actuator, ActuatorConfig, UpdatingActuator } from "../../../../model/v1/write/actuators";
 import { ACTUATOR_LIMIT, logger } from "../../../../constants";
 import { PublisherImplementor } from "../../../../model/patterns/subscriptionImplementor";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
@@ -13,13 +13,13 @@ import { createWriteEvent, getRealtimeContent } from "../../../../utility/shorth
 
 const realtime = persistentFirebaseConnection.realtimeService
 const realtimeActuator = "actuators"
-const realtimeActuatorCommand = "actuatorCommand"
-
-const commandIdKey = "actuatorCommandId"
+const realtimeActuatorConfig = "actuatorConfig"
+const realtimeActuatorConfigProposed = "actuatorConfigProposed"
 
 const firestore = persistentFirebaseConnection.firestoreService
 const firestoreActuator = "actuators"
-const firestoreActuatorCommand = "actuatorCommand"
+const firestoreActuatorConfig = "actuatorConfig"
+const firestoreActuatorConfigProposed = "actuatorConfigProposed"
 
 export default class ActuatorService {
   private publisher: PublisherImplementor<DatabaseEvent>;
@@ -71,28 +71,32 @@ export default class ActuatorService {
   }
   
   /**
-   * Get all actuator commands that is pending to be executed irl
-   * @param limitToFirst From index 0 to this limit number exclusive, get all commands in the database
-   * @returns List of actuator commands
+   * Get all actuator configs that is pending to be executed irl
+   * @returns List of actuator configs
    */
-  async getActuatorCommands(limitToFirst?: number): Promise<Option<ActuatorCommandDTO[]>> {
-    let result: Option<any[]> = await getRealtimeContent(realtimeActuatorCommand, "timeStamp", { limitToFirst })
+  async getActuatorConfig(): Promise<Option<ActuatorConfigDTO[]>> {
+    let result: Option<any[]> = await getRealtimeContent(realtimeActuatorConfig)
 
-    logger.debug(`${limitToFirst || ("All " + result.unwrapOr([]).length)} actuator command(s): ${result}`)
+    logger.debug(`Actuator config(s): ${result}`)
     // converts all json into respective DTO
     return result.map(arr => {
-      const newArr = arr.map(json => ActuatorCommandDTO.fromJson(json) as ActuatorCommandDTO)
+      const newArr = arr.map(json => ActuatorConfigDTO.fromJson(json) as ActuatorConfigDTO)
       return Some(newArr)
     })
   }
-  
+
   /**
-   * Get the oldest actuator command that was pushed but not resolved (yet)
-   * @returns A sole actuator command which has the oldest timestamp out of the list
+   * This is for hardware side usage for fetching relevant data
    */
-  async getOldestActuatorCommand(): Promise<Option<ActuatorCommandDTO>> {
-    let result = await this.getActuatorCommands(1)
-    return result.map(arr => Some(arr.pop()))
+  async getProposedActuatorConfig(): Promise<Option<ActuatorConfigDTO[]>> {
+    let result: Option<any[]> = await getRealtimeContent(realtimeActuatorConfigProposed)
+
+    logger.debug(`Proposed actuator config(s): ${result}`)
+    // converts all json into respective DTO
+    return result.map(arr => {
+      const newArr = arr.map(json => ActuatorConfigDTO.fromJson(json) as ActuatorConfigDTO)
+      return Some(newArr)
+    })
   }
 
   /**
@@ -177,52 +181,51 @@ export default class ActuatorService {
   }
 
   /**
-   * Add a single actuator command to the database
+   * Add a single actuator config to the database
    * @param actuatorName Name of the actuator
-   * @param actuatorCommand An actuator command, related by name
+   * @param actuatorConfig An actuator config, related by name
    * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
    */
-  async addActuatorCommand(actuatorName: string, actuatorCommand: ActuatorCommand): Promise<DatabaseEvent> {
-    // set up cache for id
-    await realtime.runTransaction(val => typeof(val) === 'number' ? val + 1 : 1, commandIdKey)
+  async updateActuatorConfig(
+    actuatorName: string,
+    actuatorConfig: ActuatorConfig
+  ): Promise<DatabaseEvent> {
+    const updateContent = { actuatorName, ...actuatorConfig }
 
     return await createWriteEvent({
-      data: { actuatorName, ...actuatorCommand },
+      data: updateContent,
       protectedMethods: {
         async write(){
+          const docPath = `${firestoreActuatorConfig}/${actuatorName}`
           // check if the actuator is even in the database in the first place
-          const result = await firestore.queryCollection(
-            firestoreActuator,
-            collectionRef => collectionRef.where("name", "==", actuatorName).get()
-          )
+          const result = await firestore.getDocument(docPath)
 
-          if(result.empty)
-            return Promise.reject("404Specified name does not match with anything in the database")
+          if(!result.exists) {
+            // set the document if it is not already existed
+            await firestore.setDocument(docPath, updateContent)
+            return
+          }
 
-          // push new content to the commands collection
-          await firestore.addContentToCollection(
-            firestoreActuatorCommand,
-            {
-              id: (await realtime.getContent(commandIdKey)).val(),
-              actuatorName,
-              ...actuatorCommand,
-              resolved: false
-            })
+          // update the corresponding document
+          await firestore.updateDocument(docPath, updateContent)
         },
         async read(){
-          const id = (await realtime.getContent(commandIdKey)).val()
-          if(typeof(id) !== 'number') {
-            logger.error("Could not get command id from firebase firestore storages")
-            return Promise.reject("500Server side error")
+          // same logic as write method
+          const path = `${realtimeActuatorConfig}/${actuatorName}`
+          const content = await realtime.getContent(path)
+          if(!content.exists()){
+            await realtime.setContent(updateContent, path)
+            return
           }
-          await realtime.pushContent({ id, actuatorName, ...actuatorCommand }, realtimeActuatorCommand)
+
+          await realtime.updateContent(updateContent, path)
         }
       },
       publisher: this.publisher,
-      serverLogErrorMsg: "ActuatorService: DatabaseEvent filtration leads to all error ~ 190"
+      serverLogErrorMsg: "ActuatorService: DatabaseEvent filtration leads to all error ~ 225"
     }, DatabaseUpdateEvent)
   }
-
+  
   /**
    * When the command is received, resolve it so that query database removes that specific command.
    * 
@@ -230,66 +233,43 @@ export default class ActuatorService {
    * @param id Id of the actuator command, will be unique
    * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
    */
-  async resolveActuatorCommand(id: number): Promise<DatabaseEvent> {
-    logger.info(`Resolving an actuator command with id of ${id}`)
+   async updateProposedActuatorConfig(
+    actuatorName: string,
+    actuatorConfig: ActuatorConfig
+  ): Promise<DatabaseEvent> {  
+    const updateContent = { actuatorName, ...actuatorConfig }
 
     return await createWriteEvent({
-      data: id,
+      data: updateContent,
       protectedMethods: {
         async write(){
-          // check if the actuator is in the database in the first place
-          const result = await firestore.queryCollection(
-            firestoreActuatorCommand,
-            collectionRef => collectionRef.where("id", "==", id).get()
-          )
-          
-          if(result.empty) return Promise.reject(`404No actuator command is matched with id of ${id}`)
-          
-          // turn resolved to true instead of removing it
-          await firestore.runTransaction("", async (_, t) => {
-            t.update(result.docs[0].ref, { resolved: true })
-          })
+          const docPath = `${firestoreActuatorConfigProposed}/${actuatorName}`
+          // check if the actuator is even in the database in the first place
+          const result = await firestore.getDocument(docPath)
+
+          if(!result.exists) {
+            // set the document if it is not already existed
+            await firestore.setDocument(docPath, updateContent)
+            return
+          }
+
+          // update the corresponding document
+          await firestore.updateDocument(docPath, updateContent)
         },
         async read(){
-          // needs access to the actual reference
-          await realtime.getContent(realtimeActuatorCommand, async ref => {
-            let isValid = false
-            let key = ""
+          // same logic as write method
+          const path = `${realtimeActuatorConfigProposed}/${actuatorName}`
+          const content = await realtime.getContent(path)
+          if(!content.exists()){
+            await realtime.setContent(updateContent, path)
+            return
+          }
 
-            // more customisable and does not interfere with the base models
-            await ref.orderByChild("id").equalTo(id).once('value', snapshot => {
-              logger.info("Actuator service - Resolve command: Snapshot:" + snapshot.val())
-              // get child instead of parent snapshot
-              if(isValid = snapshot.exists()) snapshot.forEach(child => { key = child.key })
-            })
-            
-            // remove resolved commands in the realtime database
-            if(isValid && key) {
-              await realtime.deleteContent(`${realtimeActuatorCommand}/${key}`)
-              return
-            }
-            
-            Promise.reject("404Wrong command id or the command has already been resolved")
-          })
+          await realtime.updateContent(updateContent, path)
         }
       },
       publisher: this.publisher,
-      serverLogErrorMsg: "ActuatorService: DatabaseEvent filtration leads to all error ~ 190"
+      serverLogErrorMsg: "ActuatorService: DatabaseEvent filtration leads to all error ~ 272"
     }, DatabaseUpdateEvent)
-    const event = new DatabaseUpdateEvent({
-      id,
-      protected: {
-        async firestore(_: DatabaseEvent){
-        },
-        async realtime(){
-        }
-      }
-    })
-
-    // must have a publisher to add sensor, else an error will be thrown
-    return filterDatabaseEvent(await this.publisher.notifyAsync(event)).unwrapOrElse(()=>{
-      logger.error("ActuatorService: DatabaseEvent filtration leads to all error ~ 299")
-      return new DatabaseErrorEvent("The action is failed to be executed", 400)
-    })
   }
 }

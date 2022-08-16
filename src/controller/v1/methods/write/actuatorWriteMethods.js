@@ -53,20 +53,20 @@ let ActuatorWriteMethods = ActuatorWriteMethods_1 = class ActuatorWriteMethods e
             return getEvent(event);
         });
     }
-    addActuatorCommand(accessToken, actuatorName, actuatorCommand) {
+    updateActuatorConfig(accessToken, actuatorName, actuatorConfig) {
         return __awaiter(this, void 0, void 0, function* () {
-            constants_1.logger.info(`ActuatorWriteMethods: Adding actuator command to the database for actuator "${actuatorName}"`);
-            const event = yield this.service.addActuatorCommand(actuatorName, actuatorCommand);
+            constants_1.logger.info(`ActuatorWriteMethods: Updating config for actuator "${actuatorName}"`);
+            const event = yield this.service.updateActuatorConfig(actuatorName, actuatorConfig);
             if (event instanceof databaseErrorEvent_1.default) {
                 this.setStatus(event.content.values.statusCode);
             }
             return getEvent(event);
         });
     }
-    resolveActuatorCommand(accessToken, id) {
+    updateProposedActuatorConfig(accessToken, actuatorName, actuatorConfig) {
         return __awaiter(this, void 0, void 0, function* () {
-            constants_1.logger.info("ActuatorWriteMethods: Resolving actuator command to the database");
-            const event = yield this.service.resolveActuatorCommand(id);
+            constants_1.logger.info(`ActuatorWriteMethods: Updating config for actuator "${actuatorName}"`);
+            const event = yield this.service.updateProposedActuatorConfig(actuatorName, actuatorConfig);
             if (event instanceof databaseErrorEvent_1.default) {
                 this.setStatus(event.content.values.statusCode);
             }
@@ -85,16 +85,17 @@ __decorate([
     __param(1, (0, tsoa_1.BodyProp)())
 ], ActuatorWriteMethods.prototype, "updateActuator", null);
 __decorate([
-    (0, tsoa_1.Post)("{actuatorName}/command/add"),
+    (0, tsoa_1.Post)("{actuatorName}/config/update"),
     __param(0, (0, tsoa_1.Query)()),
     __param(1, (0, tsoa_1.Path)()),
     __param(2, (0, tsoa_1.BodyProp)())
-], ActuatorWriteMethods.prototype, "addActuatorCommand", null);
+], ActuatorWriteMethods.prototype, "updateActuatorConfig", null);
 __decorate([
-    (0, tsoa_1.Patch)("command/{id}/resolve"),
+    (0, tsoa_1.Patch)("{actuatorName}/config/proposed/update"),
     __param(0, (0, tsoa_1.Query)()),
-    __param(1, (0, tsoa_1.Path)())
-], ActuatorWriteMethods.prototype, "resolveActuatorCommand", null);
+    __param(1, (0, tsoa_1.Path)()),
+    __param(2, (0, tsoa_1.BodyProp)())
+], ActuatorWriteMethods.prototype, "updateProposedActuatorConfig", null);
 ActuatorWriteMethods = ActuatorWriteMethods_1 = __decorate([
     (0, tsoa_1.Security)("api_key"),
     (0, tsoa_1.Route)(`api/v1/actuator`),

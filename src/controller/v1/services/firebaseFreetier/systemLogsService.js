@@ -66,7 +66,11 @@ const getLog = (oldestTimestamp, path) => __awaiter(void 0, void 0, void 0, func
     })).unwrapOr([]);
     yield realtime.getContent(path, (ref) => __awaiter(void 0, void 0, void 0, function* () {
         const temp = (yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild("timeStamp").limitToLast(constants_1.LOG_LINES), json => json.timeStamp >= oldestTimestamp)).unwrapOr([]);
-        result = result.slice(result.length - 1 - temp.length).concat(temp);
+        const len = temp.length;
+        if (len < constants_1.LOG_LINES)
+            result = result.slice(result.length - constants_1.LOG_LINES + len).concat(temp);
+        else
+            result = temp;
     }));
     return result;
 });

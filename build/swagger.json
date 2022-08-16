@@ -26,8 +26,16 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ToggleCommand": {
-				"description": "Command representation for toggle-based actuator (air pump)",
+			"ActuatorConfigType": {
+				"enum": [
+					0,
+					1,
+					2
+				],
+				"type": "number"
+			},
+			"ToggleConfig": {
+				"description": "Configuration representation for toggle-based actuator (air pump)",
 				"properties": {
 					"state": {
 						"type": "boolean"
@@ -39,8 +47,8 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"MotorCommand": {
-				"description": "Command representation for motor action, requested by Alex",
+			"MotorConfig": {
+				"description": "Configuration for motor action, requested by Alex",
 				"properties": {
 					"duration": {
 						"type": "number",
@@ -57,12 +65,8 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ActuatorCommandDTO": {
+			"ActuatorConfigDTO": {
 				"properties": {
-					"id": {
-						"type": "number",
-						"format": "double"
-					},
 					"actuatorName": {
 						"type": "string"
 					},
@@ -70,25 +74,27 @@
 						"type": "number",
 						"format": "double"
 					},
+					"type": {
+						"$ref": "#/components/schemas/ActuatorConfigType"
+					},
 					"timesPerDay": {
 						"type": "number",
 						"format": "double"
 					},
-					"toggleCommand": {
-						"$ref": "#/components/schemas/ToggleCommand"
+					"toggleConfig": {
+						"$ref": "#/components/schemas/ToggleConfig"
 					},
-					"motorCommand": {
+					"motorConfig": {
 						"items": {
-							"$ref": "#/components/schemas/MotorCommand"
+							"$ref": "#/components/schemas/MotorConfig"
 						},
 						"type": "array"
 					}
 				},
 				"required": [
-					"id",
 					"actuatorName",
 					"timeStamp",
-					"timesPerDay"
+					"type"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -293,18 +299,18 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"ActuatorCommand": {
+			"ActuatorConfig": {
 				"properties": {
 					"timeStamp": {
 						"type": "number",
 						"format": "double"
 					},
-					"toggleCommand": {
-						"$ref": "#/components/schemas/ToggleCommand"
+					"toggleConfig": {
+						"$ref": "#/components/schemas/ToggleConfig"
 					},
-					"motorCommand": {
+					"motorConfig": {
 						"items": {
-							"$ref": "#/components/schemas/MotorCommand"
+							"$ref": "#/components/schemas/MotorConfig"
 						},
 						"type": "array"
 					},
@@ -314,8 +320,7 @@
 					}
 				},
 				"required": [
-					"timeStamp",
-					"timesPerDay"
+					"timeStamp"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -527,9 +532,9 @@
 				]
 			}
 		},
-		"/api/v1/actuator/command/all/get/{limitToFirst}": {
+		"/api/v1/actuator/config/get": {
 			"get": {
-				"operationId": "GetActuatorCommands",
+				"operationId": "GetActuatorConfigs",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -537,7 +542,7 @@
 							"application/json": {
 								"schema": {
 									"items": {
-										"$ref": "#/components/schemas/ActuatorCommandDTO"
+										"$ref": "#/components/schemas/ActuatorConfigDTO"
 									},
 									"type": "array"
 								}
@@ -567,34 +572,23 @@
 						"schema": {
 							"type": "string"
 						}
-					},
-					{
-						"in": "path",
-						"name": "limitToFirst",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
 					}
 				]
 			}
 		},
-		"/api/v1/actuator/command/oldest/get": {
+		"/api/v1/actuator/config/proposed/get": {
 			"get": {
-				"operationId": "GetOldestActuatorCommand",
+				"operationId": "GetProposedActuatorConfigs",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/ActuatorCommandDTO"
-										}
-									],
-									"nullable": true
+									"items": {
+										"$ref": "#/components/schemas/ActuatorConfigDTO"
+									},
+									"type": "array"
 								}
 							}
 						}
@@ -1128,9 +1122,9 @@
 				]
 			}
 		},
-		"/api/v1/actuator/{actuatorName}/command/add": {
+		"/api/v1/actuator/{actuatorName}/config/update": {
 			"post": {
-				"operationId": "AddActuatorCommand",
+				"operationId": "UpdateActuatorConfig",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1183,9 +1177,9 @@
 				]
 			}
 		},
-		"/api/v1/actuator/command/{id}/resolve": {
+		"/api/v1/actuator/{actuatorName}/config/proposed/update": {
 			"patch": {
-				"operationId": "ResolveActuatorCommand",
+				"operationId": "UpdateProposedActuatorConfig",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1229,11 +1223,10 @@
 					},
 					{
 						"in": "path",
-						"name": "id",
+						"name": "actuatorName",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]

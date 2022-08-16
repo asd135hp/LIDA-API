@@ -50,23 +50,23 @@ let ActuatorReadMethods = class ActuatorReadMethods extends tsoa_1.Controller {
             }));
         });
     }
-    getActuatorCommands(accessToken, limitToFirst) {
+    getActuatorConfigs(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            constants_1.logger.info("ActuatorReadMethods: Getting actuator commands from the database");
-            const option = yield new actuatorService_1.default().getActuatorCommands(limitToFirst);
+            constants_1.logger.info("ActuatorReadMethods: Getting actuator configs from the database");
+            const option = yield new actuatorService_1.default().getActuatorConfig();
             return option.unwrapOrElse(() => {
                 this.setStatus(408);
                 return [];
             });
         });
     }
-    getOldestActuatorCommand(accessToken) {
+    getProposedActuatorConfigs(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            constants_1.logger.info("ActuatorReadMethods: Getting oldest actuator command from the database");
-            const option = yield new actuatorService_1.default().getOldestActuatorCommand();
+            constants_1.logger.info("ActuatorReadMethods: Getting proposed actuator configs from the database");
+            const option = yield new actuatorService_1.default().getProposedActuatorConfig();
             return option.unwrapOrElse(() => {
                 this.setStatus(408);
-                return null;
+                return [];
             });
         });
     }
@@ -81,14 +81,13 @@ __decorate([
     __param(1, (0, tsoa_1.Path)())
 ], ActuatorReadMethods.prototype, "getCategorizedActuators", null);
 __decorate([
-    (0, tsoa_1.Get)("command/all/get/{limitToFirst}"),
-    __param(0, (0, tsoa_1.Query)()),
-    __param(1, (0, tsoa_1.Path)())
-], ActuatorReadMethods.prototype, "getActuatorCommands", null);
-__decorate([
-    (0, tsoa_1.Get)("command/oldest/get"),
+    (0, tsoa_1.Get)("config/get"),
     __param(0, (0, tsoa_1.Query)())
-], ActuatorReadMethods.prototype, "getOldestActuatorCommand", null);
+], ActuatorReadMethods.prototype, "getActuatorConfigs", null);
+__decorate([
+    (0, tsoa_1.Get)("config/proposed/get"),
+    __param(0, (0, tsoa_1.Query)())
+], ActuatorReadMethods.prototype, "getProposedActuatorConfigs", null);
 ActuatorReadMethods = __decorate([
     (0, tsoa_1.Security)("api_key"),
     (0, tsoa_1.Route)(`api/v1/actuator`),

@@ -13,24 +13,24 @@ export interface UpdatingActuator {
 /**
  * 
  */
-export interface ActuatorCommand {
+export interface ActuatorConfig {
 	timeStamp: number;
-  toggleCommand?: ToggleCommand;
-  motorCommand?: MotorCommand[];
-  timesPerDay: number
+  toggleConfig?: ToggleConfig;
+  motorConfig?: MotorConfig[];
+  timesPerDay?: number;
 }
 
 /**
- * Command representation for toggle-based actuator (air pump)
+ * Configuration representation for toggle-based actuator (air pump)
  */
-export interface ToggleCommand {
+export interface ToggleConfig {
   state: boolean
 }
 
 /**
- * Command representation for motor action, requested by Alex
+ * Configuration for motor action, requested by Alex
  */
-export interface MotorCommand {
+export interface MotorConfig {
   duration: number;
   isClockwise: boolean;
 }

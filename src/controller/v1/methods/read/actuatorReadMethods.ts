@@ -1,6 +1,6 @@
-import { Get, Route, SuccessResponse, Response, Controller, Path, Security, Request, Header, Query } from "tsoa";
+import { Get, Route, SuccessResponse, Response, Controller, Path, Security, Query } from "tsoa";
 import { logger } from "../../../../constants";
-import { ActuatorDTO, ActuatorCommandDTO } from "../../../../model/v1/read/actuatorDto";
+import { ActuatorDTO, ActuatorConfigDTO } from "../../../../model/v1/read/actuatorDto";
 import ActuatorService from "../../services/firebaseFreetier/actuatorService";
 
 @Security("api_key")
@@ -40,14 +40,11 @@ export class ActuatorReadMethods extends Controller {
     })
   }
 
-  @Get("command/all/get/{limitToFirst}")
-  async getActuatorCommands(
-    @Query() accessToken: string,
-    @Path() limitToFirst?: number
-  ): Promise<ActuatorCommandDTO[]> {
-    logger.info("ActuatorReadMethods: Getting actuator commands from the database")
+  @Get("config/get")
+  async getActuatorConfigs(@Query() accessToken: string): Promise<ActuatorConfigDTO[]> {
+    logger.info("ActuatorReadMethods: Getting actuator configs from the database")
 
-    const option = await new ActuatorService().getActuatorCommands(limitToFirst)
+    const option = await new ActuatorService().getActuatorConfig()
     return option.unwrapOrElse(()=>{
       // data is null here means that the database is failing to provide us information
       this.setStatus(408)
@@ -55,17 +52,15 @@ export class ActuatorReadMethods extends Controller {
     })
   }
 
-  @Get("command/oldest/get")
-  async getOldestActuatorCommand(
-    @Query() accessToken: string
-  ): Promise<ActuatorCommandDTO | null> {
-    logger.info("ActuatorReadMethods: Getting oldest actuator command from the database")
+  @Get("config/proposed/get")
+  async getProposedActuatorConfigs(@Query() accessToken: string): Promise<ActuatorConfigDTO[]> {
+    logger.info("ActuatorReadMethods: Getting proposed actuator configs from the database")
 
-    const option = await new ActuatorService().getOldestActuatorCommand()
+    const option = await new ActuatorService().getProposedActuatorConfig()
     return option.unwrapOrElse(()=>{
       // data is null here means that the database is failing to provide us information
       this.setStatus(408)
-      return null
+      return []
     })
   }
 }

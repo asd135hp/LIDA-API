@@ -16,17 +16,17 @@ describe("Test sensor actions - Integration test", ()=>{
     await setup.init()
 
     // primitive testing
-    // for(const val of testCase.sensors) {
-    //   const event = await CommandFacade.sensor.addSensor(setup.getAccessToken(), val)
-    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-    //     throw new Error("An error is raised: " + event.content.error)
-    // }
+    for(const val of testCase.sensors) {
+      const event = await CommandFacade.sensor.addSensor(setup.getAccessToken(), val)
+      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+        throw new Error("An error is raised: " + event.content.error)
+    }
 
-    // for(const val of testCase.sensorData) {
-    //   const event = await CommandFacade.sensor.addSensorData(setup.getAccessToken(), val.sensorName, val)
-    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-    //     throw new Error("An error is raised: " + event.content.error)
-    // }
+    for(const val of testCase.sensorData) {
+      const event = await CommandFacade.sensor.addSensorData(setup.getAccessToken(), val.sensorName, val)
+      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+        throw new Error("An error is raised: " + event.content.error)
+    }
   }, timeOut * Math.max(testCase.sensorData.length, testCase.sensors.length))
 
   afterAll(async ()=>{

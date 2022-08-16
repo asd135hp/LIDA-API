@@ -1,30 +1,36 @@
 {
   "test1": {
     "sensor": {
-      "name": ["Temperature", "Moisture", "Carbon dioxide", "Oxygen"],
+      "name": [
+        "TempActive1Sensor1", "TempActive1Sensor2", "TempActive2Sensor1",
+        "TempActive2Sensor2", "TempCuringSensor1", "TempCuringSensor2",
+        "TempCuringSensor3", "TempCuringSensor4", "MoistActive1Sensor1",
+        "MoistActive1Sensor2", "MoistActive2Sensor1", "MoistActive2Sensor2",
+        "MoistCuringSensor1", "MoistCuringSensor2", "O2ExhaustSensor1",
+        "CH4ExhaustSensor1", "CO2ExhaustSensor1"
+      ],
       "type": ["Temperature", "Moisture", "Carbon dioxide", "Oxygen"],
       "isRunning": [false, true],
-      "sampleSize": 16
+      "sampleSize": 17
     },
     "sensorData": {
       "sensorName": "sensor.name",
       "value": "random",
-      "timeStamp": "1609459200-1640995200",
+      "timeStamp": "1659916800-1661126400",
       "sampleSize": 100
     },
     "actuator": {
-      "name": ["Motor", "Air pump"],
+      "name": ["Motor1", "Motor2", "Air pump1", "Air pump2", "Air pump3", "Air pump4"],
       "type": ["Motor", "Air pump"],
       "isRunning": [false, true],
-      "sampleSize": 8
+      "sampleSize": 6
     },
-    "actuatorCommands": {
+    "actuatorConfigs": {
       "actuatorName": "actuator.name",
       "timesPerDay": [1, 2, 3],
-      "timeStamp": "1609459200-1640995200",
-      "toggleCommand": { "state": [false, true] },
-      "motorCommand": { "duration": "random", "isClockwise": [false, true] },
-      "sampleSize": 100
+      "timeStamp": "1659916800-1661126400",
+      "toggleConfig": { "state": [false, true] },
+      "motorConfig": { "duration": "random", "isClockwise": [false, true] }
     },
     "sensorLogs": {
       "content": ["Sensor \"sensor.name\" is working properly"],
@@ -37,7 +43,14 @@
     "dataSaving": {
       "sensor": {
         "sensor": {
-          "name": ["Temperature", "Moisture", "Carbon dioxide", "Oxygen"],
+          "name": [
+            "TempActive1Sensor1", "TempActive1Sensor2", "TempActive2Sensor1",
+            "TempActive2Sensor2", "TempCuringSensor1", "TempCuringSensor2",
+            "TempCuringSensor3", "TempCuringSensor4", "MoistActive1Sensor1",
+            "MoistActive1Sensor2", "MoistActive2Sensor1", "MoistActive2Sensor2",
+            "MoistCuringSensor1", "MoistCuringSensor2", "O2ExhaustSensor1",
+            "CH4ExhaustSensor1", "CO2ExhaustSensor1"
+          ],
           "type": ["Temperature", "Moisture", "Carbon dioxide", "Oxygen"],
           "isRunning": [false, true],
           "sampleSize": 16
@@ -48,7 +61,7 @@
           "sampleSize": 100
         },
         "sampleSize": 10,
-        "timeStamp": "1609459200-1640995200"
+        "timeStamp": "1609459200-1659916800"
       },
       "logs": {
         "sensor": {
@@ -60,7 +73,7 @@
           "sampleSize": 100
         },
         "sampleSize": 10,
-        "timeStamp": "1609459200-1640995200"
+        "timeStamp": "1609459200-1659916800"
       }
     }
   }

@@ -42,7 +42,12 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ToggleCommand": {
+    "ActuatorConfigType": {
+        "dataType": "refEnum",
+        "enums": [0,1,2],
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "ToggleConfig": {
         "dataType": "refObject",
         "properties": {
             "state": {"dataType":"boolean","required":true},
@@ -50,7 +55,7 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "MotorCommand": {
+    "MotorConfig": {
         "dataType": "refObject",
         "properties": {
             "duration": {"dataType":"double","required":true},
@@ -59,15 +64,15 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ActuatorCommandDTO": {
+    "ActuatorConfigDTO": {
         "dataType": "refObject",
         "properties": {
-            "id": {"dataType":"double","required":true},
             "actuatorName": {"dataType":"string","required":true},
             "timeStamp": {"dataType":"double","required":true},
-            "timesPerDay": {"dataType":"double","required":true},
-            "toggleCommand": {"ref":"ToggleCommand"},
-            "motorCommand": {"dataType":"array","array":{"dataType":"refObject","ref":"MotorCommand"}},
+            "type": {"ref":"ActuatorConfigType","required":true},
+            "timesPerDay": {"dataType":"double"},
+            "toggleConfig": {"ref":"ToggleConfig"},
+            "motorConfig": {"dataType":"array","array":{"dataType":"refObject","ref":"MotorConfig"}},
         },
         "additionalProperties": false,
     },
@@ -174,13 +179,13 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "ActuatorCommand": {
+    "ActuatorConfig": {
         "dataType": "refObject",
         "properties": {
             "timeStamp": {"dataType":"double","required":true},
-            "toggleCommand": {"ref":"ToggleCommand"},
-            "motorCommand": {"dataType":"array","array":{"dataType":"refObject","ref":"MotorCommand"}},
-            "timesPerDay": {"dataType":"double","required":true},
+            "toggleConfig": {"ref":"ToggleConfig"},
+            "motorConfig": {"dataType":"array","array":{"dataType":"refObject","ref":"MotorConfig"}},
+            "timesPerDay": {"dataType":"double"},
         },
         "additionalProperties": false,
     },
@@ -287,13 +292,12 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/api/v1/actuator/command/all/get/:limitToFirst',
+        app.get('/api/v1/actuator/config/get',
             authenticateMiddleware([{"api_key":[]}]),
 
-            function ActuatorReadMethods_getActuatorCommands(request: any, response: any, next: any) {
+            function ActuatorReadMethods_getActuatorConfigs(request: any, response: any, next: any) {
             const args = {
                     accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-                    limitToFirst: {"in":"path","name":"limitToFirst","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -305,17 +309,17 @@ export function RegisterRoutes(app: express.Router) {
                 const controller = new ActuatorReadMethods();
 
 
-              const promise = controller.getActuatorCommands.apply(controller, validatedArgs as any);
+              const promise = controller.getActuatorConfigs.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/api/v1/actuator/command/oldest/get',
+        app.get('/api/v1/actuator/config/proposed/get',
             authenticateMiddleware([{"api_key":[]}]),
 
-            function ActuatorReadMethods_getOldestActuatorCommand(request: any, response: any, next: any) {
+            function ActuatorReadMethods_getProposedActuatorConfigs(request: any, response: any, next: any) {
             const args = {
                     accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
             };
@@ -329,7 +333,7 @@ export function RegisterRoutes(app: express.Router) {
                 const controller = new ActuatorReadMethods();
 
 
-              const promise = controller.getOldestActuatorCommand.apply(controller, validatedArgs as any);
+              const promise = controller.getProposedActuatorConfigs.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
@@ -586,14 +590,14 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v1/actuator/:actuatorName/command/add',
+        app.post('/api/v1/actuator/:actuatorName/config/update',
             authenticateMiddleware([{"api_key":[]}]),
 
-            function ActuatorWriteMethods_addActuatorCommand(request: any, response: any, next: any) {
+            function ActuatorWriteMethods_updateActuatorConfig(request: any, response: any, next: any) {
             const args = {
                     accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
                     actuatorName: {"in":"path","name":"actuatorName","required":true,"dataType":"string"},
-                    actuatorCommand: {"in":"body-prop","name":"actuatorCommand","required":true,"ref":"ActuatorCommand"},
+                    actuatorConfig: {"in":"body-prop","name":"actuatorConfig","required":true,"ref":"ActuatorConfig"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -605,20 +609,21 @@ export function RegisterRoutes(app: express.Router) {
                 const controller = new ActuatorWriteMethods();
 
 
-              const promise = controller.addActuatorCommand.apply(controller, validatedArgs as any);
+              const promise = controller.updateActuatorConfig.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.patch('/api/v1/actuator/command/:id/resolve',
+        app.patch('/api/v1/actuator/:actuatorName/config/proposed/update',
             authenticateMiddleware([{"api_key":[]}]),
 
-            function ActuatorWriteMethods_resolveActuatorCommand(request: any, response: any, next: any) {
+            function ActuatorWriteMethods_updateProposedActuatorConfig(request: any, response: any, next: any) {
             const args = {
                     accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-                    id: {"in":"path","name":"id","required":true,"dataType":"double"},
+                    actuatorName: {"in":"path","name":"actuatorName","required":true,"dataType":"string"},
+                    actuatorConfig: {"in":"body-prop","name":"actuatorConfig","required":true,"ref":"ActuatorConfig"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -630,7 +635,7 @@ export function RegisterRoutes(app: express.Router) {
                 const controller = new ActuatorWriteMethods();
 
 
-              const promise = controller.resolveActuatorCommand.apply(controller, validatedArgs as any);
+              const promise = controller.updateProposedActuatorConfig.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

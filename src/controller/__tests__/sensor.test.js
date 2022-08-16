@@ -12,14 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const commandFacade_1 = __importDefault(require("../commandFacade"));
 const queryFacade_1 = __importDefault(require("../queryFacade"));
 const testcases_json_1 = __importDefault(require("./testcases.json"));
+const databaseErrorEvent_1 = __importDefault(require("../../model/v1/events/databaseErrorEvent"));
+const constants_1 = require("../../constants");
 const testSetup_1 = __importDefault(require("../../utility/testSetup"));
 describe("Test sensor actions - Integration test", () => {
     const setup = new testSetup_1.default();
     const timeOut = testSetup_1.default.TIME_OUT;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.init();
+        for (const val of testcases_json_1.default.sensors) {
+            const event = yield commandFacade_1.default.sensor.addSensor(setup.getAccessToken(), val);
+            if (constants_1.TEST_SETUP_THROWS_ERROR && event instanceof databaseErrorEvent_1.default)
+                throw new Error("An error is raised: " + event.content.error);
+        }
+        for (const val of testcases_json_1.default.sensorData) {
+            const event = yield commandFacade_1.default.sensor.addSensorData(setup.getAccessToken(), val.sensorName, val);
+            if (constants_1.TEST_SETUP_THROWS_ERROR && event instanceof databaseErrorEvent_1.default)
+                throw new Error("An error is raised: " + event.content.error);
+        }
     }), timeOut * Math.max(testcases_json_1.default.sensorData.length, testcases_json_1.default.sensors.length));
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.tearDown();

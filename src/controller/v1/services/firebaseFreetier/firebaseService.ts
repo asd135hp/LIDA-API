@@ -73,4 +73,7 @@ export default class FirebaseService {
 
 // seems redundant but actually saves some performance
 // this should be the sole service for our system
+// NOTE: Since I always forget this detail:
+// The firebasePathConfig will automatically make the library start at collection level
+// do not be confused
 export const persistentFirebaseConnection = new FirebaseService(FirebaseServiceType.ALL, firebasePathConfig)

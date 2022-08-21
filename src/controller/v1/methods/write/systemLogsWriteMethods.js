@@ -53,6 +53,16 @@ let SystemLogsWriteMethods = SystemLogsWriteMethods_1 = class SystemLogsWriteMet
             return getEvent(event);
         });
     }
+    addSystemCommandLog(accessToken, logContent) {
+        return __awaiter(this, void 0, void 0, function* () {
+            constants_1.logger.info("SystemLogsWriteMethods: Adding system command log to the database");
+            const event = yield this.service.addSystemCommandLog({ logContent });
+            if (event instanceof databaseErrorEvent_1.default) {
+                this.setStatus(event.content.values.statusCode);
+            }
+            return getEvent(event);
+        });
+    }
 };
 __decorate([
     (0, tsoa_1.Post)("sensor/add"),
@@ -64,6 +74,11 @@ __decorate([
     __param(0, (0, tsoa_1.Query)()),
     __param(1, (0, tsoa_1.BodyProp)())
 ], SystemLogsWriteMethods.prototype, "addActuatorLog", null);
+__decorate([
+    (0, tsoa_1.Post)("systemCommand/add"),
+    __param(0, (0, tsoa_1.Query)()),
+    __param(1, (0, tsoa_1.BodyProp)())
+], SystemLogsWriteMethods.prototype, "addSystemCommandLog", null);
 SystemLogsWriteMethods = SystemLogsWriteMethods_1 = __decorate([
     (0, tsoa_1.Route)(`api/v1/log`),
     (0, tsoa_1.SuccessResponse)(200, "Ok"),

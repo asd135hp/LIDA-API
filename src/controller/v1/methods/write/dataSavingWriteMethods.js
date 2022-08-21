@@ -39,83 +39,6 @@ let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMet
         this.service = DataSavingWriteMethods_1.mainService;
     }
     get currentUnixTimestamp() { return luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger(); }
-    saveSensorSnapshot(accessToken, sensor, sensorData, startDate, endDate) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const t = (0, helper_1.getDateRangeString)({ startDate, endDate });
-            constants_1.logger.info(`DataSavingWriteMethods: Saving sensor snapshot to the storage from ${t.start} to ${t.end}`);
-            const event = yield this.service.uploadSensorSnapshot({
-                sensor: JSON.parse(sensor),
-                sensorData: JSON.parse(sensorData)
-            }, { startDate, endDate });
-            if (event instanceof databaseErrorEvent_1.default) {
-                this.setStatus(event.content.values.statusCode);
-            }
-            return getEvent(event);
-        });
-    }
-    saveLogSnapshot(accessToken, actuatorLogs, sensorLogs, startDate, endDate) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const t = (0, helper_1.getDateRangeString)({ startDate, endDate });
-            constants_1.logger.info(`DataSavingWriteMethods: Saving log snapshot to the storage from ${t.start} to ${t.end}`);
-            const event = yield this.service.uploadLogSnapshot({
-                sensor: JSON.parse(sensorLogs),
-                actuator: JSON.parse(actuatorLogs)
-            }, { startDate, endDate });
-            if (event instanceof databaseErrorEvent_1.default) {
-                this.setStatus(event.content.values.statusCode);
-            }
-            return getEvent(event);
-        });
-    }
-    saveDailySensorSnapshot(accessToken) {
-        return __awaiter(this, void 0, void 0, function* () {
-            constants_1.logger.info("DataSavingWriteMethods: Saving daily sensor snapshot to the storage");
-            const now = this.currentUnixTimestamp;
-            const dateRange = { startDate: now - 3600 * 24, endDate: now };
-            const event = yield this.service.uploadSensorSnapshot({
-                sensor: yield firestore.getCollection("sensors").then(result => result.docs.map(doc => doc.data())),
-                sensorData: yield firestore.getCollection("sensorData").then(result => result.docs.map(doc => doc.data()))
-            }, dateRange);
-            if (event instanceof databaseErrorEvent_1.default) {
-                this.setStatus(event.content.values.statusCode);
-            }
-            else {
-                yield firestore.deleteCollection("sensorData");
-                yield realtime.deleteContent("sensorData");
-            }
-            return getEvent(event);
-        });
-    }
-    saveDailyLogSnapshot(accessToken) {
-        return __awaiter(this, void 0, void 0, function* () {
-            constants_1.logger.info("DataSavingWriteMethods: Saving daily logs snapshot to the storage");
-            const now = this.currentUnixTimestamp;
-            const dateRange = { startDate: now - 3600 * 24, endDate: now };
-            const event = yield this.service.uploadLogSnapshot({
-                sensor: yield firestore.getCollection("logs/sensor").then(result => result.docs.map(doc => doc.data())),
-                actuator: yield firestore.getCollection("logs/actuator").then(result => result.docs.map(doc => doc.data()))
-            }, dateRange);
-            if (event instanceof databaseErrorEvent_1.default) {
-                this.setStatus(event.content.values.statusCode);
-            }
-            else {
-                yield firestore.deleteDocument("logs");
-                yield realtime.deleteContent("logs");
-            }
-            return getEvent(event);
-        });
-    }
-    deleteSensorSnapshots(accessToken, startDate, endDate) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const t = (0, helper_1.getDateRangeString)({ startDate, endDate });
-            constants_1.logger.info(`DataSavingWriteMethods: Deleting sensor snapshot from the storage from ${t.start} to ${t.end}`);
-            const event = yield this.service.deleteSensorSnapshots({ startDate, endDate });
-            if (event instanceof databaseErrorEvent_1.default) {
-                this.setStatus(event.content.values.statusCode);
-            }
-            return getEvent(event);
-        });
-    }
     deleteLogSnapshots(accessToken, startDate, endDate) {
         return __awaiter(this, void 0, void 0, function* () {
             const t = (0, helper_1.getDateRangeString)({ startDate, endDate });
@@ -128,36 +51,6 @@ let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMet
         });
     }
 };
-__decorate([
-    (0, tsoa_1.Post)("sensor/save"),
-    __param(0, (0, tsoa_1.Query)()),
-    __param(1, (0, tsoa_1.Query)()),
-    __param(2, (0, tsoa_1.Query)()),
-    __param(3, (0, tsoa_1.Query)()),
-    __param(4, (0, tsoa_1.Query)())
-], DataSavingWriteMethods.prototype, "saveSensorSnapshot", null);
-__decorate([
-    (0, tsoa_1.Post)("log/save"),
-    __param(0, (0, tsoa_1.Query)()),
-    __param(1, (0, tsoa_1.Query)()),
-    __param(2, (0, tsoa_1.Query)()),
-    __param(3, (0, tsoa_1.Query)()),
-    __param(4, (0, tsoa_1.Query)())
-], DataSavingWriteMethods.prototype, "saveLogSnapshot", null);
-__decorate([
-    (0, tsoa_1.Post)("sensor/save/daily"),
-    __param(0, (0, tsoa_1.Query)())
-], DataSavingWriteMethods.prototype, "saveDailySensorSnapshot", null);
-__decorate([
-    (0, tsoa_1.Post)("log/save/daily"),
-    __param(0, (0, tsoa_1.Query)())
-], DataSavingWriteMethods.prototype, "saveDailyLogSnapshot", null);
-__decorate([
-    (0, tsoa_1.Delete)("sensor/delete"),
-    __param(0, (0, tsoa_1.Query)()),
-    __param(1, (0, tsoa_1.Query)()),
-    __param(2, (0, tsoa_1.Query)())
-], DataSavingWriteMethods.prototype, "deleteSensorSnapshots", null);
 __decorate([
     (0, tsoa_1.Delete)("log/delete"),
     __param(0, (0, tsoa_1.Query)()),

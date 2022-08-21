@@ -44,6 +44,15 @@ let SystemLogsReadMethods = class SystemLogsReadMethods extends tsoa_1.Controlle
             });
         });
     }
+    getSystemCommandLogs(accessToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            constants_1.logger.info("SystemLogsReadMethods: Getting system command logs from the database");
+            return (yield new systemLogsService_1.default().getSystemCommandLogs()).unwrapOrElse(() => {
+                this.setStatus(408);
+                return [];
+            });
+        });
+    }
 };
 __decorate([
     (0, tsoa_1.Get)("sensor/get"),
@@ -53,6 +62,10 @@ __decorate([
     (0, tsoa_1.Get)("actuator/get"),
     __param(0, (0, tsoa_1.Query)())
 ], SystemLogsReadMethods.prototype, "getActuatorLogs", null);
+__decorate([
+    (0, tsoa_1.Get)("systemCommand/get"),
+    __param(0, (0, tsoa_1.Query)())
+], SystemLogsReadMethods.prototype, "getSystemCommandLogs", null);
 SystemLogsReadMethods = __decorate([
     (0, tsoa_1.Security)("api_key"),
     (0, tsoa_1.Route)(`api/v1/log`),

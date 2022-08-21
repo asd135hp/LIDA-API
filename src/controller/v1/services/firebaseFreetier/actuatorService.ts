@@ -7,19 +7,11 @@ import DatabaseAddEvent from "../../../../model/v1/events/databaseAddEvent";
 import DatabaseUpdateEvent from "../../../../model/v1/events/databaseUpdateEvent";
 import { persistentFirebaseConnection } from "./firebaseService";
 import { Option, Some, None } from "../../../../model/patterns/option"
-import { filterDatabaseEvent } from "../../../../utility/filterDatabaseEvent";
-import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 import { createWriteEvent, getRealtimeContent } from "../../../../utility/shorthandOps";
+import { COMPONENTS_PATH as fbPath } from "../../../../constants";
 
 const realtime = persistentFirebaseConnection.realtimeService
-const realtimeActuator = "actuators"
-const realtimeActuatorConfig = "actuatorConfig"
-const realtimeActuatorConfigProposed = "actuatorConfigProposed"
-
 const firestore = persistentFirebaseConnection.firestoreService
-const firestoreActuator = "actuators"
-const firestoreActuatorConfig = "actuatorConfig"
-const firestoreActuatorConfigProposed = "actuatorConfigProposed"
 
 export default class ActuatorService {
   private publisher: PublisherImplementor<DatabaseEvent>;
@@ -33,7 +25,7 @@ export default class ActuatorService {
    * @returns 
    */
   async getActuators(): Promise<Option<ActuatorDTO[]>> {
-    let result: Option<any[]> = await getRealtimeContent(realtimeActuator, null, { limitToFirst: ACTUATOR_LIMIT });
+    let result: Option<any[]> = await getRealtimeContent(fbPath.actuator, null, { limitToFirst: ACTUATOR_LIMIT });
 
     logger.debug(`All actuators: ${result}`)
     return result.map(arr => {
@@ -48,7 +40,7 @@ export default class ActuatorService {
    * @returns All actuator details with matched type
    */
   async getActuatorsByType(type: string): Promise<Option<ActuatorDTO[]>> {
-    let result: Option<any[]> = await getRealtimeContent(realtimeActuator, "type", { equalToValue: type })
+    let result: Option<any[]> = await getRealtimeContent(fbPath.actuator, "type", { equalToValue: type })
 
     logger.debug(`Actuators by type: ${result}`)
     return result.map(arr => {
@@ -63,7 +55,7 @@ export default class ActuatorService {
    * @returns A single actuator detail with a matched name
    */
   async getActuatorByName(name: string): Promise<Option<ActuatorDTO>> {
-    let result: Option<any[]> = await getRealtimeContent(realtimeActuator, "name", { equalToValue: name })
+    let result: Option<any[]> = await getRealtimeContent(fbPath.actuator, "name", { equalToValue: name })
 
     logger.debug(`Actuator by name: ${result}`)
     // get the only object in the object
@@ -75,7 +67,7 @@ export default class ActuatorService {
    * @returns List of actuator configs
    */
   async getActuatorConfig(): Promise<Option<ActuatorConfigDTO[]>> {
-    let result: Option<any[]> = await getRealtimeContent(realtimeActuatorConfig)
+    let result: Option<any[]> = await getRealtimeContent(fbPath.actuatorConfig)
 
     logger.debug(`Actuator config(s): ${result}`)
     // converts all json into respective DTO
@@ -89,7 +81,7 @@ export default class ActuatorService {
    * This is for hardware side usage for fetching relevant data
    */
   async getProposedActuatorConfig(): Promise<Option<ActuatorConfigDTO[]>> {
-    let result: Option<any[]> = await getRealtimeContent(realtimeActuatorConfigProposed)
+    let result: Option<any[]> = await getRealtimeContent(fbPath.actuatorConfigProposed)
 
     logger.debug(`Proposed actuator config(s): ${result}`)
     // converts all json into respective DTO
@@ -113,7 +105,7 @@ export default class ActuatorService {
         async write(_: DatabaseEvent){
           // check for the existance of given actuator in the database
           const result = await firestore.queryCollection(
-            firestoreActuator,
+            fbPath.actuator,
             collectionRef => collectionRef.where("name", "==", actuator.name).get()
           )
           if(!result.empty){
@@ -122,17 +114,17 @@ export default class ActuatorService {
           }
 
           // add content without using an array
-          await firestore.addContentToCollection(firestoreActuator, actuator)
+          await firestore.addContentToCollection(fbPath.actuator, actuator)
         },
         async read(){
           // check for content existence before pushing since
           // it will lead to ambiguity if not done so
           let result: Option<any[]> = await getRealtimeContent(
-            realtimeActuator,
+            fbPath.actuator,
             "name",
             { equalToValue: actuator.name }
           )
-          if(result.match.isNone()) await realtime.pushContent(actuator, realtimeActuator)
+          if(result.match.isNone()) await realtime.pushContent(actuator, fbPath.actuator)
         }
       },
       publisher: this.publisher,
@@ -152,7 +144,7 @@ export default class ActuatorService {
         async write(currentEvent: DatabaseEvent){
           // check for ambiguity and existance of the given actuator
           const docs = (await firestore.queryCollection(
-            firestoreActuator,
+            fbPath.actuator,
             collectionRef => collectionRef.where("name", "==", actuator.name).get()
           )).docs
 
@@ -168,9 +160,9 @@ export default class ActuatorService {
         },
         async read(){
           // needs access to the reference itself to update content
-          await realtime.getContent(realtimeActuator, async ref => {
+          await realtime.getContent(fbPath.actuator, async ref => {
             await ref.orderByChild("name").equalTo(actuator.name).once("child_added", child => {
-              realtime.updateContent(actuator, `${realtimeActuator}/${child.key}`)
+              realtime.updateContent(actuator, `${fbPath.actuator}/${child.key}`)
             })
           })
         }
@@ -196,7 +188,7 @@ export default class ActuatorService {
       data: updateContent,
       protectedMethods: {
         async write(){
-          const docPath = `${firestoreActuatorConfig}/${actuatorName}`
+          const docPath = `${fbPath.actuatorConfig}/${actuatorName}`
           // check if the actuator is even in the database in the first place
           const result = await firestore.getDocument(docPath)
 
@@ -211,7 +203,7 @@ export default class ActuatorService {
         },
         async read(){
           // same logic as write method
-          const path = `${realtimeActuatorConfig}/${actuatorName}`
+          const path = `${fbPath.actuatorConfig}/${actuatorName}`
           const content = await realtime.getContent(path)
           if(!content.exists()){
             await realtime.setContent(updateContent, path)
@@ -243,7 +235,7 @@ export default class ActuatorService {
       data: updateContent,
       protectedMethods: {
         async write(){
-          const docPath = `${firestoreActuatorConfigProposed}/${actuatorName}`
+          const docPath = `${fbPath.actuatorConfigProposed}/${actuatorName}`
           // check if the actuator is even in the database in the first place
           const result = await firestore.getDocument(docPath)
 
@@ -258,7 +250,7 @@ export default class ActuatorService {
         },
         async read(){
           // same logic as write method
-          const path = `${realtimeActuatorConfigProposed}/${actuatorName}`
+          const path = `${fbPath.actuatorConfigProposed}/${actuatorName}`
           const content = await realtime.getContent(path)
           if(!content.exists()){
             await realtime.setContent(updateContent, path)

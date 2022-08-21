@@ -11,17 +11,17 @@ import DataSavingService from "../../services/firebaseFreetier/dataSavingService
 @Response("403", "Forbidden")
 @Response("408", "Request Timeout")
 export class DataSavingReadMethods extends Controller {
-  @Get("sensor/get")
-  async retrieveSensorSnapshots(
-    @Query() accessToken: string,
-    @Query() startDate?: number,
-    @Query() endDate?: number
-  ): Promise<IterableJson[]> {
-    const t = getDateRangeString({ startDate, endDate })
-    logger.info(`DataSavingReadMethods: Getting all sensor snapshots in range from ${t.start} to ${t.end}`)
-    const option = await new DataSavingService().retrieveSensorSnapshots({ startDate, endDate })
-    return option.unwrapOr([])
-  }
+  // @Get("sensor/get")
+  // async retrieveSensorSnapshots(
+  //   @Query() accessToken: string,
+  //   @Query() startDate?: number,
+  //   @Query() endDate?: number
+  // ): Promise<IterableJson[]> {
+  //   const t = getDateRangeString({ startDate, endDate })
+  //   logger.info(`DataSavingReadMethods: Getting all sensor snapshots in range from ${t.start} to ${t.end}`)
+  //   const option = await new DataSavingService().retrieveSensorSnapshot({ startDate, endDate })
+  //   return option.unwrapOr([])
+  // }
 
   // @Route("actuator/snapshot")
   // @Get()
@@ -32,15 +32,15 @@ export class DataSavingReadMethods extends Controller {
   //   return await new DataSavingService().retrieveActuatorSnapshots({ startDate, endDate })
   // }
 
-  @Get("logs/get")
-  async retrieveLogSnapshots(
-    @Query() accessToken: string,
-    @Query() startDate?: number,
-    @Query() endDate?: number
-  ): Promise<IterableJson[]> {
-    const t = getDateRangeString({ startDate, endDate })
-    logger.info(`DataSavingReadMethods: Getting all log snapshots in range from ${t.start} to ${t.end}`)
-    const option = await new DataSavingService().retrieveLogSnapshots({ startDate, endDate })
-    return option.unwrapOr([])
-  }
+  // @Get("logs/get")
+  // async retrieveLogSnapshots(
+  //   @Query() accessToken: string,
+  //   @Query() startDate?: number,
+  //   @Query() endDate?: number
+  // ): Promise<IterableJson[]> {
+  //   const t = getDateRangeString({ startDate, endDate })
+  //   logger.info(`DataSavingReadMethods: Getting all log snapshots in range from ${t.start} to ${t.end}`)
+  //   const option = await new DataSavingService().retrieveLogSnapshot({ startDate, endDate })
+  //   return option.unwrapOr([])
+  // }
 }

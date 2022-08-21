@@ -16,29 +16,29 @@ describe("Test actuator actions - Integration test", ()=>{
     setup.init()
 
     // primitive testing
-    for(const val of testCase.actuators) {
-      const event = await CommandFacade.actuator.addActuator(setup.getAccessToken(), val)
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // for(const val of testCase.actuators) {
+    //   const event = await CommandFacade.actuator.addActuator(setup.getAccessToken(), val)
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
 
-    for(const val of testCase.actuatorConfigs) {
-      const event = await CommandFacade.actuator.updateActuatorConfig(
-        setup.getAccessToken(),
-        val.actuatorName,
-        val
-      )
-      const proposedEvent = await CommandFacade.actuator.updateProposedActuatorConfig(
-        setup.getAccessToken(),
-        val.actuatorName,
-        val
-      )
+    // for(const val of testCase.actuatorConfigs) {
+    //   const event = await CommandFacade.actuator.updateActuatorConfig(
+    //     setup.getAccessToken(),
+    //     val.actuatorName,
+    //     val
+    //   )
+    //   const proposedEvent = await CommandFacade.actuator.updateProposedActuatorConfig(
+    //     setup.getAccessToken(),
+    //     val.actuatorName,
+    //     val
+    //   )
       
-      if(TEST_SETUP_THROWS_ERROR
-      && event instanceof DatabaseErrorEvent
-      && proposedEvent instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    //   if(TEST_SETUP_THROWS_ERROR
+    //   && event instanceof DatabaseErrorEvent
+    //   && proposedEvent instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
 
 
   }, timeOut * Math.max(testCase.actuatorConfigs.length, testCase.actuators.length))

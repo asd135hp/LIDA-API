@@ -18,35 +18,10 @@ const databaseUpdateEvent_1 = __importDefault(require("../../../../model/v1/even
 const shorthandOps_1 = require("../../../../utility/shorthandOps");
 const systemCommandDto_1 = require("../../../../model/v1/read/systemCommandDto");
 const constants_1 = require("../../../../constants");
+const systemCommandService_1 = require("./utility/systemCommandService");
+const constants_2 = require("../../../../constants");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
-const path = "systemCommand/flags";
-function firestoreToggleFlag(field) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const val = {
-            start: false,
-            stop: false,
-            restart: false,
-            pause: false
-        };
-        val[field] = true;
-        return yield firestore.runTransaction(path, (snapshot, t) => __awaiter(this, void 0, void 0, function* () {
-            t.set(snapshot.ref, val);
-        }));
-    });
-}
-function realtimeToggleFlag(field) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const val = {
-            start: false,
-            stop: false,
-            restart: false,
-            pause: false
-        };
-        val[field] = true;
-        return yield realtime.runTransaction(() => val, path);
-    });
-}
 class SystemCommandService {
     constructor(publisher) {
         this.publisher = publisher;
@@ -59,12 +34,13 @@ class SystemCommandService {
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield firestoreToggleFlag(field);
+                            yield (0, systemCommandService_1.firestoreToggleFlag)(field);
+                            yield firestore.deleteCollection("sensors");
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield realtimeToggleFlag(field);
+                            yield (0, systemCommandService_1.realtimeToggleFlag)(field);
                         });
                     }
                 },
@@ -81,12 +57,12 @@ class SystemCommandService {
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield firestoreToggleFlag(field);
+                            yield (0, systemCommandService_1.firestoreToggleFlag)(field);
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield realtimeToggleFlag(field);
+                            yield (0, systemCommandService_1.realtimeToggleFlag)(field);
                         });
                     }
                 },
@@ -103,12 +79,12 @@ class SystemCommandService {
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield firestoreToggleFlag(field);
+                            yield (0, systemCommandService_1.firestoreToggleFlag)(field);
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield realtimeToggleFlag(field);
+                            yield (0, systemCommandService_1.realtimeToggleFlag)(field);
                         });
                     }
                 },
@@ -125,12 +101,12 @@ class SystemCommandService {
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield firestoreToggleFlag(field);
+                            yield (0, systemCommandService_1.firestoreToggleFlag)(field);
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield realtimeToggleFlag(field);
+                            yield (0, systemCommandService_1.realtimeToggleFlag)(field);
                         });
                     }
                 },
@@ -141,7 +117,7 @@ class SystemCommandService {
     }
     getSystemFlags() {
         return __awaiter(this, void 0, void 0, function* () {
-            const snapshot = yield realtime.getContent(path);
+            const snapshot = yield realtime.getContent(constants_2.COMPONENTS_PATH.systemCommand);
             const flags = yield snapshot.val();
             try {
                 return flags ? (0, option_1.Some)(systemCommandDto_1.SystemCommandDTO.fromJson(flags)) : option_1.None;

@@ -19,22 +19,18 @@ const databaseUpdateEvent_1 = __importDefault(require("../../../../model/v1/even
 const firebaseService_1 = require("./firebaseService");
 const firebaseRealtimeService_1 = require("../../../database/firebase/services/firebaseRealtimeService");
 const luxon_1 = require("luxon");
-const dataSavingService_1 = __importDefault(require("./dataSavingService"));
 const option_1 = require("../../../../model/patterns/option");
 const shorthandOps_1 = require("../../../../utility/shorthandOps");
+const constants_2 = require("../../../../constants");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
-const realtimeSensor = "sensors";
-const realtimeSensorData = "sensorData";
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
-const firestoreSensor = "sensors";
-const firestoreSensorData = "sensorData";
 class SensorService {
     constructor(publisher) {
         this.publisher = publisher;
     }
     getSensors() {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeSensor, null, { limitToFirst: constants_1.SENSOR_LIMIT });
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.sensor, null, { limitToFirst: constants_1.SENSOR_LIMIT });
             constants_1.logger.debug(`All sensors: ${result}`);
             return result.map(arr => {
                 const newArr = arr.map((val) => sensorDto_1.SensorDTO.fromJson(val));
@@ -44,7 +40,7 @@ class SensorService {
     }
     getSensorsByType(type) {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeSensor, "type", { equalToValue: type });
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.sensor, "type", { equalToValue: type });
             constants_1.logger.debug(`Sensors by type: ${result}`);
             return result.map(arr => {
                 const newArr = arr.map((val) => sensorDto_1.SensorDTO.fromJson(val));
@@ -54,7 +50,7 @@ class SensorService {
     }
     getSensorByName(name) {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeSensor, "name", { equalToValue: name });
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.sensor, "name", { equalToValue: name });
             constants_1.logger.debug(`Sensor by name: ${result}`);
             return result.map(arr => {
                 const sensor = sensorDto_1.SensorDTO.fromJson(arr[0]);
@@ -66,15 +62,12 @@ class SensorService {
         return __awaiter(this, void 0, void 0, function* () {
             dateRange.startDate = dateRange.startDate || 0;
             dateRange.endDate = dateRange.endDate || luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger();
-            const dataSavingService = new dataSavingService_1.default();
-            let result = yield dataSavingService.retrieveSensorDataFromSnapshots(dateRange);
-            yield realtime.getContent(realtimeSensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
-                const temp = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild("timeStamp"), json => {
+            let result = option_1.None;
+            yield realtime.getContent(constants_2.COMPONENTS_PATH.sensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
+                result = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild("timeStamp"), json => {
                     const timestamp = json.timeStamp;
                     return timestamp >= dateRange.startDate && timestamp <= dateRange.endDate;
                 });
-                const newResult = result.unwrapOr([]).concat(temp.unwrapOr([]));
-                result = newResult.length == 0 ? option_1.None : (0, option_1.Some)(newResult);
             }));
             constants_1.logger.debug(`Sensor data by name: ${result}`);
             return result.map(data => {
@@ -87,15 +80,12 @@ class SensorService {
         return __awaiter(this, void 0, void 0, function* () {
             dateRange.startDate = dateRange.startDate || 0;
             dateRange.endDate = dateRange.endDate || luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger();
-            const dataSavingService = new dataSavingService_1.default();
-            let result = yield dataSavingService.retrieveSensorDataFromSnapshots(dateRange, json => json.sensorName == name);
-            yield realtime.getContent(realtimeSensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
-                const temp = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild("sensorName").equalTo(name), json => {
+            let result = option_1.None;
+            yield realtime.getContent(constants_2.COMPONENTS_PATH.sensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
+                result = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild("sensorName").equalTo(name), json => {
                     const timestamp = json.timeStamp;
                     return timestamp >= dateRange.startDate && timestamp <= dateRange.endDate;
                 });
-                const newResult = result.unwrapOr([]).concat(temp.unwrapOr([]));
-                result = newResult.length == 0 ? option_1.None : (0, option_1.Some)(newResult);
             }));
             constants_1.logger.debug(`Sensor data by name: ${result}`);
             return result.map(data => {
@@ -113,21 +103,21 @@ class SensorService {
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const result = yield firestore.queryCollection(firestoreSensor, collectionRef => collectionRef.where("name", "==", sensor.name).get());
+                            const result = yield firestore.queryCollection(constants_2.COMPONENTS_PATH.sensor, collectionRef => collectionRef.where("name", "==", sensor.name).get());
                             if (!result.empty) {
                                 constants_1.logger.error(`An sensor of the same name has already existed in the database: "${sensor.name}"`);
                                 return Promise.reject(`400An sensor with the same name "${sensor.name}" has already existed in the database`);
                             }
-                            yield firestore.addContentToCollection(firestoreSensor, sensor);
+                            yield firestore.addContentToCollection(constants_2.COMPONENTS_PATH.sensor, sensor);
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeSensor, "name", {
+                            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.sensor, "name", {
                                 equalToValue: sensor.name
                             });
                             if (result.match.isNone())
-                                yield realtime.pushContent(sensor, realtimeSensor);
+                                yield realtime.pushContent(sensor, constants_2.COMPONENTS_PATH.sensor);
                         });
                     }
                 },
@@ -143,7 +133,7 @@ class SensorService {
                 protectedMethods: {
                     write(currentEvent) {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const docs = (yield firestore.queryCollection(firestoreSensor, collectionRef => collectionRef.where("name", "==", sensor.name).get())).docs;
+                            const docs = (yield firestore.queryCollection(constants_2.COMPONENTS_PATH.sensor, collectionRef => collectionRef.where("name", "==", sensor.name).get())).docs;
                             if (docs.length == 0)
                                 return Promise.reject("404Specified name does not match with anything in the database");
                             if (docs.length > 1) {
@@ -155,7 +145,7 @@ class SensorService {
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield realtime.getContent(realtimeSensor, (ref) => __awaiter(this, void 0, void 0, function* () {
+                            yield realtime.getContent(constants_2.COMPONENTS_PATH.sensor, (ref) => __awaiter(this, void 0, void 0, function* () {
                                 let isValid = false;
                                 let key = "";
                                 yield ref.orderByChild("name").equalTo(sensor.name).once("child_added", child => {
@@ -163,7 +153,7 @@ class SensorService {
                                         key = child.key;
                                 });
                                 if (isValid && key) {
-                                    realtime.updateContent(sensor, `${realtimeSensor}/${key}`);
+                                    realtime.updateContent(sensor, `${constants_2.COMPONENTS_PATH.sensor}/${key}`);
                                     return;
                                 }
                                 Promise.reject(`404Could not find sensor named "${sensor.name}"`);
@@ -183,20 +173,20 @@ class SensorService {
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const result = yield firestore.queryCollection(firestoreSensor, collectionRef => collectionRef.where("name", "==", sensorName).get());
+                            const result = yield firestore.queryCollection(constants_2.COMPONENTS_PATH.sensor, collectionRef => collectionRef.where("name", "==", sensorName).get());
                             if (result.empty)
                                 return Promise.reject("404Specified sensor name does not match with anything in the database");
-                            yield firestore.addContentToCollection(firestoreSensorData, Object.assign({ sensorName }, sensorData));
+                            yield firestore.addContentToCollection(constants_2.COMPONENTS_PATH.sensorData, Object.assign({ sensorName }, sensorData));
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeSensor, "name", {
+                            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.sensor, "name", {
                                 equalToValue: sensorName
                             });
                             if (result.match.isNone())
                                 return Promise.reject(`404Could not find corresponding sensor name "${sensorName}"`);
-                            yield realtime.pushContent(Object.assign({ sensorName }, sensorData), realtimeSensorData);
+                            yield realtime.pushContent(Object.assign({ sensorName }, sensorData), constants_2.COMPONENTS_PATH.sensorData);
                         });
                     }
                 },

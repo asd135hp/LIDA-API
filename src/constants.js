@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SERVICE_ACCOUNT_CREDENTIALS = exports.FIREBASE_CONFIG = exports.CIPHER_ALGORITHM = exports.RAW_CIPHER_IV = exports.RAW_CIPHER_KEY = exports.SESSION_SECRET = exports.COOKIE_SECRET = exports.TEST_ACCOUNT = exports.TEST_SETUP_THROWS_ERROR = exports.COMPRESSION_SETTINGS = exports.PROMISE_CATCH_METHOD = exports.ACTUATOR_LIMIT = exports.SENSOR_LIMIT = exports.LOG_LINES = exports.DATABASE_TIMEZONE = exports.schemaName = exports.firebasePathConfig = exports.logger = exports.dbConnection = void 0;
+exports.SERVICE_ACCOUNT_CREDENTIALS = exports.FIREBASE_CONFIG = exports.CIPHER_ALGORITHM = exports.RAW_CIPHER_IV = exports.RAW_CIPHER_KEY = exports.SESSION_SECRET = exports.COOKIE_SECRET = exports.COMPONENTS_PATH = exports.TEST_ACCOUNT = exports.TEST_SETUP_THROWS_ERROR = exports.COMPRESSION_SETTINGS = exports.PROMISE_CATCH_METHOD = exports.ACTUATOR_LIMIT = exports.SENSOR_LIMIT = exports.LOG_LINES = exports.DATABASE_TIMEZONE = exports.schemaName = exports.firebasePathConfig = exports.logger = exports.dbConnection = void 0;
 const winston_1 = __importDefault(require("winston"));
 const constants_config_json_1 = __importDefault(require("./constants.config.json"));
 (() => {
@@ -53,6 +53,7 @@ exports.PROMISE_CATCH_METHOD = PROMISE_CATCH_METHOD;
 exports.COMPRESSION_SETTINGS = constants_config_json_1.default.compression;
 exports.TEST_SETUP_THROWS_ERROR = constants_config_json_1.default.test.setupThrowsError;
 exports.TEST_ACCOUNT = constants_config_json_1.default.test.account;
+exports.COMPONENTS_PATH = constants_config_json_1.default.componentPath;
 exports.COOKIE_SECRET = process.env.SECRET_COOKIESECRET;
 exports.SESSION_SECRET = process.env.SECRET_SESSIONSECRET;
 exports.RAW_CIPHER_KEY = Buffer.from(process.env.SECRET_CIPHERKEY, "base64");

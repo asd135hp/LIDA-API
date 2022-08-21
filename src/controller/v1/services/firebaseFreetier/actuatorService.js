@@ -19,21 +19,16 @@ const databaseUpdateEvent_1 = __importDefault(require("../../../../model/v1/even
 const firebaseService_1 = require("./firebaseService");
 const option_1 = require("../../../../model/patterns/option");
 const shorthandOps_1 = require("../../../../utility/shorthandOps");
+const constants_2 = require("../../../../constants");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
-const realtimeActuator = "actuators";
-const realtimeActuatorConfig = "actuatorConfig";
-const realtimeActuatorConfigProposed = "actuatorConfigProposed";
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
-const firestoreActuator = "actuators";
-const firestoreActuatorConfig = "actuatorConfig";
-const firestoreActuatorConfigProposed = "actuatorConfigProposed";
 class ActuatorService {
     constructor(publisher) {
         this.publisher = publisher;
     }
     getActuators() {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeActuator, null, { limitToFirst: constants_1.ACTUATOR_LIMIT });
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.actuator, null, { limitToFirst: constants_1.ACTUATOR_LIMIT });
             constants_1.logger.debug(`All actuators: ${result}`);
             return result.map(arr => {
                 const newArr = arr.map(json => actuatorDto_1.ActuatorDTO.fromJson(json));
@@ -43,7 +38,7 @@ class ActuatorService {
     }
     getActuatorsByType(type) {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeActuator, "type", { equalToValue: type });
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.actuator, "type", { equalToValue: type });
             constants_1.logger.debug(`Actuators by type: ${result}`);
             return result.map(arr => {
                 const newArr = arr.map(json => actuatorDto_1.ActuatorDTO.fromJson(json));
@@ -53,14 +48,14 @@ class ActuatorService {
     }
     getActuatorByName(name) {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeActuator, "name", { equalToValue: name });
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.actuator, "name", { equalToValue: name });
             constants_1.logger.debug(`Actuator by name: ${result}`);
             return result.map(arr => (0, option_1.Some)(actuatorDto_1.ActuatorDTO.fromJson(arr[0])));
         });
     }
     getActuatorConfig() {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeActuatorConfig);
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.actuatorConfig);
             constants_1.logger.debug(`Actuator config(s): ${result}`);
             return result.map(arr => {
                 const newArr = arr.map(json => actuatorDto_1.ActuatorConfigDTO.fromJson(json));
@@ -70,7 +65,7 @@ class ActuatorService {
     }
     getProposedActuatorConfig() {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeActuatorConfigProposed);
+            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.actuatorConfigProposed);
             constants_1.logger.debug(`Proposed actuator config(s): ${result}`);
             return result.map(arr => {
                 const newArr = arr.map(json => actuatorDto_1.ActuatorConfigDTO.fromJson(json));
@@ -87,19 +82,19 @@ class ActuatorService {
                 protectedMethods: {
                     write(_) {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const result = yield firestore.queryCollection(firestoreActuator, collectionRef => collectionRef.where("name", "==", actuator.name).get());
+                            const result = yield firestore.queryCollection(constants_2.COMPONENTS_PATH.actuator, collectionRef => collectionRef.where("name", "==", actuator.name).get());
                             if (!result.empty) {
                                 constants_1.logger.error(`An actuator of the same name has already existed in the database: "${actuator.name}"`);
                                 return Promise.reject(`400An actuator with the same name "${actuator.name}" has already existed in the database`);
                             }
-                            yield firestore.addContentToCollection(firestoreActuator, actuator);
+                            yield firestore.addContentToCollection(constants_2.COMPONENTS_PATH.actuator, actuator);
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            let result = yield (0, shorthandOps_1.getRealtimeContent)(realtimeActuator, "name", { equalToValue: actuator.name });
+                            let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.actuator, "name", { equalToValue: actuator.name });
                             if (result.match.isNone())
-                                yield realtime.pushContent(actuator, realtimeActuator);
+                                yield realtime.pushContent(actuator, constants_2.COMPONENTS_PATH.actuator);
                         });
                     }
                 },
@@ -115,7 +110,7 @@ class ActuatorService {
                 protectedMethods: {
                     write(currentEvent) {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const docs = (yield firestore.queryCollection(firestoreActuator, collectionRef => collectionRef.where("name", "==", actuator.name).get())).docs;
+                            const docs = (yield firestore.queryCollection(constants_2.COMPONENTS_PATH.actuator, collectionRef => collectionRef.where("name", "==", actuator.name).get())).docs;
                             if (docs.length == 0)
                                 return Promise.reject("404Specified name does not match with anything in the database");
                             if (docs.length > 1) {
@@ -127,9 +122,9 @@ class ActuatorService {
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield realtime.getContent(realtimeActuator, (ref) => __awaiter(this, void 0, void 0, function* () {
+                            yield realtime.getContent(constants_2.COMPONENTS_PATH.actuator, (ref) => __awaiter(this, void 0, void 0, function* () {
                                 yield ref.orderByChild("name").equalTo(actuator.name).once("child_added", child => {
-                                    realtime.updateContent(actuator, `${realtimeActuator}/${child.key}`);
+                                    realtime.updateContent(actuator, `${constants_2.COMPONENTS_PATH.actuator}/${child.key}`);
                                 });
                             }));
                         });
@@ -148,7 +143,7 @@ class ActuatorService {
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const docPath = `${firestoreActuatorConfig}/${actuatorName}`;
+                            const docPath = `${constants_2.COMPONENTS_PATH.actuatorConfig}/${actuatorName}`;
                             const result = yield firestore.getDocument(docPath);
                             if (!result.exists) {
                                 yield firestore.setDocument(docPath, updateContent);
@@ -159,7 +154,7 @@ class ActuatorService {
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const path = `${realtimeActuatorConfig}/${actuatorName}`;
+                            const path = `${constants_2.COMPONENTS_PATH.actuatorConfig}/${actuatorName}`;
                             const content = yield realtime.getContent(path);
                             if (!content.exists()) {
                                 yield realtime.setContent(updateContent, path);
@@ -182,7 +177,7 @@ class ActuatorService {
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const docPath = `${firestoreActuatorConfigProposed}/${actuatorName}`;
+                            const docPath = `${constants_2.COMPONENTS_PATH.actuatorConfigProposed}/${actuatorName}`;
                             const result = yield firestore.getDocument(docPath);
                             if (!result.exists) {
                                 yield firestore.setDocument(docPath, updateContent);
@@ -193,7 +188,7 @@ class ActuatorService {
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            const path = `${realtimeActuatorConfigProposed}/${actuatorName}`;
+                            const path = `${constants_2.COMPONENTS_PATH.actuatorConfigProposed}/${actuatorName}`;
                             const content = yield realtime.getContent(path);
                             if (!content.exists()) {
                                 yield realtime.setContent(updateContent, path);

@@ -27,4 +27,13 @@ export class SystemLogsReadMethods extends Controller {
       return []
     })
   }
+
+  @Get("systemCommand/get")
+  async getSystemCommandLogs(@Query() accessToken: string): Promise<LogDTO[]> {
+    logger.info("SystemLogsReadMethods: Getting system command logs from the database")
+    return (await new LogsService().getSystemCommandLogs()).unwrapOrElse(()=>{
+      this.setStatus(408)
+      return []
+    })
+  }
 }

@@ -6,37 +6,12 @@ import DatabaseUpdateEvent from "../../../../model/v1/events/databaseUpdateEvent
 import { createWriteEvent } from "../../../../utility/shorthandOps";
 import { SystemCommandDTO } from "../../../../model/v1/read/systemCommandDto";
 import { logger } from "../../../../constants";
-import { SystemCommand } from "../../../../model/v1/write/systemCommand";
+import FirebaseFirestoreService from "../../../database/firebase/services/firebaseFirestoreService";
+import { firestoreToggleFlag, realtimeToggleFlag } from "./utility/systemCommandService";
+import { COMPONENTS_PATH } from "../../../../constants"
 
 const realtime = persistentFirebaseConnection.realtimeService
 const firestore = persistentFirebaseConnection.firestoreService
-const path = "systemCommand/flags"
-
-async function firestoreToggleFlag(field: string) {
-  const val: SystemCommand = {
-    start: false,
-    stop: false,
-    restart: false,
-    pause: false
-  }
-  val[field] = true
-
-  return await firestore.runTransaction(path, async (snapshot, t) => {
-    t.set(snapshot.ref, val)
-  })
-}
-
-async function realtimeToggleFlag(field: string) {
-  const val: SystemCommand = {
-    start: false,
-    stop: false,
-    restart: false,
-    pause: false
-  }
-  val[field] = true
-
-  return await realtime.runTransaction(()=>val, path)
-}
 
 export default class SystemCommandService {
   private publisher: PublisherImplementor<DatabaseEvent>;
@@ -52,6 +27,7 @@ export default class SystemCommandService {
       protectedMethods: {
         async write(){
           await firestoreToggleFlag(field)
+          await (firestore as FirebaseFirestoreService).deleteCollection("sensors")
         },
         async read(){
           await realtimeToggleFlag(field)
@@ -115,7 +91,7 @@ export default class SystemCommandService {
   }
 
   async getSystemFlags(): Promise<Option<SystemCommandDTO>> {
-    const snapshot = await realtime.getContent(path)
+    const snapshot = await realtime.getContent(COMPONENTS_PATH.systemCommand)
     const flags = await snapshot.val()
     try {
       return flags ? Some(SystemCommandDTO.fromJson(flags) as SystemCommandDTO) : None

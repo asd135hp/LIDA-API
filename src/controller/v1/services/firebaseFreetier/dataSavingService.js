@@ -12,201 +12,93 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const luxon_1 = require("luxon");
 const constants_1 = require("../../../../constants");
 const firebaseService_1 = require("./firebaseService");
 const databaseCreateEvent_1 = __importDefault(require("../../../../model/v1/events/databaseCreateEvent"));
-const databaseDeleteEvent_1 = __importDefault(require("../../../../model/v1/events/databaseDeleteEvent"));
 const filterDatabaseEvent_1 = require("../../../../utility/filterDatabaseEvent");
-const compression_1 = require("../../../../utility/compression");
 const helper_1 = require("../../../../utility/helper");
 const option_1 = require("../../../../model/patterns/option");
 const databaseErrorEvent_1 = __importDefault(require("../../../../model/v1/events/databaseErrorEvent"));
+const constants_2 = require("../../../../constants");
+const dataSavingService_1 = require("./utility/dataSavingService");
 const storage = firebaseService_1.persistentFirebaseConnection.storageService;
-const SENSOR_FOLDER = "sensor";
-const ACTUATOR_FOLDER = "actuator";
-const LOG_FOLDER = "log";
-function mergeDefaultDateRange(dateRange) {
-    return {
-        startDate: (dateRange === null || dateRange === void 0 ? void 0 : dateRange.startDate) || 0,
-        endDate: (dateRange === null || dateRange === void 0 ? void 0 : dateRange.endDate) || luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger()
-    };
-}
-function getSnapshotsFromDateRange(folderPath, dateRange, filter) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const [files] = yield storage.readFolderFromStorage(folderPath);
-        if (!files)
-            return option_1.None;
-        constants_1.logger.info(`There are ${files.length} in ${folderPath}`);
-        const result = [];
-        for (const file of files) {
-            const [metadata] = yield file.getMetadata();
-            const rawFileName = metadata.name.match(/(?<=\/)[^\/]+(?=\.\w+)/g)[0];
-            const fileName = Buffer.from(rawFileName, "base64").toString();
-            const info = fileName.split(";").map(val => parseInt(val));
-            constants_1.logger.info(info);
-            const byteLength = info.pop();
-            const [startDate, endDate] = info;
-            if (endDate <= dateRange.startDate || startDate >= dateRange.endDate)
-                continue;
-            const downloadContent = yield file.download().then(res => res[0]);
-            const decompressedData = (0, compression_1.decompressData)(downloadContent, byteLength).unwrapOr(null);
-            decompressedData && result.push(filter ? filter(decompressedData) : decompressedData);
-        }
-        return result.length == 0 ? option_1.None : (0, option_1.Some)(result);
-    });
-}
-const lowerCeiling = (data, dateRange) => data.timeStamp >= dateRange.startDate, higherCeiling = (data, dateRange) => data.timeStamp <= dateRange.endDate;
-const customFlat = (option, dateRange, filter) => {
-    const result = [];
-    option.unwrapOr([]).map((dataByDay, index) => {
-        if (!Array.isArray(dataByDay))
-            return;
-        for (const data of dataByDay) {
-            if (index != 0 || index != data.length - 1
-                || (lowerCeiling(data, dateRange) && higherCeiling(data, dateRange) && (!filter || filter(data))))
-                result.push(data);
-        }
-    });
-    return result.length == 0 ? option_1.None : (0, option_1.Some)(result);
-};
-const trimData = (data, key, dateRange) => {
-    const lastIndex = data.length - 1;
-    data[0][key] = data[0][key].filter((data) => higherCeiling(data, dateRange));
-    data[lastIndex][key] = data[lastIndex][key].filter((data) => higherCeiling(data, dateRange));
-};
-const uploadSnapshot = (snapshot, dateRange, folder, publisher, errorOccurrenceLine) => __awaiter(void 0, void 0, void 0, function* () {
-    const event = new databaseCreateEvent_1.default({
-        protected: {
-            storage() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const option = (0, compression_1.compressJsonDataSync)(snapshot, dateRange);
-                    if (option.match.isNone())
-                        Promise.reject();
-                    const result = option.unwrapOr(null);
-                    if (!result)
-                        return;
-                    result.fileName = `${folder}/${result.fileName}`;
-                    yield storage.uploadBytesToStorage(result.fileName, Buffer.from(result.compressedData));
-                });
-            }
-        }
-    });
-    return (0, filterDatabaseEvent_1.filterDatabaseEvent)(yield publisher.notifyAsync(event)).unwrapOrElse(() => {
-        constants_1.logger.error("DataSavingService: DatabaseEvent filtration leads to all error ~ " + errorOccurrenceLine);
-        return new databaseErrorEvent_1.default("The action is failed to be executed", 400);
-    });
-});
-const deleteSnapshots = (folderName, dateRange, publisher) => __awaiter(void 0, void 0, void 0, function* () {
-    dateRange = mergeDefaultDateRange(dateRange);
-    const event = new databaseDeleteEvent_1.default({
-        protected: {
-            storage() {
-                return __awaiter(this, void 0, void 0, function* () {
-                    const files = yield getSnapshotsFromDateRange(folderName, dateRange);
-                    for (const { byteLength, file } of files.unwrapOr([])) {
-                        yield file.delete();
-                    }
-                });
-            }
-        }
-    });
-    return (0, filterDatabaseEvent_1.filterDatabaseEvent)(yield publisher.notifyAsync(event)).unwrapOrElse(() => {
-        constants_1.logger.error("DataSavingService: DatabaseEvent filtration leads to all error ~ 289");
-        return new databaseErrorEvent_1.default("The action is failed to be executed", 400);
-    });
-});
 class DataSavingService {
     constructor(publisher) {
         this.publisher = publisher;
     }
-    retrieveSensorSnapshots(dateRange) {
+    retrieveSensorSnapshot(runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
-            dateRange = mergeDefaultDateRange(dateRange);
-            const option = yield getSnapshotsFromDateRange(SENSOR_FOLDER, dateRange);
-            return option.map(data => {
-                trimData(data, "sensorData", dateRange);
-                return data.length == 0 ? option_1.None : (0, option_1.Some)(data);
+            const folderPath = `${constants_2.COMPONENTS_PATH.storage.sensor}/run${runNumber}`;
+            const [files] = yield storage.readFolderFromStorage(folderPath);
+            if (!files || !files.length)
+                return option_1.None;
+            constants_1.logger.debug(`There are ${files.length} in ${folderPath}`);
+            const [file] = files;
+            const [startDate, endDate, byteLength, metadata] = (0, dataSavingService_1.parseStorageFileMetaData)(yield file.getMetadata());
+            return (0, option_1.Some)({
+                newFileName: `${startDate}_${endDate}_run${runNumber}.zip`,
+                bucketLink: metadata.bucket,
+                fileName: metadata.name,
+                startDate, endDate,
+                decompressionByteLength: byteLength,
+                databaseType: "firebase"
             });
-        });
-    }
-    retrieveSensorDataFromSnapshots(dateRange, filter) {
-        return __awaiter(this, void 0, void 0, function* () {
-            dateRange = mergeDefaultDateRange(dateRange);
-            const data = yield getSnapshotsFromDateRange(SENSOR_FOLDER, dateRange, json => json.sensorData);
-            return customFlat(data, dateRange, filter);
-        });
-    }
-    retrieveActuatorSnapshots(dateRange) {
-        return __awaiter(this, void 0, void 0, function* () {
-            dateRange = mergeDefaultDateRange(dateRange);
-            return null;
         });
     }
     retrieveSensorLogSnapshots(dateRange) {
         return __awaiter(this, void 0, void 0, function* () {
-            dateRange = mergeDefaultDateRange(dateRange);
-            const data = yield getSnapshotsFromDateRange(LOG_FOLDER, dateRange, log => log.sensor);
-            return customFlat(data, dateRange);
+            dateRange = (0, dataSavingService_1.mergeDefaultDateRange)(dateRange);
+            const data = yield (0, dataSavingService_1.getSnapshotsFromDateRange)(`${constants_2.COMPONENTS_PATH.storage.log}/sensor`, dateRange);
+            return (0, dataSavingService_1.customFlat)(data, dateRange);
         });
     }
     retrieveActuatorLogSnapshots(dateRange) {
         return __awaiter(this, void 0, void 0, function* () {
-            dateRange = mergeDefaultDateRange(dateRange);
-            const data = yield getSnapshotsFromDateRange(LOG_FOLDER, dateRange, log => log.actuator);
-            return customFlat(data, dateRange);
+            dateRange = (0, dataSavingService_1.mergeDefaultDateRange)(dateRange);
+            const data = yield (0, dataSavingService_1.getSnapshotsFromDateRange)(`${constants_2.COMPONENTS_PATH.storage.log}/actuator`, dateRange);
+            return (0, dataSavingService_1.customFlat)(data, dateRange);
         });
     }
-    retrieveLogSnapshots(dateRange) {
+    retrieveSystemCommandLogSnapshots(dateRange) {
         return __awaiter(this, void 0, void 0, function* () {
-            dateRange = mergeDefaultDateRange(dateRange);
-            const option = yield getSnapshotsFromDateRange(LOG_FOLDER, dateRange);
-            return option.map(data => {
-                trimData(data, "sensor", dateRange);
-                trimData(data, "actuator", dateRange);
-                return data.length == 0 ? option_1.None : (0, option_1.Some)(data);
-            });
+            dateRange = (0, dataSavingService_1.mergeDefaultDateRange)(dateRange);
+            const data = yield (0, dataSavingService_1.getSnapshotsFromDateRange)(`${constants_2.COMPONENTS_PATH.storage.log}/systemCommand`, dateRange);
+            return (0, dataSavingService_1.customFlat)(data, dateRange);
         });
     }
-    uploadSensorSnapshot(snapshot, dateRange) {
+    uploadSensorSnapshot(snapshot, dateRange, runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
-            dateRange = mergeDefaultDateRange(dateRange);
+            dateRange = (0, dataSavingService_1.mergeDefaultDateRange)(dateRange);
             snapshot = {
                 sensor: snapshot.sensor.sort((0, helper_1.orderByProp)("name")),
                 sensorData: snapshot.sensorData.sort((0, helper_1.orderByProp)("sensorName"))
             };
-            return yield uploadSnapshot(snapshot, dateRange, SENSOR_FOLDER, this.publisher, 257);
-        });
-    }
-    uploadActuatorSnapshot(snapshot, dateRange) {
-        return __awaiter(this, void 0, void 0, function* () {
-            dateRange = mergeDefaultDateRange(dateRange);
-            return null;
+            return yield (0, dataSavingService_1.uploadSnapshot)(snapshot, dateRange, `${constants_2.COMPONENTS_PATH.storage.sensor}/run${runNumber}`, this.publisher, 265);
         });
     }
     uploadLogSnapshot(snapshot, dateRange) {
         return __awaiter(this, void 0, void 0, function* () {
-            dateRange = mergeDefaultDateRange(dateRange);
+            dateRange = (0, dataSavingService_1.mergeDefaultDateRange)(dateRange);
             snapshot = {
                 sensor: snapshot.sensor.sort((0, helper_1.orderByProp)("timeStamp")),
-                actuator: snapshot.actuator.sort((0, helper_1.orderByProp)("timeStamp"))
+                actuator: snapshot.actuator.sort((0, helper_1.orderByProp)("timeStamp")),
+                systemCommand: snapshot.systemCommand.sort((0, helper_1.orderByProp)("timeStamp"))
             };
-            return yield uploadSnapshot(snapshot, dateRange, LOG_FOLDER, this.publisher, 284);
+            return (0, filterDatabaseEvent_1.filterDatabaseEvent)([
+                yield (0, dataSavingService_1.uploadSnapshot)(snapshot.sensor, dateRange, `${constants_2.COMPONENTS_PATH.storage.log}/sensor`, this.publisher, 282),
+                yield (0, dataSavingService_1.uploadSnapshot)(snapshot.actuator, dateRange, `${constants_2.COMPONENTS_PATH.storage.log}/actuator`, this.publisher, 283),
+                yield (0, dataSavingService_1.uploadSnapshot)(snapshot.systemCommand, dateRange, `${constants_2.COMPONENTS_PATH.storage.log}/systemCommand`, this.publisher, 284),
+            ], databaseCreateEvent_1.default).unwrapOr(new databaseErrorEvent_1.default("Could not retrieve saved log snapshots", 404));
         });
     }
-    deleteSensorSnapshots(dateRange) {
+    deleteSensorSnapshot(runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield deleteSnapshots(SENSOR_FOLDER, dateRange, this.publisher);
-        });
-    }
-    deleteActuatorSnapshots(dateRange) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield deleteSnapshots(ACTUATOR_FOLDER, dateRange, this.publisher);
+            return yield (0, dataSavingService_1.deleteSnapshots)(`${constants_2.COMPONENTS_PATH.storage.sensor}/run${runNumber}`, (0, dataSavingService_1.mergeDefaultDateRange)({}), this.publisher);
         });
     }
     deleteLogSnapshots(dateRange) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield deleteSnapshots(LOG_FOLDER, dateRange, this.publisher);
+            return yield (0, dataSavingService_1.deleteSnapshots)(constants_2.COMPONENTS_PATH.storage.log, dateRange, this.publisher);
         });
     }
 }

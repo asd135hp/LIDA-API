@@ -9,17 +9,12 @@ import DatabaseUpdateEvent from "../../../../model/v1/events/databaseUpdateEvent
 import { persistentFirebaseConnection } from "./firebaseService";
 import { getQueryResultAsArray } from "../../../database/firebase/services/firebaseRealtimeService";
 import { DateTime } from 'luxon'
-import DataSavingService from "./dataSavingService";
 import { Option, Some, None } from "../../../../model/patterns/option"
 import { createWriteEvent, getRealtimeContent } from "../../../../utility/shorthandOps";
+import { COMPONENTS_PATH as fbPath } from "../../../../constants";
 
 const realtime = persistentFirebaseConnection.realtimeService
-const realtimeSensor = "sensors"
-const realtimeSensorData = "sensorData"
-
 const firestore = persistentFirebaseConnection.firestoreService
-const firestoreSensor = "sensors"
-const firestoreSensorData = "sensorData"
 
 export default class SensorService {
   private publisher: PublisherImplementor<DatabaseEvent>;
@@ -33,7 +28,7 @@ export default class SensorService {
    * @returns All sensors in the database
    */
   async getSensors(): Promise<Option<SensorDTO[]>> {
-    let result: Option<any[]> = await getRealtimeContent(realtimeSensor, null, { limitToFirst: SENSOR_LIMIT });
+    let result: Option<any[]> = await getRealtimeContent(fbPath.sensor, null, { limitToFirst: SENSOR_LIMIT });
 
     logger.debug(`All sensors: ${result}`)
     return result.map(arr => {
@@ -48,7 +43,7 @@ export default class SensorService {
    * @returns All sensor details with matched type
    */
   async getSensorsByType(type: string): Promise<Option<SensorDTO[]>> {
-    let result: Option<any[]> = await getRealtimeContent(realtimeSensor, "type", { equalToValue: type });
+    let result: Option<any[]> = await getRealtimeContent(fbPath.sensor, "type", { equalToValue: type });
 
     logger.debug(`Sensors by type: ${result}`)
     return result.map(arr => {
@@ -63,7 +58,7 @@ export default class SensorService {
    * @returns A single sensor detail with a matched name
    */
   async getSensorByName(name: string): Promise<Option<SensorDTO>> {
-    let result: Option<any[]> = await getRealtimeContent(realtimeSensor, "name", { equalToValue: name });
+    let result: Option<any[]> = await getRealtimeContent(fbPath.sensor, "name", { equalToValue: name });
 
     logger.debug(`Sensor by name: ${result}`)
     return result.map(arr => {
@@ -81,20 +76,15 @@ export default class SensorService {
     dateRange.startDate = dateRange.startDate || 0
     dateRange.endDate = dateRange.endDate || DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
 
-    const dataSavingService = new DataSavingService()
-    let result: Option<any[]> = await dataSavingService.retrieveSensorDataFromSnapshots(dateRange);
-    await realtime.getContent(realtimeSensorData, async ref => {
+    let result: Option<any[]> = None
+    await realtime.getContent(fbPath.sensorData, async ref => {
       // get result by filtration
-      const temp = await getQueryResultAsArray(
+      result = await getQueryResultAsArray(
         ref.orderByChild("timeStamp"),
         json => {
           const timestamp = json.timeStamp
           return timestamp >= dateRange.startDate && timestamp <= dateRange.endDate
         })
-
-      // concatenate saved data with new data while retaining its order
-      const newResult = result.unwrapOr([]).concat(temp.unwrapOr([]))
-      result = newResult.length == 0 ? None : Some(newResult)
     })
 
     logger.debug(`Sensor data by name: ${result}`)
@@ -118,25 +108,15 @@ export default class SensorService {
     dateRange.startDate = dateRange.startDate || 0
     dateRange.endDate = dateRange.endDate || DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
 
-    const dataSavingService = new DataSavingService()
-    let result: Option<any[]> = await dataSavingService.retrieveSensorDataFromSnapshots(
-      dateRange,
-      json => json.sensorName == name
-    );
-
-    // does not return desired result
-    await realtime.getContent(realtimeSensorData, async ref => {
+    let result: Option<any[]> = None
+    await realtime.getContent(fbPath.sensorData, async ref => {
       // get result by filtration
-      const temp = await getQueryResultAsArray(
+      result = await getQueryResultAsArray(
         ref.orderByChild("sensorName").equalTo(name),
         json => {
           const timestamp = json.timeStamp
           return timestamp >= dateRange.startDate && timestamp <= dateRange.endDate
         })
-
-      // concatenate saved data with new data while retaining its order
-      const newResult = result.unwrapOr([]).concat(temp.unwrapOr([]))
-      result = newResult.length == 0 ? None : Some(newResult)
     })
 
     logger.debug(`Sensor data by name: ${result}`)
@@ -161,7 +141,7 @@ export default class SensorService {
         async write(){
           // check if the sensor exists within the database
           const result = await firestore.queryCollection(
-            firestoreSensor,
+            fbPath.sensor,
             collectionRef => collectionRef.where("name", "==", sensor.name).get()
           )
           if(!result.empty){
@@ -169,16 +149,16 @@ export default class SensorService {
             return Promise.reject(`400An sensor with the same name "${sensor.name}" has already existed in the database`)
           }
 
-          await firestore.addContentToCollection(firestoreSensor, sensor)
+          await firestore.addContentToCollection(fbPath.sensor, sensor)
         },
         async read(){
           // check if the sensor exists in the database first before pushing it
           // since it will prevent ambiguity in later stages
-          let result: Option<any[]> = await getRealtimeContent(realtimeSensor, "name", {
+          let result: Option<any[]> = await getRealtimeContent(fbPath.sensor, "name", {
             equalToValue: sensor.name
           })
 
-          if(result.match.isNone()) await realtime.pushContent(sensor, realtimeSensor)
+          if(result.match.isNone()) await realtime.pushContent(sensor, fbPath.sensor)
         }
       },
       publisher: this.publisher,
@@ -199,7 +179,7 @@ export default class SensorService {
           // check if there is only one sensor with the same name exists in the database
           // first before updating the sensor
           const docs = (await firestore.queryCollection(
-            firestoreSensor,
+            fbPath.sensor,
             collectionRef => collectionRef.where("name", "==", sensor.name).get()
           )).docs
 
@@ -214,7 +194,7 @@ export default class SensorService {
           await firestore.updateDocument(docs[0].id, sensor)
         },
         async read(){
-          await realtime.getContent(realtimeSensor, async ref => {
+          await realtime.getContent(fbPath.sensor, async ref => {
             let isValid = false
             let key = ""
 
@@ -225,7 +205,7 @@ export default class SensorService {
             })
               
             if(isValid && key) {
-              realtime.updateContent(sensor, `${realtimeSensor}/${key}`)
+              realtime.updateContent(sensor, `${fbPath.sensor}/${key}`)
               return
             }
 
@@ -250,25 +230,25 @@ export default class SensorService {
         async write(){
           // check the existance of the sensor in the database first before adding new sensor data
           const result = await firestore.queryCollection(
-            firestoreSensor,
+            fbPath.sensor,
             collectionRef => collectionRef.where("name", "==", sensorName).get()
           )
 
           if(result.empty)
             return Promise.reject("404Specified sensor name does not match with anything in the database")
 
-          await firestore.addContentToCollection(firestoreSensorData, { sensorName, ...sensorData })
+          await firestore.addContentToCollection(fbPath.sensorData, { sensorName, ...sensorData })
         },
         async read(){
           // check the existance of the sensor in the database first before adding new sensor data
-          let result: Option<any[]> = await getRealtimeContent(realtimeSensor, "name", {
+          let result: Option<any[]> = await getRealtimeContent(fbPath.sensor, "name", {
             equalToValue: sensorName
           })
 
           if(result.match.isNone())
             return Promise.reject(`404Could not find corresponding sensor name "${sensorName}"`)
 
-          await realtime.pushContent({ sensorName, ...sensorData }, realtimeSensorData)
+          await realtime.pushContent({ sensorName, ...sensorData }, fbPath.sensorData)
         }
       },
       publisher: this.publisher,

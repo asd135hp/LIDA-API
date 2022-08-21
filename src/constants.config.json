@@ -17,6 +17,27 @@
     "sensor": 100,
     "actuator": 100
   },
+  "componentPath": {
+    "sensor": "sensors",
+    "sensorData": "sensorData",
+    "actuator": "actuators",
+    "actuatorConfig": "actuatorConfig",
+    "actuatorConfigProposed": "actuatorConfigProposed",
+    "systemCommand": "systemCommand/flags",
+    "logs": {
+      "sensor": "logs/sensor",
+      "actuator": "logs/actuator",
+      "systemCommand": "logs/systemCommand"
+    },
+    "storage": {
+      "sensor": "sensor",
+      "log": "log"
+    },
+    "count": {
+      "run": "count/run",
+      "logs": "count/logs"
+    }
+  },
   "firebase": {
     "storage": {
       "development": {

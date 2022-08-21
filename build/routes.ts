@@ -77,13 +77,6 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "IterableJson": {
-        "dataType": "refObject",
-        "properties": {
-        },
-        "additionalProperties": {"dataType":"any"},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SensorDTO": {
         "dataType": "refObject",
         "properties": {
@@ -122,6 +115,13 @@ const models: TsoaRoute.Models = {
             "logContent": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "IterableJson": {
+        "dataType": "refObject",
+        "properties": {
+        },
+        "additionalProperties": {"dataType":"any"},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Report": {
@@ -340,58 +340,6 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/api/v1/snapshot/sensor/get',
-            authenticateMiddleware([{"api_key":[]}]),
-
-            function DataSavingReadMethods_retrieveSensorSnapshots(request: any, response: any, next: any) {
-            const args = {
-                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-                    startDate: {"in":"query","name":"startDate","dataType":"double"},
-                    endDate: {"in":"query","name":"endDate","dataType":"double"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new DataSavingReadMethods();
-
-
-              const promise = controller.retrieveSensorSnapshots.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/api/v1/snapshot/logs/get',
-            authenticateMiddleware([{"api_key":[]}]),
-
-            function DataSavingReadMethods_retrieveLogSnapshots(request: any, response: any, next: any) {
-            const args = {
-                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-                    startDate: {"in":"query","name":"startDate","dataType":"double"},
-                    endDate: {"in":"query","name":"endDate","dataType":"double"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new DataSavingReadMethods();
-
-
-              const promise = controller.retrieveLogSnapshots.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/sensor/get',
             authenticateMiddleware([{"api_key":[]}]),
 
@@ -540,6 +488,30 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/api/v1/log/systemCommand/get',
+            authenticateMiddleware([{"api_key":[]}]),
+
+            function SystemLogsReadMethods_getSystemCommandLogs(request: any, response: any, next: any) {
+            const args = {
+                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new SystemLogsReadMethods();
+
+
+              const promise = controller.getSystemCommandLogs.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/actuator/add',
             authenticateMiddleware([{"api_key":[]}]),
 
@@ -636,136 +608,6 @@ export function RegisterRoutes(app: express.Router) {
 
 
               const promise = controller.updateProposedActuatorConfig.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v1/snapshot/sensor/save',
-            authenticateMiddleware([{"api_key":[]}]),
-
-            function DataSavingWriteMethods_saveSensorSnapshot(request: any, response: any, next: any) {
-            const args = {
-                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-                    sensor: {"in":"query","name":"sensor","required":true,"dataType":"string"},
-                    sensorData: {"in":"query","name":"sensorData","required":true,"dataType":"string"},
-                    startDate: {"in":"query","name":"startDate","dataType":"double"},
-                    endDate: {"in":"query","name":"endDate","dataType":"double"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new DataSavingWriteMethods();
-
-
-              const promise = controller.saveSensorSnapshot.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v1/snapshot/log/save',
-            authenticateMiddleware([{"api_key":[]}]),
-
-            function DataSavingWriteMethods_saveLogSnapshot(request: any, response: any, next: any) {
-            const args = {
-                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-                    actuatorLogs: {"in":"query","name":"actuatorLogs","required":true,"dataType":"string"},
-                    sensorLogs: {"in":"query","name":"sensorLogs","required":true,"dataType":"string"},
-                    startDate: {"in":"query","name":"startDate","dataType":"double"},
-                    endDate: {"in":"query","name":"endDate","dataType":"double"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new DataSavingWriteMethods();
-
-
-              const promise = controller.saveLogSnapshot.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v1/snapshot/sensor/save/daily',
-            authenticateMiddleware([{"api_key":[]}]),
-
-            function DataSavingWriteMethods_saveDailySensorSnapshot(request: any, response: any, next: any) {
-            const args = {
-                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new DataSavingWriteMethods();
-
-
-              const promise = controller.saveDailySensorSnapshot.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v1/snapshot/log/save/daily',
-            authenticateMiddleware([{"api_key":[]}]),
-
-            function DataSavingWriteMethods_saveDailyLogSnapshot(request: any, response: any, next: any) {
-            const args = {
-                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new DataSavingWriteMethods();
-
-
-              const promise = controller.saveDailyLogSnapshot.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.delete('/api/v1/snapshot/sensor/delete',
-            authenticateMiddleware([{"api_key":[]}]),
-
-            function DataSavingWriteMethods_deleteSensorSnapshots(request: any, response: any, next: any) {
-            const args = {
-                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-                    startDate: {"in":"query","name":"startDate","dataType":"double"},
-                    endDate: {"in":"query","name":"endDate","dataType":"double"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new DataSavingWriteMethods();
-
-
-              const promise = controller.deleteSensorSnapshots.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
@@ -1012,6 +854,30 @@ export function RegisterRoutes(app: express.Router) {
 
 
               const promise = controller.addActuatorLog.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v1/log/systemCommand/add',
+
+            function SystemLogsWriteMethods_addSystemCommandLog(request: any, response: any, next: any) {
+            const args = {
+                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
+                    logContent: {"in":"body-prop","name":"logContent","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new SystemLogsWriteMethods();
+
+
+              const promise = controller.addSystemCommandLog.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

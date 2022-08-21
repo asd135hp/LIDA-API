@@ -1,8 +1,7 @@
 import { App } from "firebase-admin/app";
 import firebaseAdmin from "firebase-admin";
-import {
-  Bucket, UploadResponse, DeleteFileResponse, SaveOptions, GetFileOptions, GetFilesResponse
-} from "@google-cloud/storage";
+import { Bucket } from "firebase-admin/node_modules/@google-cloud/storage"
+import { DeleteFileResponse, SaveOptions, GetFileOptions, GetFilesResponse } from "@google-cloud/storage";
 import FirebaseStorageFacade from "../../firebase/interfaces/firebaseStorageFacade";
 import { logger, PROMISE_CATCH_METHOD } from "../../../../constants";
 

@@ -51,4 +51,18 @@ export class SystemLogsWriteMethods extends Controller {
     }
     return getEvent(event)
   }
+
+  @Post("systemCommand/add")
+  async addSystemCommandLog(
+    @Query() accessToken: string,
+    @BodyProp() logContent: string
+  ): Promise<DatabaseEvent> {
+    logger.info("SystemLogsWriteMethods: Adding system command log to the database")
+    
+    const event = await this.service.addSystemCommandLog({ logContent })
+    if(event instanceof DatabaseErrorEvent){
+      this.setStatus(event.content.values.statusCode)
+    }
+    return getEvent(event)
+  }
 }

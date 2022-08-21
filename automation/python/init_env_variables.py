@@ -7,6 +7,10 @@ from constants import app_name
 
 raw_path = os.path.dirname(os.path.realpath(__file__))
 dir_path = raw_path.replace("\\automation\\python", "")
+const_env_vars = {
+  "NODE_ENV": "testing",
+  "WEB_CONCURRENCY": "3"
+}
 
 def wrap_multiline_string(string: str):
   if len(re.findall(r"\r\n|\n", string)) > 0:
@@ -40,8 +44,10 @@ if __name__ == '__main__':
   dotenv_fp.reconfigure(write_through=True)
 
   # must have env vars
-  add_env_var_local("NODE_ENV", "testing", dotenv_fp)
+  for name, value in const_env_vars.items():
+    add_env_var_local(name, value, dotenv_fp)
   
+  # protected configuration variables (firebase configs)
   vars = {}
   for file_name in os.listdir(f"{dir_path}\\protected"):
     if file_name.endswith(".json"):
@@ -49,6 +55,7 @@ if __name__ == '__main__':
         secret_dict: dict = json.load(f)
         extract_env_vars(secret_dict, file_name.split('.')[0], dotenv_fp, vars)
 
+  # check for oauth token
   oauth_id = ""
   try:
     with open(f"{raw_path}\\auth_id.txt", "r") as f:
@@ -81,6 +88,6 @@ if __name__ == '__main__':
       "-H", "Content-Type: application/json",
       "-H", "Accept: application/vnd.heroku+json; version=3",
       "-H", f"Authorization: Bearer {auth_token}"])
-    print(json.loads(proc))
+    #print(json.loads(proc))
   except subprocess.CalledProcessError as e:
     print(e)

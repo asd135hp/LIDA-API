@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterRoutes = void 0;
 const runtime_1 = require("@tsoa/runtime");
 const actuatorReadMethods_1 = require("./../src/controller/v1/methods/read/actuatorReadMethods");
-const dataSavingReadMethods_1 = require("./../src/controller/v1/methods/read/dataSavingReadMethods");
 const sensorReadMethods_1 = require("./../src/controller/v1/methods/read/sensorReadMethods");
 const systemCommandReadMethods_1 = require("./../src/controller/v1/methods/read/systemCommandReadMethods");
 const systemLogsReadMethods_1 = require("./../src/controller/v1/methods/read/systemLogsReadMethods");
@@ -65,11 +64,6 @@ const models = {
         },
         "additionalProperties": false,
     },
-    "IterableJson": {
-        "dataType": "refObject",
-        "properties": {},
-        "additionalProperties": { "dataType": "any" },
-    },
     "SensorDTO": {
         "dataType": "refObject",
         "properties": {
@@ -105,6 +99,11 @@ const models = {
             "logContent": { "dataType": "string", "required": true },
         },
         "additionalProperties": false,
+    },
+    "IterableJson": {
+        "dataType": "refObject",
+        "properties": {},
+        "additionalProperties": { "dataType": "any" },
     },
     "Report": {
         "dataType": "refObject",
@@ -268,40 +267,6 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/snapshot/sensor/get', authenticateMiddleware([{ "api_key": [] }]), function DataSavingReadMethods_retrieveSensorSnapshots(request, response, next) {
-        const args = {
-            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-            startDate: { "in": "query", "name": "startDate", "dataType": "double" },
-            endDate: { "in": "query", "name": "endDate", "dataType": "double" },
-        };
-        let validatedArgs = [];
-        try {
-            validatedArgs = getValidatedArgs(args, request, response);
-            const controller = new dataSavingReadMethods_1.DataSavingReadMethods();
-            const promise = controller.retrieveSensorSnapshots.apply(controller, validatedArgs);
-            promiseHandler(controller, promise, response, undefined, next);
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
-    app.get('/api/v1/snapshot/logs/get', authenticateMiddleware([{ "api_key": [] }]), function DataSavingReadMethods_retrieveLogSnapshots(request, response, next) {
-        const args = {
-            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-            startDate: { "in": "query", "name": "startDate", "dataType": "double" },
-            endDate: { "in": "query", "name": "endDate", "dataType": "double" },
-        };
-        let validatedArgs = [];
-        try {
-            validatedArgs = getValidatedArgs(args, request, response);
-            const controller = new dataSavingReadMethods_1.DataSavingReadMethods();
-            const promise = controller.retrieveLogSnapshots.apply(controller, validatedArgs);
-            promiseHandler(controller, promise, response, undefined, next);
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
     app.get('/api/v1/sensor/get', authenticateMiddleware([{ "api_key": [] }]), function SensorReadMethods_getSensors(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
@@ -396,6 +361,21 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
+    app.get('/api/v1/log/systemCommand/get', authenticateMiddleware([{ "api_key": [] }]), function SystemLogsReadMethods_getSystemCommandLogs(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new systemLogsReadMethods_1.SystemLogsReadMethods();
+            const promise = controller.getSystemCommandLogs.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
     app.post('/api/v1/actuator/add', authenticateMiddleware([{ "api_key": [] }]), function ActuatorWriteMethods_addActuator(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
@@ -456,91 +436,6 @@ function RegisterRoutes(app) {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new actuatorWriteMethods_1.ActuatorWriteMethods();
             const promise = controller.updateProposedActuatorConfig.apply(controller, validatedArgs);
-            promiseHandler(controller, promise, response, undefined, next);
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
-    app.post('/api/v1/snapshot/sensor/save', authenticateMiddleware([{ "api_key": [] }]), function DataSavingWriteMethods_saveSensorSnapshot(request, response, next) {
-        const args = {
-            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-            sensor: { "in": "query", "name": "sensor", "required": true, "dataType": "string" },
-            sensorData: { "in": "query", "name": "sensorData", "required": true, "dataType": "string" },
-            startDate: { "in": "query", "name": "startDate", "dataType": "double" },
-            endDate: { "in": "query", "name": "endDate", "dataType": "double" },
-        };
-        let validatedArgs = [];
-        try {
-            validatedArgs = getValidatedArgs(args, request, response);
-            const controller = new dataSavingWriteMethods_1.DataSavingWriteMethods();
-            const promise = controller.saveSensorSnapshot.apply(controller, validatedArgs);
-            promiseHandler(controller, promise, response, undefined, next);
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
-    app.post('/api/v1/snapshot/log/save', authenticateMiddleware([{ "api_key": [] }]), function DataSavingWriteMethods_saveLogSnapshot(request, response, next) {
-        const args = {
-            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-            actuatorLogs: { "in": "query", "name": "actuatorLogs", "required": true, "dataType": "string" },
-            sensorLogs: { "in": "query", "name": "sensorLogs", "required": true, "dataType": "string" },
-            startDate: { "in": "query", "name": "startDate", "dataType": "double" },
-            endDate: { "in": "query", "name": "endDate", "dataType": "double" },
-        };
-        let validatedArgs = [];
-        try {
-            validatedArgs = getValidatedArgs(args, request, response);
-            const controller = new dataSavingWriteMethods_1.DataSavingWriteMethods();
-            const promise = controller.saveLogSnapshot.apply(controller, validatedArgs);
-            promiseHandler(controller, promise, response, undefined, next);
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
-    app.post('/api/v1/snapshot/sensor/save/daily', authenticateMiddleware([{ "api_key": [] }]), function DataSavingWriteMethods_saveDailySensorSnapshot(request, response, next) {
-        const args = {
-            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-        };
-        let validatedArgs = [];
-        try {
-            validatedArgs = getValidatedArgs(args, request, response);
-            const controller = new dataSavingWriteMethods_1.DataSavingWriteMethods();
-            const promise = controller.saveDailySensorSnapshot.apply(controller, validatedArgs);
-            promiseHandler(controller, promise, response, undefined, next);
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
-    app.post('/api/v1/snapshot/log/save/daily', authenticateMiddleware([{ "api_key": [] }]), function DataSavingWriteMethods_saveDailyLogSnapshot(request, response, next) {
-        const args = {
-            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-        };
-        let validatedArgs = [];
-        try {
-            validatedArgs = getValidatedArgs(args, request, response);
-            const controller = new dataSavingWriteMethods_1.DataSavingWriteMethods();
-            const promise = controller.saveDailyLogSnapshot.apply(controller, validatedArgs);
-            promiseHandler(controller, promise, response, undefined, next);
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
-    app.delete('/api/v1/snapshot/sensor/delete', authenticateMiddleware([{ "api_key": [] }]), function DataSavingWriteMethods_deleteSensorSnapshots(request, response, next) {
-        const args = {
-            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-            startDate: { "in": "query", "name": "startDate", "dataType": "double" },
-            endDate: { "in": "query", "name": "endDate", "dataType": "double" },
-        };
-        let validatedArgs = [];
-        try {
-            validatedArgs = getValidatedArgs(args, request, response);
-            const controller = new dataSavingWriteMethods_1.DataSavingWriteMethods();
-            const promise = controller.deleteSensorSnapshots.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {
@@ -699,6 +594,22 @@ function RegisterRoutes(app) {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new systemLogsWriteMethods_1.SystemLogsWriteMethods();
             const promise = controller.addActuatorLog.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    app.post('/api/v1/log/systemCommand/add', function SystemLogsWriteMethods_addSystemCommandLog(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+            logContent: { "in": "body-prop", "name": "logContent", "required": true, "dataType": "string" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new systemLogsWriteMethods_1.SystemLogsWriteMethods();
+            const promise = controller.addSystemCommandLog.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {

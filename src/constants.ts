@@ -79,6 +79,8 @@ export const TEST_SETUP_THROWS_ERROR = config.test.setupThrowsError
 
 export const TEST_ACCOUNT = config.test.account
 
+export const COMPONENTS_PATH = config.componentPath
+
 /// extract from process.env
 
 export const COOKIE_SECRET = process.env.SECRET_COOKIESECRET

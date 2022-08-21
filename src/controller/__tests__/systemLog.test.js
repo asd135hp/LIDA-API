@@ -12,20 +12,27 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const commandFacade_1 = __importDefault(require("../commandFacade"));
 const queryFacade_1 = __importDefault(require("../queryFacade"));
 const constants_1 = require("../../constants");
 const testcases_json_1 = __importDefault(require("./testcases.json"));
+const databaseErrorEvent_1 = __importDefault(require("../../model/v1/events/databaseErrorEvent"));
 const testSetup_1 = __importDefault(require("../../utility/testSetup"));
 describe("Test sensor actions - Integration test", () => {
     const setup = new testSetup_1.default();
     const timeOut = testSetup_1.default.TIME_OUT;
-    const deleteLogs = (snapshot, t) => __awaiter(void 0, void 0, void 0, function* () {
-        const docs = yield snapshot.ref.collection("content").listDocuments();
-        for (const doc of docs)
-            t.delete(doc);
-    });
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.init();
+        for (const val of testcases_json_1.default.sensorLogs) {
+            const event = yield commandFacade_1.default.logs.addSensorLog(setup.getAccessToken(), val);
+            if (constants_1.TEST_SETUP_THROWS_ERROR && event instanceof databaseErrorEvent_1.default)
+                throw new Error("An error is raised: " + event.content.error);
+        }
+        for (const val of testcases_json_1.default.actuatorLogs) {
+            const event = yield commandFacade_1.default.logs.addActuatorLog(setup.getAccessToken(), val);
+            if (constants_1.TEST_SETUP_THROWS_ERROR && event instanceof databaseErrorEvent_1.default)
+                throw new Error("An error is raised: " + event.content.error);
+        }
     }), timeOut * Math.max(testcases_json_1.default.sensorLogs.length, testcases_json_1.default.actuatorLogs.length));
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.tearDown();

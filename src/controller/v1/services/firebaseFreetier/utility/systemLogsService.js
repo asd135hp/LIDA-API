@@ -35,7 +35,7 @@ const pushLog = (path, log, publisher) => __awaiter(void 0, void 0, void 0, func
             },
             read() {
                 return __awaiter(this, void 0, void 0, function* () {
-                    yield realtime.getContent(constants_1.COMPONENTS_PATH.count.logs, (ref) => __awaiter(this, void 0, void 0, function* () {
+                    yield realtime.getContent(`${constants_1.COMPONENTS_PATH.count.path}/${path}`, (ref) => __awaiter(this, void 0, void 0, function* () {
                         const count = (yield ref.transaction(val => {
                             if (typeof (val) !== 'number')
                                 return 1;

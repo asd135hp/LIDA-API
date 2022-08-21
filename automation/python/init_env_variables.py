@@ -9,7 +9,7 @@ raw_path = os.path.dirname(os.path.realpath(__file__))
 dir_path = raw_path.replace("\\automation\\python", "")
 const_env_vars = {
   "NODE_ENV": "testing",
-  "WEB_CONCURRENCY": "3"
+  "WEB_CONCURRENCY": "0"
 }
 
 def wrap_multiline_string(string: str):
@@ -29,23 +29,20 @@ def extract_env_vars(
 ):
   if dotenv_fp is None: raise Exception("Local environment variable file must be openable")
 
-  for var_name in current_dict.keys():
+  for var_name, current_dict_value in current_dict.items():
     written_var_name = var_name if len(var_prefix) == 0 else f"{var_prefix}_{var_name}"
     written_var_name = written_var_name.upper()
 
-    if type(current_dict[var_name]) == dict or isinstance(current_dict[var_name], dict):
-      extract_env_vars(current_dict[var_name], written_var_name, dotenv_fp, env_vars)
+    if type(current_dict_value) == dict or isinstance(current_dict_value, dict):
+      extract_env_vars(current_dict_value, written_var_name, dotenv_fp, env_vars)
     else:
-      add_env_var_local(written_var_name, current_dict[var_name], dotenv_fp)
-      env_vars[written_var_name] = current_dict[var_name]
+      add_env_var_local(written_var_name, current_dict_value, dotenv_fp)
+      env_vars[written_var_name] = current_dict_value
 
 if __name__ == '__main__':
   dotenv_fp = open(f"{dir_path}\\.env", "w+")
   dotenv_fp.reconfigure(write_through=True)
 
-  # must have env vars
-  for name, value in const_env_vars.items():
-    add_env_var_local(name, value, dotenv_fp)
   
   # protected configuration variables (firebase configs)
   vars = {}
@@ -54,6 +51,11 @@ if __name__ == '__main__':
       with open(f"{dir_path}\\protected\\{file_name}", 'r') as f:
         secret_dict: dict = json.load(f)
         extract_env_vars(secret_dict, file_name.split('.')[0], dotenv_fp, vars)
+
+  # must have env vars
+  for name, value in const_env_vars.items():
+    add_env_var_local(name, value, dotenv_fp)
+    vars[name] = value
 
   # check for oauth token
   oauth_id = ""

@@ -9,7 +9,7 @@ import DataSavingService from "../v1/services/firebaseFreetier/dataSavingService
 import { persistentFirebaseConnection } from "../v1/services/firebaseFreetier/firebaseService";
 import testCase from "./testcases.json"
 
-describe("Data saving test - Integration test", ()=>{
+xdescribe("Data saving test - Integration test", ()=>{
   const setup = new TestSetup()
   const timeOut = TestSetup.TIME_OUT
 

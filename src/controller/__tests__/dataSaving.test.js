@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const testSetup_1 = __importDefault(require("../../utility/testSetup"));
 const testcases_json_1 = __importDefault(require("./testcases.json"));
-describe("Data saving test - Integration test", () => {
+xdescribe("Data saving test - Integration test", () => {
     const setup = new testSetup_1.default();
     const timeOut = testSetup_1.default.TIME_OUT;
     const templateStartDate = 1609459200;

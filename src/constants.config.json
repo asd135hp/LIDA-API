@@ -35,7 +35,7 @@
     },
     "count": {
       "run": "count/run",
-      "logs": "count/logs"
+      "path": "count"
     }
   },
   "firebase": {

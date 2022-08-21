@@ -35,7 +35,7 @@ export const pushLog = async(
         await firestore.addContentToCollection(`${collectionPath}/content`, log)
       },
       async read(){
-        await realtime.getContent(COMPONENTS_PATH.count.logs, async ref => {
+        await realtime.getContent(`${COMPONENTS_PATH.count.path}/${path}`, async ref => {
           // looks more clean - update log count
           const count = (await ref.transaction(val => {
             if(typeof(val) !== 'number') return 1

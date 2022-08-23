@@ -45,7 +45,7 @@ export class SensorReadMethods extends Controller {
     @Query() startDate: number = 0,
     @Query() endDate: number = DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
   ): Promise<SensorDataDTO[]> {
-    logger.info(`SensorReadMethods: Getting sensor data from the database with sensor name of "${name}"`)
+    logger.info(`SensorReadMethods: Getting sensor data from the database from ${startDate} to ${endDate}`)
 
     const option = await new SensorService().getSensorData({ startDate, endDate })
     return option.unwrapOrElse(()=>{

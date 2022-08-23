@@ -18,7 +18,7 @@ describe("Test system command as a whole", ()=>{
 
   test("Should start the system", async ()=>{
     await CommandFacade.systemCommand.startSystem(setup.getAccessToken())
-    const commands = await QueryFacade.systemCommand.getSystemCommands(setup.getAccessToken())
+    const commands = await QueryFacade.systemCommand.getProposedSystemCommands(setup.getAccessToken())
     expect(commands.isStart).toBe(true)
     expect(commands.isStop).toBe(false)
     expect(commands.isPause).toBe(false)
@@ -27,7 +27,7 @@ describe("Test system command as a whole", ()=>{
   
   test("Should stop the system", async ()=>{
     await CommandFacade.systemCommand.stopSystem(setup.getAccessToken())
-    const commands = await QueryFacade.systemCommand.getSystemCommands(setup.getAccessToken())
+    const commands = await QueryFacade.systemCommand.getProposedSystemCommands(setup.getAccessToken())
     expect(commands.isStart).toBe(false)
     expect(commands.isStop).toBe(true)
     expect(commands.isPause).toBe(false)
@@ -36,7 +36,7 @@ describe("Test system command as a whole", ()=>{
   
   test("Should pause the system", async ()=>{
     await CommandFacade.systemCommand.pauseSystem(setup.getAccessToken())
-    const commands = await QueryFacade.systemCommand.getSystemCommands(setup.getAccessToken())
+    const commands = await QueryFacade.systemCommand.getProposedSystemCommands(setup.getAccessToken())
     expect(commands.isStart).toBe(false)
     expect(commands.isStop).toBe(false)
     expect(commands.isPause).toBe(true)
@@ -45,7 +45,7 @@ describe("Test system command as a whole", ()=>{
   
   test("Should restart the system", async ()=>{
     await CommandFacade.systemCommand.restartSystem(setup.getAccessToken())
-    const commands = await QueryFacade.systemCommand.getSystemCommands(setup.getAccessToken())
+    const commands = await QueryFacade.systemCommand.getProposedSystemCommands(setup.getAccessToken())
     expect(commands.isStart).toBe(false)
     expect(commands.isStop).toBe(false)
     expect(commands.isPause).toBe(false)

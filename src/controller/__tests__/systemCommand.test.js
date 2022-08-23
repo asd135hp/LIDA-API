@@ -26,7 +26,7 @@ describe("Test system command as a whole", () => {
     }), timeOut);
     test("Should start the system", () => __awaiter(void 0, void 0, void 0, function* () {
         yield commandFacade_1.default.systemCommand.startSystem(setup.getAccessToken());
-        const commands = yield queryFacade_1.default.systemCommand.getSystemCommands(setup.getAccessToken());
+        const commands = yield queryFacade_1.default.systemCommand.getProposedSystemCommands(setup.getAccessToken());
         expect(commands.isStart).toBe(true);
         expect(commands.isStop).toBe(false);
         expect(commands.isPause).toBe(false);
@@ -34,7 +34,7 @@ describe("Test system command as a whole", () => {
     }));
     test("Should stop the system", () => __awaiter(void 0, void 0, void 0, function* () {
         yield commandFacade_1.default.systemCommand.stopSystem(setup.getAccessToken());
-        const commands = yield queryFacade_1.default.systemCommand.getSystemCommands(setup.getAccessToken());
+        const commands = yield queryFacade_1.default.systemCommand.getProposedSystemCommands(setup.getAccessToken());
         expect(commands.isStart).toBe(false);
         expect(commands.isStop).toBe(true);
         expect(commands.isPause).toBe(false);
@@ -42,7 +42,7 @@ describe("Test system command as a whole", () => {
     }));
     test("Should pause the system", () => __awaiter(void 0, void 0, void 0, function* () {
         yield commandFacade_1.default.systemCommand.pauseSystem(setup.getAccessToken());
-        const commands = yield queryFacade_1.default.systemCommand.getSystemCommands(setup.getAccessToken());
+        const commands = yield queryFacade_1.default.systemCommand.getProposedSystemCommands(setup.getAccessToken());
         expect(commands.isStart).toBe(false);
         expect(commands.isStop).toBe(false);
         expect(commands.isPause).toBe(true);
@@ -50,7 +50,7 @@ describe("Test system command as a whole", () => {
     }));
     test("Should restart the system", () => __awaiter(void 0, void 0, void 0, function* () {
         yield commandFacade_1.default.systemCommand.restartSystem(setup.getAccessToken());
-        const commands = yield queryFacade_1.default.systemCommand.getSystemCommands(setup.getAccessToken());
+        const commands = yield queryFacade_1.default.systemCommand.getProposedSystemCommands(setup.getAccessToken());
         expect(commands.isStart).toBe(false);
         expect(commands.isStop).toBe(false);
         expect(commands.isPause).toBe(false);

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const queryFacade_1 = __importDefault(require("../queryFacade"));
 const testcases_json_1 = __importDefault(require("./testcases.json"));
 const testSetup_1 = __importDefault(require("../../utility/testSetup"));
+const intersection_1 = require("../../utility/intersection");
 describe("Test sensor actions - Integration test", () => {
     const setup = new testSetup_1.default();
     const timeOut = testSetup_1.default.TIME_OUT;
@@ -51,7 +52,13 @@ describe("Test sensor actions - Integration test", () => {
             throw new Error("Wrong type");
         expect(result[0].toJson()).toStrictEqual(testcases_json_1.default.sensors[randomIndex]);
     }), timeOut);
-    test("should get sensor data by name to the database", () => __awaiter(void 0, void 0, void 0, function* () {
+    test("should get sensor data from the database", () => __awaiter(void 0, void 0, void 0, function* () {
+        const result = yield sensorRead.getSensorData(setup.getAccessToken(), 1661126400 - 3600 * 24, 1661126400);
+        const intersection = (0, intersection_1.intersectArrays)(testcases_json_1.default.sensorData.map(({ sensorName, value, timeStamp }) => `${sensorName};${value};${timeStamp}`), result.map(dto => `${dto.sensorName};${dto.value};${dto.timeStamp}`));
+        expect(intersection).not.toBe(0);
+        expect(intersection.length).toBe(result.length);
+    }), timeOut);
+    test("should get sensor data by name from the database", () => __awaiter(void 0, void 0, void 0, function* () {
         const name = "Temperature 9";
         const result = yield sensorRead.getSensorDataByName(setup.getAccessToken(), name);
         let index = 0;

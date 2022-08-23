@@ -51,7 +51,7 @@ let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
     }
     getSensorData(accessToken, startDate = 0, endDate = luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger()) {
         return __awaiter(this, void 0, void 0, function* () {
-            constants_1.logger.info(`SensorReadMethods: Getting sensor data from the database with sensor name of "${name}"`);
+            constants_1.logger.info(`SensorReadMethods: Getting sensor data from the database from ${startDate} to ${endDate}`);
             const option = yield new sensorService_1.default().getSensorData({ startDate, endDate });
             return option.unwrapOrElse(() => {
                 this.setStatus(404);

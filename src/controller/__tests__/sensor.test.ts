@@ -1,12 +1,7 @@
-import CommandFacade from "../commandFacade";
 import QueryFacade from "../queryFacade"
 import testCase from "./testcases.json"
-import DatabaseErrorEvent from "../../model/v1/events/databaseErrorEvent";
-import FirebaseFirestoreService from "../database/firebase/services/firebaseFirestoreService";
-import { persistentFirebaseConnection } from "../v1/services/firebaseFreetier/firebaseService";
-import { TEST_SETUP_THROWS_ERROR } from "../../constants";
-import User from "../../model/v1/auth/user";
 import TestSetup from "../../utility/testSetup";
+import { intersectArrays } from "../../utility/intersection";
 
 describe("Test sensor actions - Integration test", ()=>{
   const setup = new TestSetup()
@@ -72,7 +67,17 @@ describe("Test sensor actions - Integration test", ()=>{
 
   // sensor data
 
-  test("should get sensor data by name to the database", async ()=>{
+  test("should get sensor data from the database", async ()=>{
+    const result = await sensorRead.getSensorData(setup.getAccessToken(), 1661126400 - 3600 * 24, 1661126400)
+    const intersection = intersectArrays(
+      testCase.sensorData.map(({ sensorName, value, timeStamp}) => `${sensorName};${value};${timeStamp}`),
+      result.map(dto => `${dto.sensorName};${dto.value};${dto.timeStamp}`)
+    )
+    expect(intersection).not.toBe(0)
+    expect(intersection.length).toBe(result.length)
+  }, timeOut)
+
+  test("should get sensor data by name from the database", async ()=>{
     const name = "Temperature 9"
     const result = await sensorRead.getSensorDataByName(setup.getAccessToken(), name)
     let index = 0

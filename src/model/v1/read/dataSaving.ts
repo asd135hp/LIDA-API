@@ -1,8 +1,8 @@
 export interface SnapshotDownloadResponse {
   newFileName: string
-  bucketLink: string
-  fileName: string
+  downloadUrl: string
   startDate: number
   endDate: number
-  decompressionByteLength: number
+  decompressionByteLength: number,
+  note: string
 }

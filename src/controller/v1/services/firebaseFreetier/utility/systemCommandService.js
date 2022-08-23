@@ -12,46 +12,86 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.realtimeSaveSensorSnapshot = exports.realtimeToggleFlag = exports.firestoreToggleFlag = void 0;
+exports.realtimeSaveSensorSnapshot = exports.realtimeToggleFlag = exports.firestoreToggleFlag = exports.realtimeUploadFlags = exports.firestoreUploadFlags = void 0;
+const luxon_1 = require("luxon");
 const constants_1 = require("../../../../../constants");
-const dataSavingService_1 = __importDefault(require("../dataSavingService"));
+const databaseErrorEvent_1 = __importDefault(require("../../../../../model/v1/events/databaseErrorEvent"));
+const helper_1 = require("../../../../../utility/helper");
 const firebaseService_1 = require("../firebaseService");
+const sensorService_1 = __importDefault(require("../sensorService"));
+const dataSavingService_1 = require("./dataSavingService");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
+function firestoreUploadFlags(flags, isProposed = false) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield firestore.runTransaction(constants_1.COMPONENTS_PATH.systemCommand, (snapshot, t) => __awaiter(this, void 0, void 0, function* () {
+            t.set(snapshot.ref, flags);
+        }));
+    });
+}
+exports.firestoreUploadFlags = firestoreUploadFlags;
+function realtimeUploadFlags(flags, isProposed = false) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield realtime.runTransaction(() => flags, constants_1.COMPONENTS_PATH.systemCommand);
+    });
+}
+exports.realtimeUploadFlags = realtimeUploadFlags;
 function firestoreToggleFlag(field) {
     return __awaiter(this, void 0, void 0, function* () {
-        const val = {
+        const flags = {
             start: false,
             stop: false,
             restart: false,
             pause: false
         };
-        val[field] = true;
-        return yield firestore.runTransaction(constants_1.COMPONENTS_PATH.systemCommand, (snapshot, t) => __awaiter(this, void 0, void 0, function* () {
-            t.set(snapshot.ref, val);
-        }));
+        flags[field] = true;
+        return yield firestoreUploadFlags(flags, true);
     });
 }
 exports.firestoreToggleFlag = firestoreToggleFlag;
 function realtimeToggleFlag(field) {
     return __awaiter(this, void 0, void 0, function* () {
-        const val = {
+        const flags = {
             start: false,
             stop: false,
             restart: false,
             pause: false
         };
-        val[field] = true;
-        return yield realtime.runTransaction(() => val, constants_1.COMPONENTS_PATH.systemCommand);
+        flags[field] = true;
+        return realtimeUploadFlags(flags, true);
     });
 }
 exports.realtimeToggleFlag = realtimeToggleFlag;
 function realtimeSaveSensorSnapshot(publisher) {
     return __awaiter(this, void 0, void 0, function* () {
         const ref = yield realtime.getContent(constants_1.COMPONENTS_PATH.count.run);
-        const runCount = ref.exists() ? parseInt(ref.val()) : 0;
-        const dataSaving = new dataSavingService_1.default(publisher);
-        yield realtime.getContent(constants_1.COMPONENTS_PATH.sensor);
+        const runCount = ref.exists() ? parseInt(ref.val()) : 1;
+        const folderName = `${constants_1.COMPONENTS_PATH.storage.sensor}/run${runCount}`;
+        const sensorService = new sensorService_1.default();
+        const sensorEvent = yield (0, dataSavingService_1.uploadSnapshot)((yield sensorService.getSensors()).unwrapOr([]).sort((0, helper_1.orderByProp)("name")), { startDate: -1, endDate: -1 }, folderName, publisher, 65);
+        if (sensorEvent instanceof databaseErrorEvent_1.default)
+            Promise.reject("500Could not process upload data event. Please try again!");
+        let currentTimestamp = luxon_1.DateTime.now().toUnixInteger();
+        while (true) {
+            const dateRange = {
+                startDate: currentTimestamp - 3600 * 24,
+                endDate: currentTimestamp
+            };
+            const oneDayData = (yield sensorService.getSensorData(dateRange)).unwrapOr([]);
+            if (!oneDayData.length)
+                break;
+            let count = 0;
+            while (count !== 3) {
+                const event = yield (0, dataSavingService_1.uploadSnapshot)(oneDayData, dateRange, folderName, publisher, 82);
+                if (event instanceof databaseErrorEvent_1.default) {
+                    count++;
+                    continue;
+                }
+            }
+            if (count == 3)
+                Promise.reject("500Could not process upload data event. Please try again!");
+            currentTimestamp -= 3600 * 24;
+        }
         yield realtime.updateContent(runCount + 1, constants_1.COMPONENTS_PATH.count.run);
     });
 }

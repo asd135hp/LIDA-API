@@ -1,10 +1,9 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      // we are currently in admin privilege
-      // so read and write permissions should be denied for all normal users 
-      allow read, write: if false
+    match /snapshots/{env}/{type} {
+      allow read: if type != "auth" && request.auth != null;
+      allow write: if false;
     }
   }
 }

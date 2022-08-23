@@ -141,6 +141,41 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"SnapshotDownloadResponse": {
+				"properties": {
+					"newFileName": {
+						"type": "string"
+					},
+					"downloadUrl": {
+						"type": "string"
+					},
+					"startDate": {
+						"type": "number",
+						"format": "double"
+					},
+					"endDate": {
+						"type": "number",
+						"format": "double"
+					},
+					"decompressionByteLength": {
+						"type": "number",
+						"format": "double"
+					},
+					"note": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"newFileName",
+					"downloadUrl",
+					"startDate",
+					"endDate",
+					"decompressionByteLength",
+					"note"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SystemCommandDTO": {
 				"properties": {
 					"isStart": {
@@ -376,6 +411,30 @@
 				"required": [
 					"value",
 					"timeStamp"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SystemCommand": {
+				"properties": {
+					"start": {
+						"type": "boolean"
+					},
+					"pause": {
+						"type": "boolean"
+					},
+					"stop": {
+						"type": "boolean"
+					},
+					"restart": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"start",
+					"pause",
+					"stop",
+					"restart"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -787,9 +846,103 @@
 				]
 			}
 		},
+		"/api/v1/sensor/snapshot/{runNumber}/get": {
+			"get": {
+				"operationId": "GetSensorDataRunSnapshot",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/SnapshotDownloadResponse"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"408": {
+						"description": "Request Timeout"
+					}
+				},
+				"security": [
+					{
+						"api_key": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "accessToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "runNumber",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
 		"/api/v1/systemCommand/get": {
 			"get": {
 				"operationId": "GetSystemCommands",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SystemCommandDTO"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"408": {
+						"description": "Request Timeout"
+					}
+				},
+				"security": [
+					{
+						"api_key": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "accessToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/systemCommand/proposed/get": {
+			"get": {
+				"operationId": "GetProposedSystemCommands",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1155,9 +1308,9 @@
 				]
 			}
 		},
-		"/api/v1/snapshot/log/delete": {
+		"/api/v1/snapshot/sensor/{runNumber}/delete": {
 			"delete": {
-				"operationId": "DeleteLogSnapshots",
+				"operationId": "DeleteSensorSnapshot",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -1200,18 +1353,9 @@
 						}
 					},
 					{
-						"in": "query",
-						"name": "startDate",
-						"required": false,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					},
-					{
-						"in": "query",
-						"name": "endDate",
-						"required": false,
+						"in": "path",
+						"name": "runNumber",
+						"required": true,
 						"schema": {
 							"format": "double",
 							"type": "number"
@@ -1495,6 +1639,47 @@
 		"/api/v1/systemCommand/restartSystem": {
 			"post": {
 				"operationId": "RestartSystem",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DatabaseEvent"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"408": {
+						"description": "Request Timeout"
+					}
+				},
+				"security": [
+					{
+						"api_key": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "accessToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/systemCommand/flags/commit": {
+			"post": {
+				"operationId": "CommitSystemFlags",
 				"responses": {
 					"200": {
 						"description": "Ok",

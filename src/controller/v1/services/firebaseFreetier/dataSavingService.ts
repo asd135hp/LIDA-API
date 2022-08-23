@@ -11,7 +11,8 @@ import { Option, Some, None } from "../../../../model/patterns/option"
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 import { SnapshotDownloadResponse } from "../../../../model/v1/read/dataSaving";
 import { COMPONENTS_PATH as fbPath } from "../../../../constants";
-import { parseStorageFileMetaData, mergeDefaultDateRange, getSnapshotsFromDateRange, customFlat, uploadSnapshot, deleteSnapshots } from "./utility/dataSavingService";
+import { parseStorageFileMetaData, mergeDefaultDateRange, getSnapshotsFromDateRange, customFlat, uploadSnapshot, deleteSnapshots, SensorSnapshot } from "./utility/dataSavingService";
+import { DateTime } from "luxon";
 
 const storage = persistentFirebaseConnection.storageService;
 
@@ -27,24 +28,30 @@ export default class DataSavingService {
    * @param runNumber Run number that is associated with that snapshot
    * @returns None on an empty array, otherwise Some
    */
-  async retrieveSensorSnapshot(runNumber: number): Promise<Option<SnapshotDownloadResponse>> {
+  async retrieveSensorSnapshot(runNumber: number): Promise<Option<SnapshotDownloadResponse[]>> {
     const folderPath = `${fbPath.storage.sensor}/run${runNumber}`
     const [files] = await storage.readFolderFromStorage(folderPath)
     if(!files || !files.length) return None
     
     logger.debug(`There are ${files.length} in ${folderPath}`)
-    // only one file per run folder
-    const [file] = files
-    const [startDate, endDate, byteLength, metadata] = parseStorageFileMetaData(await file.getMetadata())
+    const result = []
+    for(const file of files){
+      const [startDate, endDate, byteLength] = parseStorageFileMetaData(await file.getMetadata());
+      const [signedUrl] = await file.getSignedUrl({
+        action: "read",
+        expires: DateTime.now().toUnixInteger() + 3600 * 24,
+      });
+      
+      result.push({
+        newFileName: `${startDate}_${endDate}_run${runNumber}.zip`,
+        downloadUrl: signedUrl,
+        startDate, endDate,
+        decompressionByteLength: byteLength,
+        note: "The download link will expire today"
+      })
+    }
 
-    return Some({
-      newFileName: `${startDate}_${endDate}_run${runNumber}.zip`,
-      bucketLink: metadata.bucket,
-      fileName: metadata.name,
-      startDate, endDate,
-      decompressionByteLength: byteLength,
-      databaseType: "firebase"
-    })
+    return Some(result)
   }
 
   /**
@@ -76,7 +83,7 @@ export default class DataSavingService {
    * @param dateRange 
    * @returns None on an empty array, otherwise Some
    */
-   async retrieveSystemCommandLogSnapshots(dateRange?: FirebaseDateRange): Promise<Option<IterableJson[]>> {
+  async retrieveSystemCommandLogSnapshots(dateRange?: FirebaseDateRange): Promise<Option<IterableJson[]>> {
     dateRange = mergeDefaultDateRange(dateRange)
     // get ready to merge multiple snapshots together
     const data = await getSnapshotsFromDateRange(`${fbPath.storage.log}/systemCommand`, dateRange)
@@ -89,14 +96,31 @@ export default class DataSavingService {
    * @param dateRange 
    * @returns 
    */
-  async uploadSensorSnapshot(snapshot: IterableJson, dateRange: FirebaseDateRange, runNumber: number): Promise<DatabaseEvent> {
-    dateRange = mergeDefaultDateRange(dateRange)
-    snapshot = {
-      sensor: snapshot.sensor.sort(orderByProp("name")),
-      sensorData: snapshot.sensorData.sort(orderByProp("sensorName"))
-    }
+  async uploadSensorSnapshot(snapshots: SensorSnapshot, runNumber: number): Promise<DatabaseEvent> {
+    const folderName = `${fbPath.storage.sensor}/run${runNumber}`
 
-    return await uploadSnapshot(snapshot, dateRange, `${fbPath.storage.sensor}/run${runNumber}`, this.publisher, 265)
+    // upload sensors
+    const sensorEvent = await uploadSnapshot(
+      snapshots.sensor.sort(orderByProp("name")),
+      { startDate: -1, endDate: -1 },
+      folderName,
+      this.publisher,
+      106
+    )
+
+    // upload their respective data
+    const sortedData = snapshots.data.sort((data1, data2) => {
+      if(data1.chunk.timeStamp == data2.chunk.timeStamp) return 0
+      return data1.chunk.timeStamp > data2.chunk.timeStamp ? 1 : -1
+    })
+    const sensorDataEvent = await Promise.all(sortedData.map(({ chunk, dateRange }) => {
+      return uploadSnapshot(chunk, dateRange, folderName, this.publisher, 114)
+    })).catch(() => [new DatabaseErrorEvent("Placeholder error event ~ 115") as DatabaseEvent])
+
+    return filterDatabaseEvent([sensorEvent, ...sensorDataEvent], DatabaseCreateEvent).unwrapOrElse(()=>{
+      logger.error("DataSavingService: DatabaseEvent filtration leads to all error ~ 119")
+      return new DatabaseErrorEvent("The action is failed to be executed", 400)
+    })
   }
 
   /**
@@ -133,6 +157,11 @@ export default class DataSavingService {
     )
   }
 
+  /**
+   * Delete log snapshots of a specific date range - not functional
+   * @param runNumber 
+   * @returns 
+   */
   async deleteLogSnapshots(dateRange: FirebaseDateRange): Promise<DatabaseEvent> {
     return await deleteSnapshots(fbPath.storage.log, dateRange, this.publisher)
   }

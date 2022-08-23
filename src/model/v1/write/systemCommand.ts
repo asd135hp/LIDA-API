@@ -3,6 +3,9 @@ export interface SystemCommand {
   start: boolean,
   pause: boolean,
   stop: boolean,
-  restart: boolean,
+  restart: boolean
+}
+
+export interface SystemCommandIterable extends SystemCommand {
   [flagName: string]: boolean
 }

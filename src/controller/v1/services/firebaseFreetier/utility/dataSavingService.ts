@@ -11,8 +11,17 @@ import { decompressData, compressJsonDataSync } from "../../../../../utility/com
 import { filterDatabaseEvent } from "../../../../../utility/filterDatabaseEvent";
 import { persistentFirebaseConnection } from "../firebaseService";
 import { Option, Some, None } from "../../../../../model/patterns/option"
+import { Sensor, SensorData } from "../../../../../model/v1/write/sensors";
 
 const storage = persistentFirebaseConnection.storageService;
+
+export type SensorSnapshot = {
+  sensor: Sensor[],
+  data: {
+    chunk: SensorData,
+    dateRange: FirebaseDateRange
+  }[]
+}
 
 /**
  * Utility method - replaces provided dateRange object with its default options

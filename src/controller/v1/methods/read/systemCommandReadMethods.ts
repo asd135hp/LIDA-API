@@ -19,4 +19,14 @@ export class SystemCommandReadMethods extends Controller {
       throw new Error("Internal error")
     })
   }
+  
+  @Get("proposed/get")
+  async getProposedSystemCommands(@Query() accessToken: string): Promise<SystemCommandDTO> {
+    logger.info("SystemCommandReadMethods: Getting proposed system commands from the database")
+    const option = await new SystemCommandService().getProposedSystemFlags()
+    return option.unwrapOrElse(()=>{
+      logger.error("SystemCommandReadMethods - Something happened to either the code or the database")
+      throw new Error("Internal error")
+    })
+  }
 }

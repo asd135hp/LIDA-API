@@ -46,6 +46,11 @@ let SystemCommandWriteMethods = SystemCommandWriteMethods_1 = class SystemComman
             return yield this.service.setRestartSystem();
         });
     }
+    commitSystemFlags(accessToken, flags) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.service.uploadHardwareSystemFlags(flags);
+        });
+    }
 };
 __decorate([
     (0, tsoa_1.Post)("startSystem"),
@@ -63,6 +68,11 @@ __decorate([
     (0, tsoa_1.Post)("restartSystem"),
     __param(0, (0, tsoa_1.Query)())
 ], SystemCommandWriteMethods.prototype, "restartSystem", null);
+__decorate([
+    (0, tsoa_1.Post)("flags/commit"),
+    __param(0, (0, tsoa_1.Query)()),
+    __param(1, (0, tsoa_1.BodyProp)())
+], SystemCommandWriteMethods.prototype, "commitSystemFlags", null);
 SystemCommandWriteMethods = SystemCommandWriteMethods_1 = __decorate([
     (0, tsoa_1.Security)("api_key"),
     (0, tsoa_1.Route)(`api/v1/systemCommand`),

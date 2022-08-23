@@ -1,4 +1,4 @@
-import { Route, SuccessResponse, Response, Controller, Security, Delete, Query, Post, Header } from "tsoa";
+import { Route, SuccessResponse, Response, Controller, Security, Delete, Query, Post, Header, Path } from "tsoa";
 import { DATABASE_TIMEZONE, logger } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
@@ -145,21 +145,34 @@ export class DataSavingWriteMethods extends Controller {
   //   return getEvent(event)
   // }
 
-  @Delete("log/delete")
-  async deleteLogSnapshots(
+  @Delete("sensor/{runNumber}/delete")
+  async deleteSensorSnapshot(
     @Query() accessToken: string,
-    @Query() startDate?: number,
-    @Query() endDate?: number
+    @Path() runNumber: number
   ): Promise<DatabaseEvent> {
-    const t = getDateRangeString({ startDate, endDate })
-    logger.info(`DataSavingWriteMethods: Deleting log snapshots from the storage from ${t.start} to ${t.end}`)
-    
-    // return appropriate status code from internal system
-    const event = await this.service.deleteLogSnapshots({ startDate, endDate })
+    const event = await this.service.deleteSensorSnapshot(runNumber)
     if(event instanceof DatabaseErrorEvent){
       this.setStatus(event.content.values.statusCode)
     }
 
     return getEvent(event)
   }
+
+  // @Delete("log/delete")
+  // async deleteLogSnapshots(
+  //   @Query() accessToken: string,
+  //   @Query() startDate?: number,
+  //   @Query() endDate?: number
+  // ): Promise<DatabaseEvent> {
+  //   const t = getDateRangeString({ startDate, endDate })
+  //   logger.info(`DataSavingWriteMethods: Deleting log snapshots from the storage from ${t.start} to ${t.end}`)
+    
+  //   // return appropriate status code from internal system
+  //   const event = await this.service.deleteLogSnapshots({ startDate, endDate })
+  //   if(event instanceof DatabaseErrorEvent){
+  //     this.setStatus(event.content.values.statusCode)
+  //   }
+
+  //   return getEvent(event)
+  // }
 }

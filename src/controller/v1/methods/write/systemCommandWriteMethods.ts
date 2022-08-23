@@ -1,5 +1,6 @@
-import { Route, SuccessResponse, Response, Controller, Security, Query, Post } from "tsoa";
+import { Route, SuccessResponse, Response, Controller, Security, Query, Post, BodyProp } from "tsoa";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
+import { SystemCommand } from "../../../../model/v1/write/systemCommand";
 import SystemCommandService from "../../services/firebaseFreetier/systemCommandService";
 
 @Security("api_key")
@@ -36,5 +37,13 @@ export class SystemCommandWriteMethods extends Controller {
   @Post("restartSystem")
   async restartSystem(@Query() accessToken: string): Promise<DatabaseEvent> {
     return await this.service.setRestartSystem()
+  }
+
+  @Post("flags/commit")
+  async commitSystemFlags(
+    @Query() accessToken: string,
+    @BodyProp() flags: SystemCommand
+  ): Promise<DatabaseEvent> {
+    return await this.service.uploadHardwareSystemFlags(flags)
   }
 }

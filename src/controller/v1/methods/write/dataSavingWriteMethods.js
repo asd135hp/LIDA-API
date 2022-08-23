@@ -28,7 +28,6 @@ const constants_1 = require("../../../../constants");
 const databaseEvent_1 = __importDefault(require("../../../../model/v1/events/databaseEvent"));
 const databaseErrorEvent_1 = __importDefault(require("../../../../model/v1/events/databaseErrorEvent"));
 const luxon_1 = require("luxon");
-const helper_1 = require("../../../../utility/helper");
 const firebaseService_1 = require("../../services/firebaseFreetier/firebaseService");
 const getEvent = databaseEvent_1.default.getCompactEvent;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
@@ -39,11 +38,9 @@ let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMet
         this.service = DataSavingWriteMethods_1.mainService;
     }
     get currentUnixTimestamp() { return luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger(); }
-    deleteLogSnapshots(accessToken, startDate, endDate) {
+    deleteSensorSnapshot(accessToken, runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
-            const t = (0, helper_1.getDateRangeString)({ startDate, endDate });
-            constants_1.logger.info(`DataSavingWriteMethods: Deleting log snapshots from the storage from ${t.start} to ${t.end}`);
-            const event = yield this.service.deleteLogSnapshots({ startDate, endDate });
+            const event = yield this.service.deleteSensorSnapshot(runNumber);
             if (event instanceof databaseErrorEvent_1.default) {
                 this.setStatus(event.content.values.statusCode);
             }
@@ -52,11 +49,10 @@ let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMet
     }
 };
 __decorate([
-    (0, tsoa_1.Delete)("log/delete"),
+    (0, tsoa_1.Delete)("sensor/{runNumber}/delete"),
     __param(0, (0, tsoa_1.Query)()),
-    __param(1, (0, tsoa_1.Query)()),
-    __param(2, (0, tsoa_1.Query)())
-], DataSavingWriteMethods.prototype, "deleteLogSnapshots", null);
+    __param(1, (0, tsoa_1.Path)())
+], DataSavingWriteMethods.prototype, "deleteSensorSnapshot", null);
 DataSavingWriteMethods = DataSavingWriteMethods_1 = __decorate([
     (0, tsoa_1.Security)("api_key"),
     (0, tsoa_1.Route)(`api/v1/snapshot`),

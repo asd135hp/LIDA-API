@@ -26,87 +26,62 @@ class SystemCommandService {
     constructor(publisher) {
         this.publisher = publisher;
     }
+    toggleFlag(flag) {
+        return (0, shorthandOps_1.createWriteEvent)({
+            data: { [flag]: true },
+            protectedMethods: {
+                write() {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        yield (0, systemCommandService_1.firestoreToggleFlag)(flag);
+                    });
+                },
+                read() {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        yield (0, systemCommandService_1.realtimeToggleFlag)(flag);
+                    });
+                }
+            },
+            publisher: this.publisher,
+            serverLogErrorMsg: "SystemCommandService: All database filtration leads to error ~ 52"
+        }, databaseUpdateEvent_1.default);
+    }
     setStartSystem() {
         return __awaiter(this, void 0, void 0, function* () {
-            const field = "start";
-            return yield (0, shorthandOps_1.createWriteEvent)({
-                data: { isStarted: true },
-                protectedMethods: {
-                    write() {
-                        return __awaiter(this, void 0, void 0, function* () {
-                            yield (0, systemCommandService_1.firestoreToggleFlag)(field);
-                            yield firestore.deleteCollection("sensors");
-                        });
-                    },
-                    read() {
-                        return __awaiter(this, void 0, void 0, function* () {
-                            yield (0, systemCommandService_1.realtimeToggleFlag)(field);
-                        });
-                    }
-                },
-                publisher: this.publisher,
-                serverLogErrorMsg: "SystemCommandService: All database filtration leads to error ~ 52"
-            }, databaseUpdateEvent_1.default);
+            return yield this.toggleFlag("start");
         });
     }
     setPauseSystem() {
         return __awaiter(this, void 0, void 0, function* () {
-            const field = "pause";
-            return yield (0, shorthandOps_1.createWriteEvent)({
-                data: { isPaused: true },
-                protectedMethods: {
-                    write() {
-                        return __awaiter(this, void 0, void 0, function* () {
-                            yield (0, systemCommandService_1.firestoreToggleFlag)(field);
-                        });
-                    },
-                    read() {
-                        return __awaiter(this, void 0, void 0, function* () {
-                            yield (0, systemCommandService_1.realtimeToggleFlag)(field);
-                        });
-                    }
-                },
-                publisher: this.publisher,
-                serverLogErrorMsg: "SystemCommandService: All database filtration leads to error ~ 69"
-            }, databaseUpdateEvent_1.default);
+            return yield this.toggleFlag("pause");
         });
     }
     setStopSystem() {
         return __awaiter(this, void 0, void 0, function* () {
-            const field = "stop";
-            return yield (0, shorthandOps_1.createWriteEvent)({
-                data: { isStopped: true },
-                protectedMethods: {
-                    write() {
-                        return __awaiter(this, void 0, void 0, function* () {
-                            yield (0, systemCommandService_1.firestoreToggleFlag)(field);
-                        });
-                    },
-                    read() {
-                        return __awaiter(this, void 0, void 0, function* () {
-                            yield (0, systemCommandService_1.realtimeToggleFlag)(field);
-                        });
-                    }
-                },
-                publisher: this.publisher,
-                serverLogErrorMsg: "SystemCommandService: All database filtration leads to error ~ 86"
-            }, databaseUpdateEvent_1.default);
+            return yield this.toggleFlag("stop");
         });
     }
     setRestartSystem() {
         return __awaiter(this, void 0, void 0, function* () {
-            const field = "restart";
+            return yield this.toggleFlag("restart");
+        });
+    }
+    uploadHardwareSystemFlags(flags) {
+        return __awaiter(this, void 0, void 0, function* () {
             return yield (0, shorthandOps_1.createWriteEvent)({
                 data: { isRestarted: true },
                 protectedMethods: {
                     write() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield (0, systemCommandService_1.firestoreToggleFlag)(field);
+                            yield (0, systemCommandService_1.firestoreUploadFlags)(flags);
+                            if (flags.start)
+                                yield firestore.deleteCollection("sensors");
                         });
                     },
                     read() {
                         return __awaiter(this, void 0, void 0, function* () {
-                            yield (0, systemCommandService_1.realtimeToggleFlag)(field);
+                            yield (0, systemCommandService_1.realtimeUploadFlags)(flags);
+                            if (flags.start)
+                                yield (0, systemCommandService_1.realtimeSaveSensorSnapshot)(this.publisher);
                         });
                     }
                 },
@@ -118,6 +93,19 @@ class SystemCommandService {
     getSystemFlags() {
         return __awaiter(this, void 0, void 0, function* () {
             const snapshot = yield realtime.getContent(constants_2.COMPONENTS_PATH.systemCommand);
+            const flags = yield snapshot.val();
+            try {
+                return flags ? (0, option_1.Some)(systemCommandDto_1.SystemCommandDTO.fromJson(flags)) : option_1.None;
+            }
+            catch (e) {
+                constants_1.logger.error("SystemCommandService - Caught an error while getting system flags: " + e);
+                return option_1.None;
+            }
+        });
+    }
+    getProposedSystemFlags() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const snapshot = yield realtime.getContent(constants_2.COMPONENTS_PATH.systemCommandProposed);
             const flags = yield snapshot.val();
             try {
                 return flags ? (0, option_1.Some)(systemCommandDto_1.SystemCommandDTO.fromJson(flags)) : option_1.None;

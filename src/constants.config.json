@@ -24,6 +24,7 @@
     "actuatorConfig": "actuatorConfig",
     "actuatorConfigProposed": "actuatorConfigProposed",
     "systemCommand": "systemCommand/flags",
+    "systemCommandProposed": "systemCommand/flags",
     "logs": {
       "sensor": "logs/sensor",
       "actuator": "logs/actuator",

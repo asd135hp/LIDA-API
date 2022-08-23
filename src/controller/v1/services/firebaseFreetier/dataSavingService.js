@@ -21,6 +21,7 @@ const option_1 = require("../../../../model/patterns/option");
 const databaseErrorEvent_1 = __importDefault(require("../../../../model/v1/events/databaseErrorEvent"));
 const constants_2 = require("../../../../constants");
 const dataSavingService_1 = require("./utility/dataSavingService");
+const luxon_1 = require("luxon");
 const storage = firebaseService_1.persistentFirebaseConnection.storageService;
 class DataSavingService {
     constructor(publisher) {
@@ -33,16 +34,22 @@ class DataSavingService {
             if (!files || !files.length)
                 return option_1.None;
             constants_1.logger.debug(`There are ${files.length} in ${folderPath}`);
-            const [file] = files;
-            const [startDate, endDate, byteLength, metadata] = (0, dataSavingService_1.parseStorageFileMetaData)(yield file.getMetadata());
-            return (0, option_1.Some)({
-                newFileName: `${startDate}_${endDate}_run${runNumber}.zip`,
-                bucketLink: metadata.bucket,
-                fileName: metadata.name,
-                startDate, endDate,
-                decompressionByteLength: byteLength,
-                databaseType: "firebase"
-            });
+            const result = [];
+            for (const file of files) {
+                const [startDate, endDate, byteLength] = (0, dataSavingService_1.parseStorageFileMetaData)(yield file.getMetadata());
+                const [signedUrl] = yield file.getSignedUrl({
+                    action: "read",
+                    expires: luxon_1.DateTime.now().toUnixInteger() + 3600 * 24,
+                });
+                result.push({
+                    newFileName: `${startDate}_${endDate}_run${runNumber}.zip`,
+                    downloadUrl: signedUrl,
+                    startDate, endDate,
+                    decompressionByteLength: byteLength,
+                    note: "The download link will expire today"
+                });
+            }
+            return (0, option_1.Some)(result);
         });
     }
     retrieveSensorLogSnapshots(dateRange) {
@@ -66,14 +73,22 @@ class DataSavingService {
             return (0, dataSavingService_1.customFlat)(data, dateRange);
         });
     }
-    uploadSensorSnapshot(snapshot, dateRange, runNumber) {
+    uploadSensorSnapshot(snapshots, runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
-            dateRange = (0, dataSavingService_1.mergeDefaultDateRange)(dateRange);
-            snapshot = {
-                sensor: snapshot.sensor.sort((0, helper_1.orderByProp)("name")),
-                sensorData: snapshot.sensorData.sort((0, helper_1.orderByProp)("sensorName"))
-            };
-            return yield (0, dataSavingService_1.uploadSnapshot)(snapshot, dateRange, `${constants_2.COMPONENTS_PATH.storage.sensor}/run${runNumber}`, this.publisher, 265);
+            const folderName = `${constants_2.COMPONENTS_PATH.storage.sensor}/run${runNumber}`;
+            const sensorEvent = yield (0, dataSavingService_1.uploadSnapshot)(snapshots.sensor.sort((0, helper_1.orderByProp)("name")), { startDate: -1, endDate: -1 }, folderName, this.publisher, 106);
+            const sortedData = snapshots.data.sort((data1, data2) => {
+                if (data1.chunk.timeStamp == data2.chunk.timeStamp)
+                    return 0;
+                return data1.chunk.timeStamp > data2.chunk.timeStamp ? 1 : -1;
+            });
+            const sensorDataEvent = yield Promise.all(sortedData.map(({ chunk, dateRange }) => {
+                return (0, dataSavingService_1.uploadSnapshot)(chunk, dateRange, folderName, this.publisher, 114);
+            })).catch(() => [new databaseErrorEvent_1.default("Placeholder error event ~ 115")]);
+            return (0, filterDatabaseEvent_1.filterDatabaseEvent)([sensorEvent, ...sensorDataEvent], databaseCreateEvent_1.default).unwrapOrElse(() => {
+                constants_1.logger.error("DataSavingService: DatabaseEvent filtration leads to all error ~ 119");
+                return new databaseErrorEvent_1.default("The action is failed to be executed", 400);
+            });
         });
     }
     uploadLogSnapshot(snapshot, dateRange) {

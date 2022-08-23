@@ -25,6 +25,7 @@ exports.SensorReadMethods = void 0;
 const luxon_1 = require("luxon");
 const tsoa_1 = require("tsoa");
 const constants_1 = require("../../../../constants");
+const dataSavingService_1 = __importDefault(require("../../services/firebaseFreetier/dataSavingService"));
 const sensorService_1 = __importDefault(require("../../services/firebaseFreetier/sensorService"));
 let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
     getSensors(accessToken) {
@@ -58,6 +59,16 @@ let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
             });
         });
     }
+    getSensorDataRunSnapshot(accessToken, runNumber) {
+        return __awaiter(this, void 0, void 0, function* () {
+            constants_1.logger.info(`SensorReadMethods: Getting sensor data of the previous run#${runNumber} from the database`);
+            const option = yield new dataSavingService_1.default().retrieveSensorSnapshot(runNumber);
+            return option.unwrapOrElse(() => {
+                this.setStatus(404);
+                return [];
+            });
+        });
+    }
 };
 __decorate([
     (0, tsoa_1.Get)("get"),
@@ -75,6 +86,11 @@ __decorate([
     __param(2, (0, tsoa_1.Query)()),
     __param(3, (0, tsoa_1.Query)())
 ], SensorReadMethods.prototype, "getSensorData", null);
+__decorate([
+    (0, tsoa_1.Get)("snapshot/{runNumber}/get"),
+    __param(0, (0, tsoa_1.Query)()),
+    __param(1, (0, tsoa_1.Path)())
+], SensorReadMethods.prototype, "getSensorDataRunSnapshot", null);
 SensorReadMethods = __decorate([
     (0, tsoa_1.Security)("api_key"),
     (0, tsoa_1.Route)(`api/v1/sensor`),

@@ -2,7 +2,9 @@ import { DateTime } from "luxon";
 import { Get, Route, SuccessResponse, Response, Controller, Path, Security, Query, Header } from "tsoa";
 import { DATABASE_TIMEZONE, logger } from "../../../../constants";
 import { apiPath } from "../../../../constants.config.json"
+import { SnapshotDownloadResponse } from "../../../../model/v1/read/dataSaving";
 import { SensorDTO, SensorDataDTO } from "../../../../model/v1/read/sensorDto";
+import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
 import SensorService from "../../services/firebaseFreetier/sensorService";
 
 @Security("api_key")
@@ -47,6 +49,21 @@ export class SensorReadMethods extends Controller {
     logger.info(`SensorReadMethods: Getting sensor data from the database with sensor name of "${name}"`)
 
     const option = await new SensorService().getSensorDataByName(name, { startDate, endDate })
+    return option.unwrapOrElse(()=>{
+      // handle status code when the entity is not found in the database
+      this.setStatus(404)
+      return []
+    })
+  }
+
+  @Get("snapshot/{runNumber}/get")
+  async getSensorDataRunSnapshot(
+    @Query() accessToken: string,
+    @Path() runNumber: number
+  ): Promise<SnapshotDownloadResponse[]> {
+    logger.info(`SensorReadMethods: Getting sensor data of the previous run#${runNumber} from the database`)
+    
+    const option = await new DataSavingService().retrieveSensorSnapshot(runNumber)
     return option.unwrapOrElse(()=>{
       // handle status code when the entity is not found in the database
       this.setStatus(404)

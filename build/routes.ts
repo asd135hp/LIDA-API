@@ -97,6 +97,19 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SnapshotDownloadResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "newFileName": {"dataType":"string","required":true},
+            "downloadUrl": {"dataType":"string","required":true},
+            "startDate": {"dataType":"double","required":true},
+            "endDate": {"dataType":"double","required":true},
+            "decompressionByteLength": {"dataType":"double","required":true},
+            "note": {"dataType":"string","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SystemCommandDTO": {
         "dataType": "refObject",
         "properties": {
@@ -215,6 +228,17 @@ const models: TsoaRoute.Models = {
         "properties": {
             "value": {"dataType":"double","required":true},
             "timeStamp": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "SystemCommand": {
+        "dataType": "refObject",
+        "properties": {
+            "start": {"dataType":"boolean","required":true},
+            "pause": {"dataType":"boolean","required":true},
+            "stop": {"dataType":"boolean","required":true},
+            "restart": {"dataType":"boolean","required":true},
         },
         "additionalProperties": false,
     },
@@ -416,6 +440,31 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/api/v1/sensor/snapshot/:runNumber/get',
+            authenticateMiddleware([{"api_key":[]}]),
+
+            function SensorReadMethods_getSensorDataRunSnapshot(request: any, response: any, next: any) {
+            const args = {
+                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
+                    runNumber: {"in":"path","name":"runNumber","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new SensorReadMethods();
+
+
+              const promise = controller.getSensorDataRunSnapshot.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/systemCommand/get',
             authenticateMiddleware([{"api_key":[]}]),
 
@@ -434,6 +483,30 @@ export function RegisterRoutes(app: express.Router) {
 
 
               const promise = controller.getSystemCommands.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/api/v1/systemCommand/proposed/get',
+            authenticateMiddleware([{"api_key":[]}]),
+
+            function SystemCommandReadMethods_getProposedSystemCommands(request: any, response: any, next: any) {
+            const args = {
+                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new SystemCommandReadMethods();
+
+
+              const promise = controller.getProposedSystemCommands.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
@@ -614,14 +687,13 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.delete('/api/v1/snapshot/log/delete',
+        app.delete('/api/v1/snapshot/sensor/:runNumber/delete',
             authenticateMiddleware([{"api_key":[]}]),
 
-            function DataSavingWriteMethods_deleteLogSnapshots(request: any, response: any, next: any) {
+            function DataSavingWriteMethods_deleteSensorSnapshot(request: any, response: any, next: any) {
             const args = {
                     accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
-                    startDate: {"in":"query","name":"startDate","dataType":"double"},
-                    endDate: {"in":"query","name":"endDate","dataType":"double"},
+                    runNumber: {"in":"path","name":"runNumber","required":true,"dataType":"double"},
             };
 
             // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
@@ -633,7 +705,7 @@ export function RegisterRoutes(app: express.Router) {
                 const controller = new DataSavingWriteMethods();
 
 
-              const promise = controller.deleteLogSnapshots.apply(controller, validatedArgs as any);
+              const promise = controller.deleteSensorSnapshot.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
@@ -806,6 +878,31 @@ export function RegisterRoutes(app: express.Router) {
 
 
               const promise = controller.restartSystem.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v1/systemCommand/flags/commit',
+            authenticateMiddleware([{"api_key":[]}]),
+
+            function SystemCommandWriteMethods_commitSystemFlags(request: any, response: any, next: any) {
+            const args = {
+                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
+                    flags: {"in":"body-prop","name":"flags","required":true,"ref":"SystemCommand"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new SystemCommandWriteMethods();
+
+
+              const promise = controller.commitSystemFlags.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

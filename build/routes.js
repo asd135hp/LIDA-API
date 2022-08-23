@@ -82,6 +82,18 @@ const models = {
         },
         "additionalProperties": false,
     },
+    "SnapshotDownloadResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "newFileName": { "dataType": "string", "required": true },
+            "downloadUrl": { "dataType": "string", "required": true },
+            "startDate": { "dataType": "double", "required": true },
+            "endDate": { "dataType": "double", "required": true },
+            "decompressionByteLength": { "dataType": "double", "required": true },
+            "note": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
     "SystemCommandDTO": {
         "dataType": "refObject",
         "properties": {
@@ -187,6 +199,16 @@ const models = {
         "properties": {
             "value": { "dataType": "double", "required": true },
             "timeStamp": { "dataType": "double", "required": true },
+        },
+        "additionalProperties": false,
+    },
+    "SystemCommand": {
+        "dataType": "refObject",
+        "properties": {
+            "start": { "dataType": "boolean", "required": true },
+            "pause": { "dataType": "boolean", "required": true },
+            "stop": { "dataType": "boolean", "required": true },
+            "restart": { "dataType": "boolean", "required": true },
         },
         "additionalProperties": false,
     },
@@ -316,6 +338,22 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
+    app.get('/api/v1/sensor/snapshot/:runNumber/get', authenticateMiddleware([{ "api_key": [] }]), function SensorReadMethods_getSensorDataRunSnapshot(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+            runNumber: { "in": "path", "name": "runNumber", "required": true, "dataType": "double" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new sensorReadMethods_1.SensorReadMethods();
+            const promise = controller.getSensorDataRunSnapshot.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
     app.get('/api/v1/systemCommand/get', authenticateMiddleware([{ "api_key": [] }]), function SystemCommandReadMethods_getSystemCommands(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
@@ -325,6 +363,21 @@ function RegisterRoutes(app) {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new systemCommandReadMethods_1.SystemCommandReadMethods();
             const promise = controller.getSystemCommands.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    app.get('/api/v1/systemCommand/proposed/get', authenticateMiddleware([{ "api_key": [] }]), function SystemCommandReadMethods_getProposedSystemCommands(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new systemCommandReadMethods_1.SystemCommandReadMethods();
+            const promise = controller.getProposedSystemCommands.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {
@@ -442,17 +495,16 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.delete('/api/v1/snapshot/log/delete', authenticateMiddleware([{ "api_key": [] }]), function DataSavingWriteMethods_deleteLogSnapshots(request, response, next) {
+    app.delete('/api/v1/snapshot/sensor/:runNumber/delete', authenticateMiddleware([{ "api_key": [] }]), function DataSavingWriteMethods_deleteSensorSnapshot(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
-            startDate: { "in": "query", "name": "startDate", "dataType": "double" },
-            endDate: { "in": "query", "name": "endDate", "dataType": "double" },
+            runNumber: { "in": "path", "name": "runNumber", "required": true, "dataType": "double" },
         };
         let validatedArgs = [];
         try {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new dataSavingWriteMethods_1.DataSavingWriteMethods();
-            const promise = controller.deleteLogSnapshots.apply(controller, validatedArgs);
+            const promise = controller.deleteSensorSnapshot.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {
@@ -562,6 +614,22 @@ function RegisterRoutes(app) {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new systemCommandWriteMethods_1.SystemCommandWriteMethods();
             const promise = controller.restartSystem.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    app.post('/api/v1/systemCommand/flags/commit', authenticateMiddleware([{ "api_key": [] }]), function SystemCommandWriteMethods_commitSystemFlags(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+            flags: { "in": "body-prop", "name": "flags", "required": true, "ref": "SystemCommand" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new systemCommandWriteMethods_1.SystemCommandWriteMethods();
+            const promise = controller.commitSystemFlags.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {

@@ -13,17 +13,17 @@ describe("Test sensor actions - Integration test", ()=>{
     await setup.init()
 
     // primitive testing
-    for(const val of testCase.sensorLogs) {
-      const event = await CommandFacade.logs.addSensorLog(setup.getAccessToken(), val)
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // for(const val of testCase.sensorLogs) {
+    //   const event = await CommandFacade.logs.addSensorLog(setup.getAccessToken(), val)
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
 
-    for(const val of testCase.actuatorLogs) {
-      const event = await CommandFacade.logs.addActuatorLog(setup.getAccessToken(), val)
-      if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
-        throw new Error("An error is raised: " + event.content.error)
-    }
+    // for(const val of testCase.actuatorLogs) {
+    //   const event = await CommandFacade.logs.addActuatorLog(setup.getAccessToken(), val)
+    //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
+    //     throw new Error("An error is raised: " + event.content.error)
+    // }
   }, timeOut * Math.max(testCase.sensorLogs.length, testCase.actuatorLogs.length))
 
   afterAll(async ()=>{

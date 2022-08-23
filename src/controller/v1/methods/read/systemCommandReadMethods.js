@@ -36,11 +36,25 @@ let SystemCommandReadMethods = class SystemCommandReadMethods extends tsoa_1.Con
             });
         });
     }
+    getProposedSystemCommands(accessToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            constants_1.logger.info("SystemCommandReadMethods: Getting proposed system commands from the database");
+            const option = yield new systemCommandService_1.default().getProposedSystemFlags();
+            return option.unwrapOrElse(() => {
+                constants_1.logger.error("SystemCommandReadMethods - Something happened to either the code or the database");
+                throw new Error("Internal error");
+            });
+        });
+    }
 };
 __decorate([
     (0, tsoa_1.Get)("get"),
     __param(0, (0, tsoa_1.Query)())
 ], SystemCommandReadMethods.prototype, "getSystemCommands", null);
+__decorate([
+    (0, tsoa_1.Get)("proposed/get"),
+    __param(0, (0, tsoa_1.Query)())
+], SystemCommandReadMethods.prototype, "getProposedSystemCommands", null);
 SystemCommandReadMethods = __decorate([
     (0, tsoa_1.Security)("api_key"),
     (0, tsoa_1.Route)(`api/v1/systemCommand`),

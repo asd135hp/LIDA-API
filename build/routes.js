@@ -320,7 +320,24 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/sensor/:name/data/get', authenticateMiddleware([{ "api_key": [] }]), function SensorReadMethods_getSensorData(request, response, next) {
+    app.get('/api/v1/sensor/data/get', authenticateMiddleware([{ "api_key": [] }]), function SensorReadMethods_getSensorData(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+            startDate: { "default": 0, "in": "query", "name": "startDate", "dataType": "double" },
+            endDate: { "in": "query", "name": "endDate", "dataType": "double" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new sensorReadMethods_1.SensorReadMethods();
+            const promise = controller.getSensorData.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    app.get('/api/v1/sensor/:name/data/get', authenticateMiddleware([{ "api_key": [] }]), function SensorReadMethods_getSensorDataByName(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             name: { "in": "path", "name": "name", "required": true, "dataType": "string" },
@@ -331,7 +348,7 @@ function RegisterRoutes(app) {
         try {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new sensorReadMethods_1.SensorReadMethods();
-            const promise = controller.getSensorData.apply(controller, validatedArgs);
+            const promise = controller.getSensorDataByName.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {

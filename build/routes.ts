@@ -413,10 +413,36 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/api/v1/sensor/:name/data/get',
+        app.get('/api/v1/sensor/data/get',
             authenticateMiddleware([{"api_key":[]}]),
 
             function SensorReadMethods_getSensorData(request: any, response: any, next: any) {
+            const args = {
+                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
+                    startDate: {"default":0,"in":"query","name":"startDate","dataType":"double"},
+                    endDate: {"in":"query","name":"endDate","dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new SensorReadMethods();
+
+
+              const promise = controller.getSensorData.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/api/v1/sensor/:name/data/get',
+            authenticateMiddleware([{"api_key":[]}]),
+
+            function SensorReadMethods_getSensorDataByName(request: any, response: any, next: any) {
             const args = {
                     accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
                     name: {"in":"path","name":"name","required":true,"dataType":"string"},
@@ -433,7 +459,7 @@ export function RegisterRoutes(app: express.Router) {
                 const controller = new SensorReadMethods();
 
 
-              const promise = controller.getSensorData.apply(controller, validatedArgs as any);
+              const promise = controller.getSensorDataByName.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

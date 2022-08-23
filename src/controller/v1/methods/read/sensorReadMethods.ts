@@ -39,8 +39,24 @@ export class SensorReadMethods extends Controller {
     })
   }
 
-  @Get("{name}/data/get")
+  @Get("data/get")
   async getSensorData(
+    @Query() accessToken: string,
+    @Query() startDate: number = 0,
+    @Query() endDate: number = DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
+  ): Promise<SensorDataDTO[]> {
+    logger.info(`SensorReadMethods: Getting sensor data from the database with sensor name of "${name}"`)
+
+    const option = await new SensorService().getSensorData({ startDate, endDate })
+    return option.unwrapOrElse(()=>{
+      // handle status code when the entity is not found in the database
+      this.setStatus(404)
+      return []
+    })
+  }
+
+  @Get("{name}/data/get")
+  async getSensorDataByName(
     @Query() accessToken: string,
     @Path() name: string,
     @Query() startDate: number = 0,

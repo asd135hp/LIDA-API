@@ -53,7 +53,7 @@ describe("Test sensor actions - Integration test", () => {
     }), timeOut);
     test("should get sensor data by name to the database", () => __awaiter(void 0, void 0, void 0, function* () {
         const name = "Temperature 9";
-        const result = yield sensorRead.getSensorData(setup.getAccessToken(), name);
+        const result = yield sensorRead.getSensorDataByName(setup.getAccessToken(), name);
         let index = 0;
         testcases_json_1.default.sensorData.map(data => {
             if (data.sensorName != name)

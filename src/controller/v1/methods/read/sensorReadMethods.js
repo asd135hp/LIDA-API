@@ -49,7 +49,17 @@ let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
             }));
         });
     }
-    getSensorData(accessToken, name, startDate = 0, endDate = luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger()) {
+    getSensorData(accessToken, startDate = 0, endDate = luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger()) {
+        return __awaiter(this, void 0, void 0, function* () {
+            constants_1.logger.info(`SensorReadMethods: Getting sensor data from the database with sensor name of "${name}"`);
+            const option = yield new sensorService_1.default().getSensorData({ startDate, endDate });
+            return option.unwrapOrElse(() => {
+                this.setStatus(404);
+                return [];
+            });
+        });
+    }
+    getSensorDataByName(accessToken, name, startDate = 0, endDate = luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger()) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`SensorReadMethods: Getting sensor data from the database with sensor name of "${name}"`);
             const option = yield new sensorService_1.default().getSensorDataByName(name, { startDate, endDate });
@@ -80,12 +90,18 @@ __decorate([
     __param(1, (0, tsoa_1.Path)())
 ], SensorReadMethods.prototype, "getCategorizedSensors", null);
 __decorate([
+    (0, tsoa_1.Get)("data/get"),
+    __param(0, (0, tsoa_1.Query)()),
+    __param(1, (0, tsoa_1.Query)()),
+    __param(2, (0, tsoa_1.Query)())
+], SensorReadMethods.prototype, "getSensorData", null);
+__decorate([
     (0, tsoa_1.Get)("{name}/data/get"),
     __param(0, (0, tsoa_1.Query)()),
     __param(1, (0, tsoa_1.Path)()),
     __param(2, (0, tsoa_1.Query)()),
     __param(3, (0, tsoa_1.Query)())
-], SensorReadMethods.prototype, "getSensorData", null);
+], SensorReadMethods.prototype, "getSensorDataByName", null);
 __decorate([
     (0, tsoa_1.Get)("snapshot/{runNumber}/get"),
     __param(0, (0, tsoa_1.Query)()),

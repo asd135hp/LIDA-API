@@ -74,7 +74,7 @@ describe("Test sensor actions - Integration test", ()=>{
 
   test("should get sensor data by name to the database", async ()=>{
     const name = "Temperature 9"
-    const result = await sensorRead.getSensorData(setup.getAccessToken(), name)
+    const result = await sensorRead.getSensorDataByName(setup.getAccessToken(), name)
     let index = 0
     testCase.sensorData.map(data => {
       if(data.sensorName != name) return

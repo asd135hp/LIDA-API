@@ -775,9 +775,72 @@
 				]
 			}
 		},
-		"/api/v1/sensor/{name}/data/get": {
+		"/api/v1/sensor/data/get": {
 			"get": {
 				"operationId": "GetSensorData",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/SensorDataDTO"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"408": {
+						"description": "Request Timeout"
+					}
+				},
+				"security": [
+					{
+						"api_key": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "accessToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "startDate",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "endDate",
+						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/sensor/{name}/data/get": {
+			"get": {
+				"operationId": "GetSensorDataByName",
 				"responses": {
 					"200": {
 						"description": "Ok",

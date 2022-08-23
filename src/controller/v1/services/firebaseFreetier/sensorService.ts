@@ -72,7 +72,7 @@ export default class SensorService {
    * @param dateRange Date range to limit how much data is downloaded
    * @returns All sensor data filtered by date range
    */
-   async getSensorData(dateRange: FirebaseDateRange = {}): Promise<Option<SensorDataDTO[]>> {
+  async getSensorData(dateRange: FirebaseDateRange = {}): Promise<Option<SensorDataDTO[]>> {
     dateRange.startDate = dateRange.startDate || 0
     dateRange.endDate = dateRange.endDate || DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
 

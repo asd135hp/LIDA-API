@@ -90,7 +90,7 @@ __decorate([
     __param(1, (0, tsoa_1.Path)())
 ], SensorReadMethods.prototype, "getCategorizedSensors", null);
 __decorate([
-    (0, tsoa_1.Get)("data/get"),
+    (0, tsoa_1.Get)("data/fetchAll"),
     __param(0, (0, tsoa_1.Query)()),
     __param(1, (0, tsoa_1.Query)()),
     __param(2, (0, tsoa_1.Query)())

@@ -14,7 +14,7 @@
 import os
 import argparse
 import subprocess
-from constants import app_name
+from constants import heroku_app_names
 
 class BuildScript:
   def __init__(self):
@@ -41,20 +41,21 @@ class BuildScript:
     print(end_message)
 
   def push_to_heroku_container(self):
-    try:
-      subprocess.check_output(["git", "push", "heroku", "master"])
-    except subprocess.CalledProcessError:
-      print("Heroku github repository is not initialized. Reinitialize the process (if Heroku CLI is not installed, please do so and rerun this):")
+    for app_name in heroku_app_names:
       try:
-        subprocess.run(["heroku", "login"], shell=True)
-      finally:
+        subprocess.check_output(["git", "push", "heroku", "master"])
+      except subprocess.CalledProcessError:
+        print("Heroku github repository is not initialized. Reinitialize the process (if Heroku CLI is not installed, please do so and rerun this):")
         try:
-          subprocess.check_output(["heroku", "git:remote", "-a", app_name], shell=True)
-          subprocess.run(["git", "pull", "heroku", "master"])
-          subprocess.run(["git", "push", "heroku", "master"])
-          print("Finished pushing code to Heroku container")
-        except subprocess.CalledProcessError as e:
-          print(e)
+          subprocess.run(["heroku", "login"], shell=True)
+        finally:
+          try:
+            subprocess.check_output(["heroku", "git:remote", "-a", app_name], shell=True)
+            subprocess.run(["git", "pull", "heroku", "master"])
+            subprocess.run(["git", "push", "heroku", "master"])
+            print("Finished pushing code to Heroku container")
+          except subprocess.CalledProcessError as e:
+            print(e)
 
   def execute(self):
     namespace = self.parser.parse_args()

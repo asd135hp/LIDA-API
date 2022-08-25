@@ -64,8 +64,9 @@ class SensorService {
             dateRange.endDate = dateRange.endDate || luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger();
             let result = option_1.None;
             yield realtime.getContent(constants_2.COMPONENTS_PATH.sensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
-                result = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild("timeStamp"), json => {
+                result = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByKey(), json => {
                     const timestamp = json.timeStamp;
+                    constants_1.logger.debug("Get sensor data - timeStamp: " + json.timeStamp);
                     return timestamp >= dateRange.startDate && timestamp <= dateRange.endDate;
                 });
             }));

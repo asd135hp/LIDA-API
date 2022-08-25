@@ -775,7 +775,7 @@
 				]
 			}
 		},
-		"/api/v1/sensor/data/get": {
+		"/api/v1/sensor/data/fetchAll": {
 			"get": {
 				"operationId": "GetSensorData",
 				"responses": {

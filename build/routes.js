@@ -320,7 +320,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/sensor/data/get', authenticateMiddleware([{ "api_key": [] }]), function SensorReadMethods_getSensorData(request, response, next) {
+    app.get('/api/v1/sensor/data/fetchAll', authenticateMiddleware([{ "api_key": [] }]), function SensorReadMethods_getSensorData(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             startDate: { "default": 0, "in": "query", "name": "startDate", "dataType": "double" },

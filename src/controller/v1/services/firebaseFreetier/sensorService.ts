@@ -80,9 +80,10 @@ export default class SensorService {
     await realtime.getContent(fbPath.sensorData, async ref => {
       // get result by filtration
       result = await getQueryResultAsArray(
-        ref.orderByChild("timeStamp"),
+        ref.orderByKey(),
         json => {
           const timestamp = json.timeStamp
+          logger.debug("Get sensor data - timeStamp: " + json.timeStamp)
           return timestamp >= dateRange.startDate && timestamp <= dateRange.endDate
         })
     })

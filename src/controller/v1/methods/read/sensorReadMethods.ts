@@ -39,7 +39,7 @@ export class SensorReadMethods extends Controller {
     })
   }
 
-  @Get("data/get")
+  @Get("data/fetchAll")
   async getSensorData(
     @Query() accessToken: string,
     @Query() startDate: number = 0,

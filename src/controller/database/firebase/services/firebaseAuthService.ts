@@ -9,7 +9,7 @@ import FirebaseAuthFacade from "../interfaces/firebaseAuthFacade";
 import FirebaseStorageFacade from "../interfaces/firebaseStorageFacade";
 import { DateTime } from "luxon";
 import { randomInt, randomBytes } from "crypto";
-import { asymmetricKeyEncryption } from "../../../../utility/encryption";
+import { asymmetricKeyDecryption, asymmetricKeyEncryption } from "../../../../utility/encryption";
 
 class APIKey {
   private storage: FirebaseStorageFacade;
@@ -99,12 +99,16 @@ export default class FirebaseAuthService implements FirebaseAuthFacade {
     return await signInWithEmailAndPassword(this.clientAuth, email, password)
       .then(async credentials => {
         const apiKeyObj = new APIKey(this.storage, "admin")
-        const apiKey =
-          await apiKeyObj.getKey(credentials.user.uid) ||
-          await apiKeyObj.renewKey(credentials.user.uid)
+        let apiKey = await apiKeyObj.getKey(credentials.user.uid)
+
+        try{
+          asymmetricKeyDecryption(Buffer.from(apiKey, 'hex'))
+        } catch(e) {
+          apiKey = await apiKeyObj.renewKey(credentials.user.uid)
+        }
         
         logger.info("FirebaseAuthService - loginWithEmail: New user logged in!")
-        let accessToken: string = ""
+        let accessToken: Buffer = null
         if(apiKey){
           accessToken = asymmetricKeyEncryption(`${credentials.user.uid}|${apiKey}`)
           return new User(credentials.user, accessToken)
@@ -138,7 +142,7 @@ export default class FirebaseAuthService implements FirebaseAuthFacade {
         const apiKey = await new APIKey(this.storage, "admin").renewKey(credentials.user.uid)
         logger.info("FirebaseAuthService - reauthenticationWithEmail: New user logged in!")
 
-        let accessToken: string = ""
+        let accessToken: Buffer = null
         if(apiKey){
           accessToken = asymmetricKeyEncryption(`${credentials.user.uid}|${apiKey}`)
           return new User(credentials.user, accessToken)

@@ -9,14 +9,14 @@ export default class User {
   emailVerified: boolean
   accessToken: string
 
-  constructor(userData: any, accessToken: string) {
+  constructor(userData: any, accessToken: Buffer) {
     this.displayName = userData.displayName
     this.email = userData.email
     this.emailVerified = userData.emailVerified
     this.phoneNumber = userData.phoneNumber
     this.photoURL = userData.photoURL
     this.isLoggedOut = false
-    this.accessToken = accessToken
+    this.accessToken = accessToken.toString('hex')
   }
 
   logOut() { this.isLoggedOut = true }

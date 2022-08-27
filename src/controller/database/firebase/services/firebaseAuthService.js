@@ -78,10 +78,15 @@ class FirebaseAuthService {
             return yield (0, auth_1.signInWithEmailAndPassword)(this.clientAuth, email, password)
                 .then((credentials) => __awaiter(this, void 0, void 0, function* () {
                 const apiKeyObj = new APIKey(this.storage, "admin");
-                const apiKey = (yield apiKeyObj.getKey(credentials.user.uid)) ||
-                    (yield apiKeyObj.renewKey(credentials.user.uid));
+                let apiKey = yield apiKeyObj.getKey(credentials.user.uid);
+                try {
+                    (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(apiKey, 'hex'));
+                }
+                catch (e) {
+                    apiKey = yield apiKeyObj.renewKey(credentials.user.uid);
+                }
                 constants_1.logger.info("FirebaseAuthService - loginWithEmail: New user logged in!");
-                let accessToken = "";
+                let accessToken = null;
                 if (apiKey) {
                     accessToken = (0, encryption_1.asymmetricKeyEncryption)(`${credentials.user.uid}|${apiKey}`);
                     return new user_1.default(credentials.user, accessToken);
@@ -116,7 +121,7 @@ class FirebaseAuthService {
                 .then((credentials) => __awaiter(this, void 0, void 0, function* () {
                 const apiKey = yield new APIKey(this.storage, "admin").renewKey(credentials.user.uid);
                 constants_1.logger.info("FirebaseAuthService - reauthenticationWithEmail: New user logged in!");
-                let accessToken = "";
+                let accessToken = null;
                 if (apiKey) {
                     accessToken = (0, encryption_1.asymmetricKeyEncryption)(`${credentials.user.uid}|${apiKey}`);
                     return new user_1.default(credentials.user, accessToken);

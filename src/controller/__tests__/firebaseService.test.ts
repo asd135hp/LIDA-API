@@ -131,13 +131,13 @@ describe("Test firebase service as a whole", ()=>{
     expect(user.email).toBe(email)
     
     // third verify api key
-    const [uid, apiKey] = asymmetricKeyDecryption(user.accessToken).split("|")
+    const [uid, apiKey] = asymmetricKeyDecryption(Buffer.from(user.accessToken, 'hex')).split("|")
     expect(await auth.verifyApiKey(uid, apiKey)).toBe(true)
     
     // fourth reauthentication
     // (which could be hard to do since the expirary duration for api keys are 30 days)
     user = await auth.reauthenticationWithEmail(email, password)
-    const [_, newApiKey] = asymmetricKeyDecryption(user.accessToken).split("|")
+    const [_, newApiKey] = asymmetricKeyDecryption(Buffer.from(user.accessToken, 'hex')).split("|")
     expect(newApiKey).not.toBe(apiKey)
 
     // delete user first

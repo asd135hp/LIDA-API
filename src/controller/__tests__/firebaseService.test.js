@@ -113,10 +113,10 @@ describe("Test firebase service as a whole", () => {
         let user = yield auth.loginWithEmail(email, password).catch(() => null);
         expect(user).not.toBe(null);
         expect(user.email).toBe(email);
-        const [uid, apiKey] = (0, encryption_1.asymmetricKeyDecryption)(user.accessToken).split("|");
+        const [uid, apiKey] = (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(user.accessToken, 'hex')).split("|");
         expect(yield auth.verifyApiKey(uid, apiKey)).toBe(true);
         user = yield auth.reauthenticationWithEmail(email, password);
-        const [_, newApiKey] = (0, encryption_1.asymmetricKeyDecryption)(user.accessToken).split("|");
+        const [_, newApiKey] = (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(user.accessToken, 'hex')).split("|");
         expect(newApiKey).not.toBe(apiKey);
         yield auth.deleteUser(uid, newApiKey);
         auth.logout(user);

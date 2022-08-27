@@ -47,7 +47,7 @@ class TestSetup {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             process.env.NODE_ENV = this.prevEnv;
-            const [uid, apiKey] = (0, encryption_1.asymmetricKeyDecryption)(this.getAccessToken()).split("|");
+            const [uid, apiKey] = (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(this.getAccessToken(), "hex")).split("|");
             yield firebaseService_1.persistentFirebaseConnection.authService.deleteUser(uid, apiKey);
             (_a = this.closeHandler) === null || _a === void 0 ? void 0 : _a.call(null);
         });

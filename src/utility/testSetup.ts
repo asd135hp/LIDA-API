@@ -35,7 +35,7 @@ export default class TestSetup {
   
   async tearDown() {
     process.env.NODE_ENV = this.prevEnv
-    const [uid, apiKey] = asymmetricKeyDecryption(this.getAccessToken()).split("|")
+    const [uid, apiKey] = asymmetricKeyDecryption(Buffer.from(this.getAccessToken(), "hex")).split("|")
     await persistentFirebaseConnection.authService.deleteUser(uid, apiKey)
     this.closeHandler?.call(null);
   }

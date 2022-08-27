@@ -16,7 +16,7 @@ export async function expressAuthentication(
     if(!token) return Promise.reject({ message: "No authentication token is provided" })
     if(Array.isArray(token)) return Promise.reject({ message: "Wrong token format - only one token is needed"})
 
-    const unpacked = asymmetricKeyDecryption(token.toString()).split('|')
+    const unpacked = asymmetricKeyDecryption(Buffer.from(token.toString(), 'hex')).split('|')
     if(unpacked.length != 2) return Promise.reject({ message: "Wrong token format" })
 
     const [userId, apiKey] = unpacked

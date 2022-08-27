@@ -8,7 +8,7 @@ class User {
         this.phoneNumber = userData.phoneNumber;
         this.photoURL = userData.photoURL;
         this.isLoggedOut = false;
-        this.accessToken = accessToken;
+        this.accessToken = accessToken.toString('hex');
     }
     logOut() { this.isLoggedOut = true; }
     toUpdateRequest() {

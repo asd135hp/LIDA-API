@@ -9,7 +9,7 @@ def install_and_run_yarn():
   print("Checking and rebuilding dependencies with yarn...")
   command = ["yarn", "install", "--network-timeout %d" % 100_000]
   try:
-    subprocess.run(command, shell=True)
+    subprocess.check_output(command, shell=True)
   except:
     # retry command but enable yarn first
     buf = subprocess.run(['node', '--version'], stdout=subprocess.PIPE).stdout

@@ -23,3 +23,6 @@ temp
 
 # Test cases, which is really big
 src/controller/__tests__/testcases.json
+.vercel
+automation/python/*.txt
+automation/python/__pycache__/

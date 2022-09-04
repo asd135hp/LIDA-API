@@ -50,3 +50,5 @@ server.on("connect", ()=>{
 server.on("close", ()=>{
   logger.info("Closing server...")
 })
+
+export default app

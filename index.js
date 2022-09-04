@@ -40,4 +40,5 @@ server.on("connect", () => {
 server.on("close", () => {
     constants_1.logger.info("Closing server...");
 });
+exports.default = app;
 //# sourceMappingURL=index.js.map

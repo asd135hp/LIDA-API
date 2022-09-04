@@ -37,14 +37,11 @@ jobs:
           # Used to specify the path to a dependency file: package-lock.json, yarn.lock, etc. Supports wildcards or a list of file names for caching multiple dependencies.
           cache-dependency-path: yarn.lock
         
-      - name: Install packages
-        run: yarn install
-        
-      - name: Generate routes
-        run: npx tsoa spec-and-routes
-        
-      - name: Transpile Typescript
-        run: npx tsc --experimentalDecorators --esModuleInterop
+      - name: Basic transpilation
+        run: |
+          yarn install
+          npx tsoa spec-and-routes
+          npx tsc --experimentalDecorators --esModuleInterop
         
       - name: Testing with Jest
         run: npx jest --detectOpenHandles --forceExit

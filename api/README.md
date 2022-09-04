@@ -1,1 +1,0 @@
-This folder is used for deploying the app on Vercel

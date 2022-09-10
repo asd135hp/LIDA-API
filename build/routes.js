@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.RegisterRoutes = void 0;
 const runtime_1 = require("@tsoa/runtime");
 const actuatorReadMethods_1 = require("./../src/controller/v1/methods/read/actuatorReadMethods");
+const dataSavingReadMethods_1 = require("./../src/controller/v1/methods/read/dataSavingReadMethods");
 const sensorReadMethods_1 = require("./../src/controller/v1/methods/read/sensorReadMethods");
 const systemCommandReadMethods_1 = require("./../src/controller/v1/methods/read/systemCommandReadMethods");
 const systemLogsReadMethods_1 = require("./../src/controller/v1/methods/read/systemLogsReadMethods");
@@ -64,6 +65,18 @@ const models = {
         },
         "additionalProperties": false,
     },
+    "SnapshotDownloadResponse": {
+        "dataType": "refObject",
+        "properties": {
+            "newFileName": { "dataType": "string", "required": true },
+            "downloadUrl": { "dataType": "string", "required": true },
+            "startDate": { "dataType": "double", "required": true },
+            "endDate": { "dataType": "double", "required": true },
+            "decompressionByteLength": { "dataType": "double", "required": true },
+            "note": { "dataType": "string", "required": true },
+        },
+        "additionalProperties": false,
+    },
     "SensorDTO": {
         "dataType": "refObject",
         "properties": {
@@ -79,18 +92,6 @@ const models = {
             "sensorName": { "dataType": "string", "required": true },
             "value": { "dataType": "double", "required": true },
             "timeStamp": { "dataType": "double", "required": true },
-        },
-        "additionalProperties": false,
-    },
-    "SnapshotDownloadResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "newFileName": { "dataType": "string", "required": true },
-            "downloadUrl": { "dataType": "string", "required": true },
-            "startDate": { "dataType": "double", "required": true },
-            "endDate": { "dataType": "double", "required": true },
-            "decompressionByteLength": { "dataType": "double", "required": true },
-            "note": { "dataType": "string", "required": true },
         },
         "additionalProperties": false,
     },
@@ -289,6 +290,22 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
+    app.get('/api/v1/snapshot/snapshot/:runNumber/get', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods.prototype.retrieveSensorDataRunSnapshot)), function DataSavingReadMethods_retrieveSensorDataRunSnapshot(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+            runNumber: { "in": "path", "name": "runNumber", "required": true, "dataType": "double" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new dataSavingReadMethods_1.DataSavingReadMethods();
+            const promise = controller.retrieveSensorDataRunSnapshot.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
     app.get('/api/v1/sensor/get', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getSensors)), function SensorReadMethods_getSensors(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
@@ -349,6 +366,37 @@ function RegisterRoutes(app) {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new sensorReadMethods_1.SensorReadMethods();
             const promise = controller.getSensorDataByName.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    app.get('/api/v1/sensor/data/latest/get', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getLatestSensorData)), function SensorReadMethods_getLatestSensorData(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new sensorReadMethods_1.SensorReadMethods();
+            const promise = controller.getLatestSensorData.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    app.get('/api/v1/sensor/:name/data/latest/get', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getLatestSensorDataByName)), function SensorReadMethods_getLatestSensorDataByName(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+            name: { "in": "path", "name": "name", "required": true, "dataType": "string" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new sensorReadMethods_1.SensorReadMethods();
+            const promise = controller.getLatestSensorDataByName.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {
@@ -512,7 +560,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.delete('/api/v1/snapshot/sensor/:runNumber/delete', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods.prototype.deleteSensorSnapshot)), function DataSavingWriteMethods_deleteSensorSnapshot(request, response, next) {
+    app.patch('/api/v1/snapshot/sensor/:runNumber/delete', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods.prototype.deleteSensorSnapshot)), function DataSavingWriteMethods_deleteSensorSnapshot(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             runNumber: { "in": "path", "name": "runNumber", "required": true, "dataType": "double" },
@@ -522,6 +570,21 @@ function RegisterRoutes(app) {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new dataSavingWriteMethods_1.DataSavingWriteMethods();
             const promise = controller.deleteSensorSnapshot.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
+    app.post('/api/v1/snapshot/sensor/save', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods.prototype.saveSensorSnapshot)), function DataSavingWriteMethods_saveSensorSnapshot(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new dataSavingWriteMethods_1.DataSavingWriteMethods();
+            const promise = controller.saveSensorSnapshot.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {

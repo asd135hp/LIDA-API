@@ -22,6 +22,7 @@ const databaseErrorEvent_1 = __importDefault(require("../../../../model/v1/event
 const constants_2 = require("../../../../constants");
 const dataSavingService_1 = require("./utility/dataSavingService");
 const luxon_1 = require("luxon");
+const fflate_1 = require("fflate");
 const storage = firebaseService_1.persistentFirebaseConnection.storageService;
 class DataSavingService {
     constructor(publisher) {
@@ -76,16 +77,32 @@ class DataSavingService {
     uploadSensorSnapshot(snapshots, runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const folderName = `${constants_2.COMPONENTS_PATH.storage.sensor}/run${runNumber}`;
-            const sensorEvent = yield (0, dataSavingService_1.uploadSnapshot)(snapshots.sensor.sort((0, helper_1.orderByProp)("name")), { startDate: -1, endDate: -1 }, folderName, this.publisher, 106);
-            const sortedData = snapshots.data.sort((data1, data2) => {
-                if (data1.chunk.timeStamp == data2.chunk.timeStamp)
-                    return 0;
-                return data1.chunk.timeStamp > data2.chunk.timeStamp ? 1 : -1;
+            const sensorName = snapshots.sensor.sort((0, helper_1.orderByProp)("name"));
+            const sensorData = new Object();
+            snapshots.data.map((obj, systemDay) => {
+                Object.assign(sensorData, {
+                    [`day#${systemDay}`]: obj
+                });
             });
-            const sensorDataEvent = yield Promise.all(sortedData.map(({ chunk, dateRange }) => {
-                return (0, dataSavingService_1.uploadSnapshot)(chunk, dateRange, folderName, this.publisher, 114);
-            })).catch(() => [new databaseErrorEvent_1.default("Placeholder error event ~ 115")]);
-            return (0, filterDatabaseEvent_1.filterDatabaseEvent)([sensorEvent, ...sensorDataEvent], databaseCreateEvent_1.default).unwrapOrElse(() => {
+            const event = new databaseCreateEvent_1.default({
+                protected: {
+                    storage() {
+                        return __awaiter(this, void 0, void 0, function* () {
+                            let buffer = null;
+                            (0, fflate_1.zip)({
+                                "sensor_names_and_statuses": [(0, fflate_1.strToU8)(JSON.stringify(sensorName)), {}],
+                                "sensor_data": [(0, fflate_1.strToU8)(JSON.stringify(sensorData)), {}]
+                            }, { level: 9 }, (err, data) => {
+                                if (err)
+                                    throw err;
+                                buffer = Buffer.from(data);
+                            });
+                            yield storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}`, buffer);
+                        });
+                    }
+                }
+            });
+            return (0, filterDatabaseEvent_1.filterDatabaseEvent)(yield this.publisher.notifyAsync(event)).unwrapOrElse(() => {
                 constants_1.logger.error("DataSavingService: DatabaseEvent filtration leads to all error ~ 119");
                 return new databaseErrorEvent_1.default("The action is failed to be executed", 400);
             });

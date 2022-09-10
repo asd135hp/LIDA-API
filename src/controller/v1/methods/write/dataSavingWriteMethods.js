@@ -27,8 +27,8 @@ const tsoa_1 = require("tsoa");
 const constants_1 = require("../../../../constants");
 const databaseEvent_1 = __importDefault(require("../../../../model/v1/events/databaseEvent"));
 const databaseErrorEvent_1 = __importDefault(require("../../../../model/v1/events/databaseErrorEvent"));
-const luxon_1 = require("luxon");
 const firebaseService_1 = require("../../services/firebaseFreetier/firebaseService");
+const sensorService_1 = __importDefault(require("../../services/firebaseFreetier/sensorService"));
 const getEvent = databaseEvent_1.default.getCompactEvent;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
@@ -37,7 +37,6 @@ let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMet
         super();
         this.service = DataSavingWriteMethods_1.mainService;
     }
-    get currentUnixTimestamp() { return luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger(); }
     deleteSensorSnapshot(accessToken, runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const event = yield this.service.deleteSensorSnapshot(runNumber);
@@ -47,12 +46,33 @@ let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMet
             return getEvent(event);
         });
     }
+    saveSensorSnapshot(accessToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            constants_1.logger.info(`DataSavingWriteMethods: Saving sensor snapshot to the storage`);
+            const sensorService = new sensorService_1.default();
+            const snapshot = yield sensorService.getSensorDataSnapshot();
+            let event = yield this.service.uploadSensorSnapshot({
+                sensor: (yield sensorService.getSensors()).unwrapOr([]),
+                data: snapshot.unwrapOr([])
+            }, 1);
+            if (process.env.NODE_ENV === 'production') {
+            }
+            if (event instanceof databaseErrorEvent_1.default) {
+                this.setStatus(event.content.values.statusCode);
+            }
+            return getEvent(event);
+        });
+    }
 };
 __decorate([
-    (0, tsoa_1.Delete)("sensor/{runNumber}/delete"),
+    (0, tsoa_1.Patch)("sensor/{runNumber}/delete"),
     __param(0, (0, tsoa_1.Query)()),
     __param(1, (0, tsoa_1.Path)())
 ], DataSavingWriteMethods.prototype, "deleteSensorSnapshot", null);
+__decorate([
+    (0, tsoa_1.Post)("sensor/save"),
+    __param(0, (0, tsoa_1.Query)())
+], DataSavingWriteMethods.prototype, "saveSensorSnapshot", null);
 DataSavingWriteMethods = DataSavingWriteMethods_1 = __decorate([
     (0, tsoa_1.Security)("api_key"),
     (0, tsoa_1.Route)(`api/v1/snapshot`),

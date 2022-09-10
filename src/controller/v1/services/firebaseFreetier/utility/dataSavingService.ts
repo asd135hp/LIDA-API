@@ -17,10 +17,7 @@ const storage = persistentFirebaseConnection.storageService;
 
 export type SensorSnapshot = {
   sensor: Sensor[],
-  data: {
-    chunk: SensorData,
-    dateRange: FirebaseDateRange
-  }[]
+  data: SensorData[][]
 }
 
 /**

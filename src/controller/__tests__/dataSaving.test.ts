@@ -40,12 +40,12 @@ xdescribe("Data saving test - Integration test", ()=>{
     //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
     //     throw new Error("An error is raised: " + event.content.error)
     // }
-  }, timeOut * (testCase.dataSaving.sensor.length + testCase.dataSaving.logs.length))
+  }, timeOut * (testCase.dataSaving.sensor.length + testCase.dataSaving.logs.length + 5))
 
   afterAll(async ()=>{
     // await persistentFirebaseConnection.storageService.deleteFolderFromStorage("")
     await setup.tearDown()
-  }, timeOut * 2)
+  }, timeOut * 5)
 
   // const dataSaving = QueryFacade.dataSaving
 

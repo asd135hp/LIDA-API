@@ -21,10 +21,10 @@ describe("Test sensor actions - Integration test", () => {
     const timeOut = testSetup_1.default.TIME_OUT;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.init();
-    }), timeOut * Math.max(testcases_json_1.default.sensorLogs.length, testcases_json_1.default.actuatorLogs.length));
+    }), timeOut * (Math.max(testcases_json_1.default.sensorLogs.length, testcases_json_1.default.actuatorLogs.length) + 5));
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.tearDown();
-    }), timeOut * 4);
+    }), timeOut * 5);
     const logsRead = queryFacade_1.default.logs;
     test("should read all sensor logs form the database", () => __awaiter(void 0, void 0, void 0, function* () {
         const result = yield logsRead.getSensorLogs(setup.getAccessToken());

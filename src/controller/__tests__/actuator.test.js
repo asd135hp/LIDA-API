@@ -20,10 +20,10 @@ describe("Test actuator actions - Integration test", () => {
     const timeOut = testSetup_1.default.TIME_OUT;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         setup.init();
-    }), timeOut * Math.max(testcases_json_1.default.actuatorConfigs.length, testcases_json_1.default.actuators.length));
+    }), timeOut * (Math.max(testcases_json_1.default.actuatorConfigs.length, testcases_json_1.default.actuators.length) + 5));
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.tearDown();
-    }), timeOut * 4);
+    }), timeOut * 5);
     const actuatorRead = queryFacade_1.default.actuator;
     test("should read all actuators from the database", () => __awaiter(void 0, void 0, void 0, function* () {
         const result = (yield actuatorRead.getActuators(setup.getAccessToken())).map(a => a.toJson());

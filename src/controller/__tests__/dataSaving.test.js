@@ -20,9 +20,9 @@ xdescribe("Data saving test - Integration test", () => {
     const templateStartDate = 1609459200;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.init();
-    }), timeOut * (testcases_json_1.default.dataSaving.sensor.length + testcases_json_1.default.dataSaving.logs.length));
+    }), timeOut * (testcases_json_1.default.dataSaving.sensor.length + testcases_json_1.default.dataSaving.logs.length + 5));
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.tearDown();
-    }), timeOut * 2);
+    }), timeOut * 5);
 });
 //# sourceMappingURL=dataSaving.test.js.map

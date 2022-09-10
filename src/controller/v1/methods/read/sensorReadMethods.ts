@@ -72,6 +72,35 @@ export class SensorReadMethods extends Controller {
     })
   }
 
+  @Get("data/latest/get")
+  async getLatestSensorData(
+    @Query() accessToken: string
+  ): Promise<SensorDataDTO[]> {
+    logger.info(`SensorReadMethods: Getting all latest sensor data from the database`)
+
+    const option = await new SensorService().getLatestSensorData()
+    return option.unwrapOrElse(()=>{
+      // handle status code when the entity is not found in the database
+      this.setStatus(404)
+      return []
+    })
+  }
+
+  @Get("{name}/data/latest/get")
+  async getLatestSensorDataByName(
+    @Query() accessToken: string,
+    @Path() name: string
+  ): Promise<SensorDataDTO> {
+    logger.info(`SensorReadMethods: Getting latest sensor data from the database with sensor name of "${name}"`)
+
+    const option = await new SensorService().getLatestSensorDataByName(name)
+    return option.unwrapOrElse(()=>{
+      // handle status code when the entity is not found in the database
+      this.setStatus(404)
+      return SensorDataDTO.fromJson({}) as SensorDataDTO
+    })
+  }
+
   @Get("snapshot/{runNumber}/get")
   async getSensorDataRunSnapshot(
     @Query() accessToken: string,

@@ -95,6 +95,81 @@ class SensorService {
             });
         });
     }
+    getSensorDataSnapshot(dateRange = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            dateRange = {
+                startDate: dateRange.startDate || 0,
+                endDate: dateRange.endDate || luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger()
+            };
+            const cachedEndDate = luxon_1.DateTime.fromSeconds(dateRange.endDate);
+            const boundTimeObj = luxon_1.DateTime.local(cachedEndDate.year, cachedEndDate.month, cachedEndDate.day + 1).setZone(constants_1.DATABASE_TIMEZONE);
+            let currentDayCount = 1;
+            let [upperBoundTime, lowerBoundTime] = [
+                boundTimeObj.toUnixInteger(),
+                boundTimeObj.minus({ day: currentDayCount++ }).toUnixInteger()
+            ];
+            let result = null;
+            yield realtime.getContent(constants_2.COMPONENTS_PATH.sensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
+                yield ref.orderByChild("timeStamp").once('value', snapshot => {
+                    if (!snapshot.exists()) {
+                        constants_1.logger.warn("Snapshot does not exist with a value of " + snapshot.val());
+                        return;
+                    }
+                    snapshot.forEach(child => {
+                        const json = child.val();
+                        const timestamp = json.timeStamp;
+                        if (timestamp <= upperBoundTime) {
+                            if (timestamp < lowerBoundTime) {
+                                [upperBoundTime, lowerBoundTime] = [
+                                    lowerBoundTime,
+                                    boundTimeObj.minus({ day: currentDayCount++ }).toUnixInteger()
+                                ];
+                                if (lowerBoundTime < dateRange.startDate)
+                                    return;
+                                result.push([json]);
+                                return;
+                            }
+                            result[currentDayCount - 1].push(json);
+                        }
+                    });
+                });
+            }));
+            constants_1.logger.debug(`SensorData by date: ${result}`);
+            return !result ? option_1.None : (0, option_1.Some)(result.reverse());
+        });
+    }
+    getLatestSensorData() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result = option_1.None;
+            yield realtime.getContent(constants_2.COMPONENTS_PATH.sensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
+                const sensorNames = yield this.getSensors();
+                if (sensorNames.match.isNone())
+                    return;
+                const recentData = [];
+                for (const sensor of sensorNames.unwrapOr([])) {
+                    const option = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild(sensor.name).limitToFirst(1));
+                    const data = option.unwrapOr([]).pop();
+                    if (!data)
+                        return;
+                    recentData.push(data);
+                }
+                result = (0, option_1.Some)(recentData);
+            }));
+            constants_1.logger.debug(`Sensor data by Name: ${result}`);
+            return result;
+        });
+    }
+    getLatestSensorDataByName(name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let result = option_1.None;
+            yield realtime.getContent(constants_2.COMPONENTS_PATH.sensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
+                const temp = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild("sensorName").equalTo(name).limitToFirst(1));
+                result = temp.map(arr => !arr[0] ? option_1.None : (0, option_1.Some)(arr[0]));
+            }));
+            constants_1.logger.debug(`Latest sensor data by name: ${result.unwrapOr(null)}`);
+            return result;
+        });
+    }
     addSensor(sensor) {
         return __awaiter(this, void 0, void 0, function* () {
             if (typeof (sensor.isRunning) === 'undefined')

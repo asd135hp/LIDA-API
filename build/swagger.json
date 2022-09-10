@@ -99,6 +99,41 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"SnapshotDownloadResponse": {
+				"properties": {
+					"newFileName": {
+						"type": "string"
+					},
+					"downloadUrl": {
+						"type": "string"
+					},
+					"startDate": {
+						"type": "number",
+						"format": "double"
+					},
+					"endDate": {
+						"type": "number",
+						"format": "double"
+					},
+					"decompressionByteLength": {
+						"type": "number",
+						"format": "double"
+					},
+					"note": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"newFileName",
+					"downloadUrl",
+					"startDate",
+					"endDate",
+					"decompressionByteLength",
+					"note"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SensorDTO": {
 				"properties": {
 					"name": {
@@ -137,41 +172,6 @@
 					"sensorName",
 					"value",
 					"timeStamp"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"SnapshotDownloadResponse": {
-				"properties": {
-					"newFileName": {
-						"type": "string"
-					},
-					"downloadUrl": {
-						"type": "string"
-					},
-					"startDate": {
-						"type": "number",
-						"format": "double"
-					},
-					"endDate": {
-						"type": "number",
-						"format": "double"
-					},
-					"decompressionByteLength": {
-						"type": "number",
-						"format": "double"
-					},
-					"note": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"newFileName",
-					"downloadUrl",
-					"startDate",
-					"endDate",
-					"decompressionByteLength",
-					"note"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -679,6 +679,56 @@
 				]
 			}
 		},
+		"/api/v1/snapshot/snapshot/{runNumber}/get": {
+			"get": {
+				"operationId": "RetrieveSensorDataRunSnapshot",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/SnapshotDownloadResponse"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"408": {
+						"description": "Request Timeout"
+					}
+				},
+				"security": [
+					{
+						"api_key": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "accessToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "runNumber",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
 		"/api/v1/sensor/get": {
 			"get": {
 				"operationId": "GetSensors",
@@ -904,6 +954,99 @@
 						"schema": {
 							"format": "double",
 							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/sensor/data/latest/get": {
+			"get": {
+				"operationId": "GetLatestSensorData",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/SensorDataDTO"
+									},
+									"type": "array"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"408": {
+						"description": "Request Timeout"
+					}
+				},
+				"security": [
+					{
+						"api_key": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "accessToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/sensor/{name}/data/latest/get": {
+			"get": {
+				"operationId": "GetLatestSensorDataByName",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SensorDataDTO"
+								}
+							}
+						}
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"408": {
+						"description": "Request Timeout"
+					}
+				},
+				"security": [
+					{
+						"api_key": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "accessToken",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
 						}
 					}
 				]
@@ -1444,7 +1587,7 @@
 			}
 		},
 		"/api/v1/snapshot/sensor/{runNumber}/delete": {
-			"delete": {
+			"patch": {
 				"operationId": "DeleteSensorSnapshot",
 				"responses": {
 					"200": {
@@ -1494,6 +1637,53 @@
 						"schema": {
 							"format": "double",
 							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/api/v1/snapshot/sensor/save": {
+			"post": {
+				"operationId": "SaveSensorSnapshot",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DatabaseEvent"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request"
+					},
+					"401": {
+						"description": "Unauthorized"
+					},
+					"403": {
+						"description": "Forbidden"
+					},
+					"404": {
+						"description": "Not Found"
+					},
+					"408": {
+						"description": "Request Timeout"
+					}
+				},
+				"security": [
+					{
+						"api_key": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "accessToken",
+						"required": true,
+						"schema": {
+							"type": "string"
 						}
 					}
 				]

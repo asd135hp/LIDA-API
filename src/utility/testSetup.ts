@@ -3,7 +3,9 @@ import { TEST_ACCOUNT } from "../constants";
 import QueryFacade from "../controller/queryFacade";
 import User from "../model/v1/auth/user";
 import { setTimeout } from "timers/promises";
-import { persistentFirebaseConnection } from "../controller/v1/services/firebaseFreetier/firebaseService";
+import {
+  persistentFirebaseConnection, setNewPersistentFirebaseConnection
+} from "../controller/v1/services/firebaseFreetier/firebaseService";
 import { asymmetricKeyDecryption } from "./encryption";
 
 export default class TestSetup {
@@ -18,6 +20,7 @@ export default class TestSetup {
     this.prevEnv = process.env.NODE_ENV
     process.env.NODE_ENV = 'test'
     this.closeHandler = apiSetup(null);
+    //setNewPersistentFirebaseConnection()
 
     // register and login
     await QueryFacade.security.register(email, password).then(async ()=>await setTimeout(2000), ()=>{})
@@ -37,6 +40,9 @@ export default class TestSetup {
     process.env.NODE_ENV = this.prevEnv
     const [uid, apiKey] = asymmetricKeyDecryption(Buffer.from(this.getAccessToken(), "hex")).split("|")
     await persistentFirebaseConnection.authService.deleteUser(uid, apiKey)
+    //await persistentFirebaseConnection.close();
+    await new Promise<string>(resolve => global.setTimeout(() => resolve(""), 500))
+
     this.closeHandler?.call(null);
   }
 }

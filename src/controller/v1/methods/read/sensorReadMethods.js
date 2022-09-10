@@ -25,6 +25,7 @@ exports.SensorReadMethods = void 0;
 const luxon_1 = require("luxon");
 const tsoa_1 = require("tsoa");
 const constants_1 = require("../../../../constants");
+const sensorDto_1 = require("../../../../model/v1/read/sensorDto");
 const dataSavingService_1 = __importDefault(require("../../services/firebaseFreetier/dataSavingService"));
 const sensorService_1 = __importDefault(require("../../services/firebaseFreetier/sensorService"));
 let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
@@ -69,6 +70,26 @@ let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
             });
         });
     }
+    getLatestSensorData(accessToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            constants_1.logger.info(`SensorReadMethods: Getting all latest sensor data from the database`);
+            const option = yield new sensorService_1.default().getLatestSensorData();
+            return option.unwrapOrElse(() => {
+                this.setStatus(404);
+                return [];
+            });
+        });
+    }
+    getLatestSensorDataByName(accessToken, name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            constants_1.logger.info(`SensorReadMethods: Getting latest sensor data from the database with sensor name of "${name}"`);
+            const option = yield new sensorService_1.default().getLatestSensorDataByName(name);
+            return option.unwrapOrElse(() => {
+                this.setStatus(404);
+                return sensorDto_1.SensorDataDTO.fromJson({});
+            });
+        });
+    }
     getSensorDataRunSnapshot(accessToken, runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`SensorReadMethods: Getting sensor data of the previous run#${runNumber} from the database`);
@@ -102,6 +123,15 @@ __decorate([
     __param(2, (0, tsoa_1.Query)()),
     __param(3, (0, tsoa_1.Query)())
 ], SensorReadMethods.prototype, "getSensorDataByName", null);
+__decorate([
+    (0, tsoa_1.Get)("data/latest/get"),
+    __param(0, (0, tsoa_1.Query)())
+], SensorReadMethods.prototype, "getLatestSensorData", null);
+__decorate([
+    (0, tsoa_1.Get)("{name}/data/latest/get"),
+    __param(0, (0, tsoa_1.Query)()),
+    __param(1, (0, tsoa_1.Path)())
+], SensorReadMethods.prototype, "getLatestSensorDataByName", null);
 __decorate([
     (0, tsoa_1.Get)("snapshot/{runNumber}/get"),
     __param(0, (0, tsoa_1.Query)()),

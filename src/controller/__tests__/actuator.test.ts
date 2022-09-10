@@ -41,7 +41,7 @@ describe("Test actuator actions - Integration test", ()=>{
     // }
 
 
-  }, timeOut * Math.max(testCase.actuatorConfigs.length, testCase.actuators.length))
+  }, timeOut * (Math.max(testCase.actuatorConfigs.length, testCase.actuators.length) + 5))
 
   afterAll(async ()=>{
     // const fs = persistentFirebaseConnection.firestoreService as FirebaseFirestoreService
@@ -54,7 +54,7 @@ describe("Test actuator actions - Integration test", ()=>{
     // await rt.deleteContent("actuatorCommandId")
     
     await setup.tearDown()
-  }, timeOut * 4)
+  }, timeOut * 5)
   
   const actuatorRead = QueryFacade.actuator
 

@@ -11,8 +11,12 @@ import { Option, Some, None } from "../../../../model/patterns/option"
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 import { SnapshotDownloadResponse } from "../../../../model/v1/read/dataSaving";
 import { COMPONENTS_PATH as fbPath } from "../../../../constants";
-import { parseStorageFileMetaData, mergeDefaultDateRange, getSnapshotsFromDateRange, customFlat, uploadSnapshot, deleteSnapshots, SensorSnapshot } from "./utility/dataSavingService";
+import {
+  parseStorageFileMetaData, mergeDefaultDateRange, getSnapshotsFromDateRange,
+  customFlat, uploadSnapshot, deleteSnapshots, SensorSnapshot
+} from "./utility/dataSavingService";
 import { DateTime } from "luxon";
+import { strToU8, zip } from "fflate";
 
 const storage = persistentFirebaseConnection.storageService;
 
@@ -92,32 +96,42 @@ export default class DataSavingService {
 
   /**
    * Upload what is considered to be a snapshot of sensor data in a period of time to a sensor folder on the server
-   * @param snapshot 
-   * @param dateRange 
+   * @param snapshots 
+   * @param runNumber
    * @returns 
    */
   async uploadSensorSnapshot(snapshots: SensorSnapshot, runNumber: number): Promise<DatabaseEvent> {
     const folderName = `${fbPath.storage.sensor}/run${runNumber}`
+    const sensorName = snapshots.sensor.sort(orderByProp("name"))
+    const sensorData = new Object()
 
-    // upload sensors
-    const sensorEvent = await uploadSnapshot(
-      snapshots.sensor.sort(orderByProp("name")),
-      { startDate: -1, endDate: -1 },
-      folderName,
-      this.publisher,
-      106
-    )
-
-    // upload their respective data
-    const sortedData = snapshots.data.sort((data1, data2) => {
-      if(data1.chunk.timeStamp == data2.chunk.timeStamp) return 0
-      return data1.chunk.timeStamp > data2.chunk.timeStamp ? 1 : -1
+    snapshots.data.map((obj, systemDay) => {
+      Object.assign(sensorData, {
+        [`day#${systemDay}`]: obj
+      })
     })
-    const sensorDataEvent = await Promise.all(sortedData.map(({ chunk, dateRange }) => {
-      return uploadSnapshot(chunk, dateRange, folderName, this.publisher, 114)
-    })).catch(() => [new DatabaseErrorEvent("Placeholder error event ~ 115") as DatabaseEvent])
 
-    return filterDatabaseEvent([sensorEvent, ...sensorDataEvent], DatabaseCreateEvent).unwrapOrElse(()=>{
+    // upload zipped snapshot to the database
+    const event = new DatabaseCreateEvent({
+      protected:{
+        async storage(){
+          //mock this -jest test
+          let buffer: Buffer = null
+          
+          zip({
+            "sensor_names_and_statuses": [strToU8(JSON.stringify(sensorName)), {}],
+            "sensor_data": [strToU8(JSON.stringify(sensorData)), {}]
+          }, { level: 9 }, (err, data) => {
+            if(err) throw err
+            buffer =  Buffer.from(data)
+          })
+
+          await storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}`, buffer)
+        }
+      }
+    })
+
+    return filterDatabaseEvent(await this.publisher.notifyAsync(event)).unwrapOrElse(()=>{
       logger.error("DataSavingService: DatabaseEvent filtration leads to all error ~ 119")
       return new DatabaseErrorEvent("The action is failed to be executed", 400)
     })

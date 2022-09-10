@@ -4,7 +4,12 @@
   "description": "This is a REST API utilising the CQRS design pattern being exposed via Google Clouds serverless functions.",
   "main": "index.js",
   "scripts": {
-    "start": "node --optimize_for_size --max_old_space_size=460 index.js"
+    "routes": "tsoa spec-and-routes",
+    "compile": "tsc --experimentalDecorators --esModuleInterop",
+    "start": "node --optimize_for_size --max_old_space_size=460 index.js",
+    "test": "jest --detectOpenHandles --forceExit || exit 0",
+    "build": "npm run routes && npm run compile && npm test",
+    "dev": "npm run routes && npm run compile && npm test && npm start && vercel dev"
   },
   "repository": {
     "type": "git",

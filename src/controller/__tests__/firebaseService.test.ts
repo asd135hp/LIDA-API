@@ -120,10 +120,11 @@ describe("Test firebase service as a whole", ()=>{
     const { email, password } = TEST_ACCOUNT
     // first register
     await auth.registerWithEmail(email, password).catch(async()=>{
+      console.log("Failed to register")
     })
     
-    // wait 2 sec since this is not a realtime database
-    await setTimeout(2000)
+    // wait 5 sec since this is not a realtime database
+    await setTimeout(TIMEOUT)
 
     // second login
     let user: User = await auth.loginWithEmail(email, password).catch(()=>null)
@@ -146,5 +147,5 @@ describe("Test firebase service as a whole", ()=>{
     // finally logging out
     auth.logout(user)
     expect(user.isLoggedOut).toBe(true)
-  }, TIMEOUT * 2 + 2000)
+  }, TIMEOUT * 3)
 })

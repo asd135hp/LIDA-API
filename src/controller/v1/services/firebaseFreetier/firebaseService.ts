@@ -10,7 +10,7 @@ import FirebaseAuthFacade from "../../../database/firebase/interfaces/firebaseAu
 import FirebaseAuthService from "../../../database/firebase/services/firebaseAuthService";
 import { FirebaseServiceType } from ".";
 import { randomInt } from "crypto";
-import { firebasePathConfig, FIREBASE_CONFIG, SERVICE_ACCOUNT_CREDENTIALS } from "../../../../constants";
+import { firebasePathConfig, FIREBASE_CONFIG, logger, SERVICE_ACCOUNT_CREDENTIALS } from "../../../../constants";
 
 interface FirebaseRootPath {
   firestoreDocPath?: string;
@@ -25,12 +25,14 @@ export default class FirebaseService {
   private _firestoreService: FirebaseFirestoreFacade;
   private _auth: FirebaseAuthFacade;
   private _app: App;
+  private _appName: string;
 
   constructor(type: FirebaseServiceType, path?: FirebaseRootPath){
+    this._appName = Array(10).fill(0).map(_ => String.fromCharCode(randomInt(65, 90))).join('')
     this._app = firebaseAdmin.initializeApp({
       credential: firebaseAdmin.credential.cert(SERVICE_ACCOUNT_CREDENTIALS),
       ...FIREBASE_CONFIG
-    }, Array(10).fill(0).map(_ => String.fromCharCode(randomInt(65, 90))).join(''))
+    }, this._appName)
 
     if(process.env.NODE_ENV !== 'production') {
       
@@ -60,6 +62,11 @@ export default class FirebaseService {
 
   get authService() { return this._auth }
 
+  async close(){
+    await firebaseAdmin.app(this._appName).delete()
+    logger.info("Database is successfully closed")
+  }
+
   /**
    * Bitwise flag - verification of bit presence
    * @param type 
@@ -76,4 +83,13 @@ export default class FirebaseService {
 // NOTE: Since I always forget this detail:
 // The firebasePathConfig will automatically make the library start at collection level
 // do not be confused
-export const persistentFirebaseConnection = new FirebaseService(FirebaseServiceType.ALL, firebasePathConfig)
+export let persistentFirebaseConnection = new FirebaseService(FirebaseServiceType.ALL, firebasePathConfig)
+
+export function setNewPersistentFirebaseConnection(newService?: FirebaseService){
+  persistentFirebaseConnection.close().catch(async () => {
+    // retry closing firebase connection
+    for(let i = 0; i < 10; i++) await persistentFirebaseConnection.close()
+  }).finally(() => {
+    persistentFirebaseConnection = newService ?? new FirebaseService(FirebaseServiceType.ALL, firebasePathConfig)
+  })
+}

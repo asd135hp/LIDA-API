@@ -24,7 +24,7 @@ describe("Test sensor actions - Integration test", ()=>{
     //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
     //     throw new Error("An error is raised: " + event.content.error)
     // }
-  }, timeOut * Math.max(testCase.sensorLogs.length, testCase.actuatorLogs.length))
+  }, timeOut * (Math.max(testCase.sensorLogs.length, testCase.actuatorLogs.length) + 5))
 
   afterAll(async ()=>{
     // await persistentFirebaseConnection.firestoreService.runTransaction("logs/sensor", deleteLogs)
@@ -33,7 +33,7 @@ describe("Test sensor actions - Integration test", ()=>{
     // await persistentFirebaseConnection.realtimeService.deleteContent("logs")
 
     await setup.tearDown()
-  }, timeOut * 4)
+  }, timeOut * 5)
 
   const logsRead = QueryFacade.logs
 

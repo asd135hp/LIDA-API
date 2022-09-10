@@ -8,11 +8,11 @@ describe("Test system command as a whole", ()=>{
   
   beforeAll(async () => {
     await setup.init()
-  }, timeOut * 2)
+  }, timeOut * 5)
 
   afterAll(async () => {
     await setup.tearDown()
-  }, timeOut)
+  }, timeOut * 5)
 
   // all tests return false for all 
 
@@ -23,7 +23,7 @@ describe("Test system command as a whole", ()=>{
     expect(commands.isStop).toBe(false)
     expect(commands.isPause).toBe(false)
     expect(commands.isRestart).toBe(false)
-  })
+  }, timeOut)
   
   test("Should stop the system", async ()=>{
     await CommandFacade.systemCommand.stopSystem(setup.getAccessToken())
@@ -32,7 +32,7 @@ describe("Test system command as a whole", ()=>{
     expect(commands.isStop).toBe(true)
     expect(commands.isPause).toBe(false)
     expect(commands.isRestart).toBe(false)
-  })
+  }, timeOut)
   
   test("Should pause the system", async ()=>{
     await CommandFacade.systemCommand.pauseSystem(setup.getAccessToken())
@@ -41,7 +41,7 @@ describe("Test system command as a whole", ()=>{
     expect(commands.isStop).toBe(false)
     expect(commands.isPause).toBe(true)
     expect(commands.isRestart).toBe(false)
-  })
+  }, timeOut)
   
   test("Should restart the system", async ()=>{
     await CommandFacade.systemCommand.restartSystem(setup.getAccessToken())
@@ -50,5 +50,5 @@ describe("Test system command as a whole", ()=>{
     expect(commands.isStop).toBe(false)
     expect(commands.isPause).toBe(false)
     expect(commands.isRestart).toBe(true)
-  })
+  }, timeOut)
 })

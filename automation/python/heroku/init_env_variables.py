@@ -5,6 +5,8 @@ import json
 import re
 from constants import app_name
 
+# Generate environment variables only, no porting them to remote server
+
 raw_path = os.path.dirname(os.path.realpath(__file__))
 dir_path = raw_path.replace("\\automation\\python", "")
 const_env_vars = {

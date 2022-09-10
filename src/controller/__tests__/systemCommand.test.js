@@ -20,10 +20,10 @@ describe("Test system command as a whole", () => {
     const timeOut = testSetup_1.default.TIME_OUT;
     beforeAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.init();
-    }), timeOut * 2);
+    }), timeOut * 5);
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.tearDown();
-    }), timeOut);
+    }), timeOut * 5);
     test("Should start the system", () => __awaiter(void 0, void 0, void 0, function* () {
         yield commandFacade_1.default.systemCommand.startSystem(setup.getAccessToken());
         const commands = yield queryFacade_1.default.systemCommand.getProposedSystemCommands(setup.getAccessToken());
@@ -31,7 +31,7 @@ describe("Test system command as a whole", () => {
         expect(commands.isStop).toBe(false);
         expect(commands.isPause).toBe(false);
         expect(commands.isRestart).toBe(false);
-    }));
+    }), timeOut);
     test("Should stop the system", () => __awaiter(void 0, void 0, void 0, function* () {
         yield commandFacade_1.default.systemCommand.stopSystem(setup.getAccessToken());
         const commands = yield queryFacade_1.default.systemCommand.getProposedSystemCommands(setup.getAccessToken());
@@ -39,7 +39,7 @@ describe("Test system command as a whole", () => {
         expect(commands.isStop).toBe(true);
         expect(commands.isPause).toBe(false);
         expect(commands.isRestart).toBe(false);
-    }));
+    }), timeOut);
     test("Should pause the system", () => __awaiter(void 0, void 0, void 0, function* () {
         yield commandFacade_1.default.systemCommand.pauseSystem(setup.getAccessToken());
         const commands = yield queryFacade_1.default.systemCommand.getProposedSystemCommands(setup.getAccessToken());
@@ -47,7 +47,7 @@ describe("Test system command as a whole", () => {
         expect(commands.isStop).toBe(false);
         expect(commands.isPause).toBe(true);
         expect(commands.isRestart).toBe(false);
-    }));
+    }), timeOut);
     test("Should restart the system", () => __awaiter(void 0, void 0, void 0, function* () {
         yield commandFacade_1.default.systemCommand.restartSystem(setup.getAccessToken());
         const commands = yield queryFacade_1.default.systemCommand.getProposedSystemCommands(setup.getAccessToken());
@@ -55,6 +55,6 @@ describe("Test system command as a whole", () => {
         expect(commands.isStop).toBe(false);
         expect(commands.isPause).toBe(false);
         expect(commands.isRestart).toBe(true);
-    }));
+    }), timeOut);
 });
 //# sourceMappingURL=systemCommand.test.js.map

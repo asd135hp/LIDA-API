@@ -1,10 +1,8 @@
 import { Post, Patch, Route, SuccessResponse, Response, Controller, Security, BodyProp, Path, Header, Query } from "tsoa";
 import { logger } from "../../../../constants";
-import { apiPath } from "../../../../constants.config.json"
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import { Sensor, SensorData, UpdatingSensor } from "../../../../model/v1/write/sensors";
 import SensorService from "../../services/firebaseFreetier/sensorService";
-import SystemLogsService from "../../services/firebaseFreetier/systemLogsService";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 
 const getEvent = DatabaseEvent.getCompactEvent
@@ -21,7 +19,6 @@ export class SensorWriteMethods extends Controller {
   static mainService: SensorService;
   
   private service: SensorService;
-  private logger: SystemLogsService;
 
   constructor(){
     super()

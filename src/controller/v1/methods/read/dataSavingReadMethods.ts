@@ -1,9 +1,10 @@
 import { apiPath } from "../../../../constants.config.json"
-import { Get, Route, SuccessResponse, Response, Controller, Security, Query, Header } from "tsoa";
+import { Get, Route, SuccessResponse, Response, Controller, Security, Query, Header, Path } from "tsoa";
 import { logger } from "../../../../constants";
 import { IterableJson } from "../../../../model/json";
 import { getDateRangeString } from "../../../../utility/helper";
 import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
+import { SnapshotDownloadResponse } from "../../../../model/v1/read/dataSaving";
 
 @Security("api_key")
 @Route(`api/v1/snapshot`)
@@ -43,4 +44,17 @@ export class DataSavingReadMethods extends Controller {
   //   const option = await new DataSavingService().retrieveLogSnapshot({ startDate, endDate })
   //   return option.unwrapOr([])
   // }
+  
+  @Get("snapshot/{runNumber}/get")
+  async retrieveSensorDataRunSnapshot(
+    @Query() accessToken: string,
+    @Path() runNumber: number
+  ): Promise<SnapshotDownloadResponse[]> {
+    logger.info(`DataSavingReadMethods: Getting run #${runNumber} sensor snapshot from the database`)
+    const option = await new DataSavingService().retrieveSensorSnapshot(runNumber)
+    return option.unwrapOrElse(()=>{
+      this.setStatus(404)
+      return []
+    })
+  }
 }

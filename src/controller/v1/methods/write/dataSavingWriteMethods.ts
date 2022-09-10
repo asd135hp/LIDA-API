@@ -1,4 +1,4 @@
-import { Route, SuccessResponse, Response, Controller, Security, Delete, Query, Post, Header, Path } from "tsoa";
+import { Route, SuccessResponse, Response, Controller, Security, Delete, Query, Post, Header, Path, Patch } from "tsoa";
 import { DATABASE_TIMEZONE, logger } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
@@ -7,6 +7,7 @@ import { DateTime } from "luxon";
 import { getDateRangeString } from "../../../../utility/helper";
 import { persistentFirebaseConnection } from "../../services/firebaseFreetier/firebaseService";
 import FirebaseFirestoreService from "../../../database/firebase/services/firebaseFirestoreService";
+import SensorService from "../../services/firebaseFreetier/sensorService";
 
 const getEvent = DatabaseEvent.getCompactEvent
 const firestore = persistentFirebaseConnection.firestoreService
@@ -30,29 +31,46 @@ export class DataSavingWriteMethods extends Controller {
     this.service = DataSavingWriteMethods.mainService
   }
 
-  private get currentUnixTimestamp() { return DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger() }
+  // private get currentUnixTimestamp() { return DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger() }
 
-  // @Post("sensor/save")
-  // async saveSensorSnapshot(
-  //   @Query() accessToken: string,
-  //   @Query() sensor: string,
-  //   @Query() sensorData: string,
-  //   @Query() startDate?: number,
-  //   @Query() endDate?: number
-  // ){
-  //   const t = getDateRangeString({ startDate, endDate })
-  //   logger.info(`DataSavingWriteMethods: Saving sensor snapshot to the storage from ${t.start} to ${t.end}`)
+  @Patch("sensor/{runNumber}/delete")
+  async deleteSensorSnapshot(
+    @Query() accessToken: string,
+    @Path() runNumber: number
+  ): Promise<DatabaseEvent> {
 
-  //   // return appropriate status code from internal system
-  //   const event = await this.service.uploadSensorSnapshot({
-  //     sensor: JSON.parse(sensor),
-  //     sensorData: JSON.parse(sensorData)
-  //   }, { startDate, endDate })
-  //   if(event instanceof DatabaseErrorEvent){
-  //     this.setStatus(event.content.values.statusCode)
-  //   }
-  //   return getEvent(event)
-  // }
+    // download content to a file
+    // and then upload it to storage bucket
+    const event = await this.service.deleteSensorSnapshot(runNumber)
+    if(event instanceof DatabaseErrorEvent){
+      this.setStatus(event.content.values.statusCode)
+    }
+
+    return getEvent(event)
+  }
+
+  @Post("sensor/save")
+  async saveSensorSnapshot(@Query() accessToken: string){
+    logger.info(`DataSavingWriteMethods: Saving sensor snapshot to the storage`)
+
+    // return appropriate status code from internal system
+    const sensorService = new SensorService()
+    const snapshot = await sensorService.getSensorDataSnapshot()
+
+    let event = await this.service.uploadSensorSnapshot({
+      sensor: (await sensorService.getSensors()).unwrapOr([]),
+      data: snapshot.unwrapOr([])
+    }, 1)
+
+    if(process.env.NODE_ENV === 'production'){
+      // elete data here
+    }
+
+    if(event instanceof DatabaseErrorEvent){
+      this.setStatus(event.content.values.statusCode)
+    }
+    return getEvent(event)
+  }
 
   // @Post("log/save")
   // async saveLogSnapshot(
@@ -145,18 +163,18 @@ export class DataSavingWriteMethods extends Controller {
   //   return getEvent(event)
   // }
 
-  @Delete("sensor/{runNumber}/delete")
-  async deleteSensorSnapshot(
-    @Query() accessToken: string,
-    @Path() runNumber: number
-  ): Promise<DatabaseEvent> {
-    const event = await this.service.deleteSensorSnapshot(runNumber)
-    if(event instanceof DatabaseErrorEvent){
-      this.setStatus(event.content.values.statusCode)
-    }
+  // @Delete("sensor/{runNumber}/delete")
+  // async deleteSensorSnapshot(
+  //   @Query() accessToken: string,
+  //   @Path() runNumber: number
+  // ): Promise<DatabaseEvent> {
+  //   const event = await this.service.deleteSensorSnapshot(runNumber)
+  //   if(event instanceof DatabaseErrorEvent){
+  //     this.setStatus(event.content.values.statusCode)
+  //   }
 
-    return getEvent(event)
-  }
+  //   return getEvent(event)
+  // }
 
   // @Delete("log/delete")
   // async deleteLogSnapshots(

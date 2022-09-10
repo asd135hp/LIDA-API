@@ -1,5 +1,4 @@
 import { Server } from "http";
-import winston from "winston"
 import { logger } from "./constants";
 import CommandBus from "./controller/v1/model/bus/commandBus";
 import WriteModel from "./controller/v1/model/writeModel";

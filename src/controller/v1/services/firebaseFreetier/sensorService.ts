@@ -128,6 +128,106 @@ export default class SensorService {
     })
   }
 
+  async getSensorDataSnapshot(dateRange: FirebaseDateRange = {}): Promise<Option<SensorData[][]>> {
+    dateRange = {
+      startDate: dateRange.startDate || 0,
+      endDate: dateRange.endDate || DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
+    }
+
+    const cachedEndDate = DateTime.fromSeconds(dateRange.endDate)
+    const boundTimeObj = DateTime.local(cachedEndDate.year, cachedEndDate.month, cachedEndDate.day + 1).setZone(DATABASE_TIMEZONE)
+
+    let currentDayCount = 1
+    let [upperBoundTime, lowerBoundTime] = [
+      boundTimeObj.toUnixInteger(),
+      boundTimeObj.minus({ day: currentDayCount++ }).toUnixInteger()
+    ]
+    let result: SensorData[][] = null
+    await realtime.getContent(fbPath.sensorData, async ref => {
+      // get result bu filtration
+      await ref.orderByChild("timeStamp").once('value', snapshot => {
+        if(!snapshot.exists()){
+          logger.warn("Snapshot does not exist with a value of " + snapshot.val())
+          return
+        }
+
+        snapshot.forEach(child => {
+          const json = child.val()
+          const timestamp = json.timeStamp
+          if(timestamp <= upperBoundTime) {
+            if(timestamp < lowerBoundTime) {
+              // set time boundaries whenever the timestamp value is less trhan the current day
+              [upperBoundTime, lowerBoundTime] = [
+                lowerBoundTime, 
+                boundTimeObj.minus({ day: currentDayCount++ }).toUnixInteger()
+              ]
+
+              // if the lower bound of current time range is indefinitely lower than what is specified,
+              // do not do anything
+              if(lowerBoundTime < dateRange.startDate) return
+
+              // else add a new array, indicating a storage for new day
+              result.push([json])
+              return
+            }
+
+            // use the day count from before, add json data to the current day storage
+            // this is not supposed to be interfered by lowerBoundTime < dateRange.startDate
+            result[currentDayCount - 1].push(json)
+          }
+        })
+      })
+    })
+
+    logger.debug(`SensorData by date: ${result}`)
+    return !result? None : Some(result.reverse())
+  }
+
+  /**
+   * Get the latest sensot data from the database
+   */
+  async getLatestSensorData(): Promise<Option<SensorDataDTO[]>>{
+    let result: Option<SensorDataDTO[]> = None
+    await realtime.getContent(fbPath.sensorData, async ref => {
+      // get resykt by filtration
+      const sensorNames = await this.getSensors()
+      if(sensorNames.match.isNone()) return;
+
+      const recentData = []
+      for(const sensor of sensorNames.unwrapOr([])) {
+        const option = await getQueryResultAsArray(ref.orderByChild(sensor.name).limitToFirst(1))
+        const data = option.unwrapOr([]).pop()
+
+        // data cannot be fetched -> terminate???
+        if(!data) return
+        recentData.push(data)
+      }
+
+      result = Some(recentData)
+    })
+
+    logger.debug(`Sensor data by Name: ${result}`)
+    return result
+  }
+
+  /**
+   * Get the latest sensor data by name.
+   * It is assumed that front-end will only need to use the most recent data sorted by sensor name
+   * @param name Sensor name
+   * @returns
+   */
+  async getLatestSensorDataByName(name: string): Promise<Option<SensorDataDTO>>{
+    let result: Option<SensorDataDTO> = None
+    await realtime.getContent(fbPath.sensorData, async ref => {
+      // get only the most recent result by filtration
+      const temp = await getQueryResultAsArray(ref.orderByChild("sensorName").equalTo(name).limitToFirst(1))
+      result = temp.map(arr => !arr[0] ? None : Some(arr[0]))
+    })
+
+    logger.debug(`Latest sensor data by name: ${result.unwrapOr(null)}`)
+    return result
+  }
+
   /**
    * Add a single sensor to the database, this is cooperated with an anti-duping method
    * @param sensor Details about the sensor

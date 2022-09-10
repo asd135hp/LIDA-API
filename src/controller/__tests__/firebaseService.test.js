@@ -108,8 +108,9 @@ describe("Test firebase service as a whole", () => {
             return;
         const { email, password } = constants_1.TEST_ACCOUNT;
         yield auth.registerWithEmail(email, password).catch(() => __awaiter(void 0, void 0, void 0, function* () {
+            console.log("Failed to register");
         }));
-        yield (0, promises_1.setTimeout)(2000);
+        yield (0, promises_1.setTimeout)(TIMEOUT);
         let user = yield auth.loginWithEmail(email, password).catch(() => null);
         expect(user).not.toBe(null);
         expect(user.email).toBe(email);
@@ -121,6 +122,6 @@ describe("Test firebase service as a whole", () => {
         yield auth.deleteUser(uid, newApiKey);
         auth.logout(user);
         expect(user.isLoggedOut).toBe(true);
-    }), TIMEOUT * 2 + 2000);
+    }), TIMEOUT * 3);
 });
 //# sourceMappingURL=firebaseService.test.js.map

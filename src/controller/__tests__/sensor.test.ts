@@ -22,7 +22,7 @@ describe("Test sensor actions - Integration test", ()=>{
     //   if(TEST_SETUP_THROWS_ERROR && event instanceof DatabaseErrorEvent)
     //     throw new Error("An error is raised: " + event.content.error)
     // }
-  }, timeOut * Math.max(testCase.sensorData.length, testCase.sensors.length))
+  }, timeOut * Math.max(testCase.sensorData.length, testCase.sensors.length + 5))
 
   afterAll(async ()=>{
     // const fs = persistentFirebaseConnection.firestoreService as FirebaseFirestoreService
@@ -34,7 +34,7 @@ describe("Test sensor actions - Integration test", ()=>{
     // await rt.deleteContent("sensorData")
     
     await setup.tearDown()
-  }, timeOut * (testCase.sensorData.length + testCase.sensors.length) / 2)
+  }, timeOut * (testCase.sensorData.length + testCase.sensors.length + 10) / 2)
 
   const sensorRead = QueryFacade.sensor
 

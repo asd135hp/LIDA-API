@@ -14,6 +14,8 @@ import { createWriteEvent, getRealtimeContent } from "../../../../utility/shorth
 import { COMPONENTS_PATH as fbPath } from "../../../../constants";
 import { getEachSensorLatestData } from "./utility/sensorService";
 import { orderByProp } from "../../../../utility/helper";
+import FirebaseFirestoreService from "../../../database/firebase/services/firebaseFirestoreService";
+import DatabaseDeleteEvent from "../../../../model/v1/events/databaseDeleteEvent";
 
 const realtime = persistentFirebaseConnection.realtimeService
 const firestore = persistentFirebaseConnection.firestoreService
@@ -353,5 +355,29 @@ export default class SensorService {
       publisher: this.publisher,
       serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 194"
     }, DatabaseAddEvent)
+  }
+
+  /**
+   * WARNING: Avoid using this method unless it is necessary
+   * 
+   * Delete all sensor data stored in the firebase database
+   * @returns 
+   */
+  async deleteSensorData(): Promise<DatabaseEvent> {
+    return await createWriteEvent({
+      data: {},
+      protectedMethods: {
+        async write(){
+          // really dangerous so it is not recommended for normal usage
+          await (firestore as FirebaseFirestoreService).deleteCollection(fbPath.sensorData)
+        },
+        async read(){
+          // really dangerous so it is not recommended for normal usage
+          await realtime.deleteContent(fbPath.sensorData)
+        }
+      },
+      publisher: this.publisher,
+      serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 194"
+    }, DatabaseDeleteEvent)
   }
 }

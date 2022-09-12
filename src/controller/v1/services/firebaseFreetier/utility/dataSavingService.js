@@ -32,11 +32,8 @@ function mergeDefaultDateRange(dateRange) {
 exports.mergeDefaultDateRange = mergeDefaultDateRange;
 function parseStorageFileMetaData(rawMetaData) {
     const [metadata] = rawMetaData;
-    const rawFileName = metadata.name.split(/[\/\\]/).pop();
-    const fileName = Buffer.from(rawFileName, "base64").toString();
-    const info = fileName.split(";").map(val => parseInt(val));
-    constants_1.logger.debug(info);
-    return [...info, metadata];
+    const rawFileName = metadata.name.split(/[\/\\]/).pop().split('.')[0];
+    return [parseInt(rawFileName), metadata];
 }
 exports.parseStorageFileMetaData = parseStorageFileMetaData;
 function getSnapshotsFromDateRange(folderPath, dateRange, options) {

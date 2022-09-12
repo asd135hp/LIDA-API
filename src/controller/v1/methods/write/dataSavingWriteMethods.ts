@@ -1,17 +1,12 @@
-import { Route, SuccessResponse, Response, Controller, Security, Delete, Query, Post, Header, Path, Patch } from "tsoa";
-import { DATABASE_TIMEZONE, logger } from "../../../../constants";
+import { Route, SuccessResponse, Response, Controller, Security, Query, Post, Path, Patch } from "tsoa";
+import { logger } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
-import { DateTime } from "luxon";
-import { getDateRangeString } from "../../../../utility/helper";
-import { persistentFirebaseConnection } from "../../services/firebaseFreetier/firebaseService";
-import FirebaseFirestoreService from "../../../database/firebase/services/firebaseFirestoreService";
 import SensorService from "../../services/firebaseFreetier/sensorService";
+import CounterService from "../../services/firebaseFreetier/counterService";
 
 const getEvent = DatabaseEvent.getCompactEvent
-const firestore = persistentFirebaseConnection.firestoreService
-const realtime = persistentFirebaseConnection.realtimeService
 
 @Security("api_key")
 @Route(`api/v1/snapshot`)
@@ -55,15 +50,30 @@ export class DataSavingWriteMethods extends Controller {
 
     // return appropriate status code from internal system
     const sensorService = new SensorService()
+    const counterService = new CounterService()
     const snapshot = await sensorService.getSensorDataSnapshot()
 
     let event = await this.service.uploadSensorSnapshot({
       sensor: (await sensorService.getSensors()).unwrapOr([]),
       data: snapshot.unwrapOr([])
-    }, 1)
+    }, await counterService.incrementSystemRunCounter())
 
-    if(process.env.NODE_ENV === 'production'){
-      // elete data here
+    // prod code, no reason to delete data on test servers
+    if(process.env.NODE_ENV === 'production'
+    && !(event instanceof DatabaseErrorEvent)
+    ){
+      // delete data here, if there are problems with this, please remove it
+      try{
+        let count = 0
+        while(count++ < 3){
+          const deleteEvent = await sensorService.deleteSensorData()
+          if(deleteEvent instanceof DatabaseErrorEvent){
+            continue
+          } else break;
+        }
+      } finally {
+        // do not throw anything here since it will defo break the code
+      }
     }
 
     if(event instanceof DatabaseErrorEvent){

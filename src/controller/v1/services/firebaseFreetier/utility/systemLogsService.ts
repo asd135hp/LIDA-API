@@ -6,6 +6,7 @@ import DatabaseEvent from "../../../../../model/v1/events/databaseEvent"
 import { Log } from "../../../../../model/v1/write/systemLog"
 import { createWriteEvent } from "../../../../../utility/shorthandOps"
 import { getQueryResult, getQueryResultAsArray } from "../../../../database/firebase/services/firebaseRealtimeService"
+import CounterService from "../counterService"
 import DataSavingService from "../dataSavingService"
 import { persistentFirebaseConnection } from "../firebaseService"
 
@@ -35,22 +36,15 @@ export const pushLog = async(
         await firestore.addContentToCollection(`${collectionPath}/content`, log)
       },
       async read(){
-        await realtime.getContent(`${COMPONENTS_PATH.count.path}/${path}`, async ref => {
-          // looks more clean - update log count
-          const count = (await ref.transaction(val => {
-            if(typeof(val) !== 'number') return 1
-            if(val < LOG_LINES) return val + 1
-            return val
-          })).snapshot.val()
-
-          // trim out the oldest line to match the limit
-          if(count >= LOG_LINES) realtime.getContent(path, async ref => {
-            const temp = await getQueryResult(ref.orderByChild("timeStamp").limitToFirst(1))
-            for(const key in temp)
-              await realtime.deleteContent(`${path}/${key}`)
-          })
-          realtime.pushContent(log, path)
+        const count = await new CounterService().incrementLogCounter(path)
+        
+        // trim out the oldest line to match the limit
+        if(count >= LOG_LINES) await realtime.getContent(path, async ref => {
+          const temp = await getQueryResult(ref.orderByChild("timeStamp").limitToFirst(1))
+          for(const key in temp)
+            await realtime.deleteContent(`${path}/${key}`)
         })
+        await realtime.pushContent(log, path)
       }
     },
     publisher,

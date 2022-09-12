@@ -107,14 +107,6 @@
 					"downloadUrl": {
 						"type": "string"
 					},
-					"startDate": {
-						"type": "number",
-						"format": "double"
-					},
-					"endDate": {
-						"type": "number",
-						"format": "double"
-					},
 					"decompressionByteLength": {
 						"type": "number",
 						"format": "double"
@@ -126,8 +118,6 @@
 				"required": [
 					"newFileName",
 					"downloadUrl",
-					"startDate",
-					"endDate",
 					"decompressionByteLength",
 					"note"
 				],

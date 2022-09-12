@@ -36,13 +36,9 @@ export function mergeDefaultDateRange(dateRange: FirebaseDateRange): FirebaseDat
 export function parseStorageFileMetaData(rawMetaData: [any, any]) {
   const [metadata] = rawMetaData
   // removes directory and extension so that only file name is used
-  const rawFileName = metadata.name.split(/[\/\\]/).pop()
-  // get file name from base64 encoding to utf-8
-  const fileName = Buffer.from(rawFileName, "base64").toString()
-  // format: startTimestamp;endTimestamp;decompressedByteLength
-  const info = fileName.split(";").map(val => parseInt(val))
-  logger.debug(info)
-  return [...info, metadata]
+  const rawFileName = metadata.name.split(/[\/\\]/).pop().split('.')[0]
+  // can be added to handle various name formats
+  return [parseInt(rawFileName), metadata]
 }
 
 /**

@@ -44,16 +44,16 @@ export default class DataSavingService {
     logger.debug(`There are ${files.length} in ${folderPath}`)
     const result = []
     for(const file of files){
-      const [startDate, endDate, byteLength] = parseStorageFileMetaData(await file.getMetadata());
+      const [byteLength, _] = parseStorageFileMetaData(await file.getMetadata());
       const [signedUrl] = await file.getSignedUrl({
         action: "read",
-        expires: DateTime.now().toUnixInteger() + 3600 * 24,
+        expires: DateTime.now().toUTC().toUnixInteger() * 1000 + 1000 * 3600 * 24, // ms
       });
       
       result.push({
-        newFileName: `${startDate}_${endDate}_run${runNumber}.zip`,
+        // can add a unique uid here
+        newFileName: `lida_run${runNumber}.zip`,
         downloadUrl: signedUrl,
-        startDate, endDate,
         decompressionByteLength: byteLength,
         note: "The download link will expire today"
       })
@@ -119,16 +119,15 @@ export default class DataSavingService {
     const event = new DatabaseCreateEvent({
       protected:{
         async storage(){
-          //mock this -jest test
           let buffer: Buffer = null
           
           zip({
-            "sensor_names_and_statuses": [strToU8(JSON.stringify(sensorName)), {}],
-            "sensor_data": [strToU8(JSON.stringify(sensorData)), {}]
+            "sensor_names_and_statuses.json": [strToU8(JSON.stringify(sensorName)), {}],
+            "sensor_data.json": [strToU8(JSON.stringify(sensorData)), {}]
           }, { level: 9 }, (err, data) => {
             if(err) throw err
             buffer =  Buffer.from(data)
-            storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}`, buffer).then(()=>{
+            storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}.zip`, buffer).then(()=>{
               logger.debug("It worked ~ DataSavingService.ts line 128")
             }, (reason: any)=>{
               logger.error(`Error: ${reason} ~ DataSavingService.ts line 130`)

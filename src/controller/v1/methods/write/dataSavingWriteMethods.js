@@ -27,11 +27,9 @@ const tsoa_1 = require("tsoa");
 const constants_1 = require("../../../../constants");
 const databaseEvent_1 = __importDefault(require("../../../../model/v1/events/databaseEvent"));
 const databaseErrorEvent_1 = __importDefault(require("../../../../model/v1/events/databaseErrorEvent"));
-const firebaseService_1 = require("../../services/firebaseFreetier/firebaseService");
 const sensorService_1 = __importDefault(require("../../services/firebaseFreetier/sensorService"));
+const counterService_1 = __importDefault(require("../../services/firebaseFreetier/counterService"));
 const getEvent = databaseEvent_1.default.getCompactEvent;
-const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
-const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMethods extends tsoa_1.Controller {
     constructor() {
         super();
@@ -50,12 +48,27 @@ let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMet
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`DataSavingWriteMethods: Saving sensor snapshot to the storage`);
             const sensorService = new sensorService_1.default();
+            const counterService = new counterService_1.default();
             const snapshot = yield sensorService.getSensorDataSnapshot();
             let event = yield this.service.uploadSensorSnapshot({
                 sensor: (yield sensorService.getSensors()).unwrapOr([]),
                 data: snapshot.unwrapOr([])
-            }, 1);
-            if (process.env.NODE_ENV === 'production') {
+            }, yield counterService.incrementSystemRunCounter());
+            if (process.env.NODE_ENV === 'production'
+                && !(event instanceof databaseErrorEvent_1.default)) {
+                try {
+                    let count = 0;
+                    while (count++ < 3) {
+                        const deleteEvent = yield sensorService.deleteSensorData();
+                        if (deleteEvent instanceof databaseErrorEvent_1.default) {
+                            continue;
+                        }
+                        else
+                            break;
+                    }
+                }
+                finally {
+                }
             }
             if (event instanceof databaseErrorEvent_1.default) {
                 this.setStatus(event.content.values.statusCode);

@@ -18,6 +18,7 @@ const constants_1 = require("../../../../../constants");
 const databaseAddEvent_1 = __importDefault(require("../../../../../model/v1/events/databaseAddEvent"));
 const shorthandOps_1 = require("../../../../../utility/shorthandOps");
 const firebaseRealtimeService_1 = require("../../../../database/firebase/services/firebaseRealtimeService");
+const counterService_1 = __importDefault(require("../counterService"));
 const dataSavingService_1 = __importDefault(require("../dataSavingService"));
 const firebaseService_1 = require("../firebaseService");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
@@ -35,22 +36,14 @@ const pushLog = (path, log, publisher) => __awaiter(void 0, void 0, void 0, func
             },
             read() {
                 return __awaiter(this, void 0, void 0, function* () {
-                    yield realtime.getContent(`${constants_1.COMPONENTS_PATH.count.path}/${path}`, (ref) => __awaiter(this, void 0, void 0, function* () {
-                        const count = (yield ref.transaction(val => {
-                            if (typeof (val) !== 'number')
-                                return 1;
-                            if (val < constants_1.LOG_LINES)
-                                return val + 1;
-                            return val;
-                        })).snapshot.val();
-                        if (count >= constants_1.LOG_LINES)
-                            realtime.getContent(path, (ref) => __awaiter(this, void 0, void 0, function* () {
-                                const temp = yield (0, firebaseRealtimeService_1.getQueryResult)(ref.orderByChild("timeStamp").limitToFirst(1));
-                                for (const key in temp)
-                                    yield realtime.deleteContent(`${path}/${key}`);
-                            }));
-                        realtime.pushContent(log, path);
-                    }));
+                    const count = yield new counterService_1.default().incrementLogCounter(path);
+                    if (count >= constants_1.LOG_LINES)
+                        yield realtime.getContent(path, (ref) => __awaiter(this, void 0, void 0, function* () {
+                            const temp = yield (0, firebaseRealtimeService_1.getQueryResult)(ref.orderByChild("timeStamp").limitToFirst(1));
+                            for (const key in temp)
+                                yield realtime.deleteContent(`${path}/${key}`);
+                        }));
+                    yield realtime.pushContent(log, path);
                 });
             }
         },

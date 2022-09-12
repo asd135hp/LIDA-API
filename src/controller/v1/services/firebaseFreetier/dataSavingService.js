@@ -40,15 +40,14 @@ class DataSavingService {
             constants_1.logger.debug(`There are ${files.length} in ${folderPath}`);
             const result = [];
             for (const file of files) {
-                const [startDate, endDate, byteLength] = (0, dataSavingService_1.parseStorageFileMetaData)(yield file.getMetadata());
+                const [byteLength, _] = (0, dataSavingService_1.parseStorageFileMetaData)(yield file.getMetadata());
                 const [signedUrl] = yield file.getSignedUrl({
                     action: "read",
-                    expires: luxon_1.DateTime.now().toUnixInteger() + 3600 * 24,
+                    expires: luxon_1.DateTime.now().toUTC().toUnixInteger() * 1000 + 1000 * 3600 * 24,
                 });
                 result.push({
-                    newFileName: `${startDate}_${endDate}_run${runNumber}.zip`,
+                    newFileName: `lida_run${runNumber}.zip`,
                     downloadUrl: signedUrl,
-                    startDate, endDate,
                     decompressionByteLength: byteLength,
                     note: "The download link will expire today"
                 });
@@ -93,13 +92,13 @@ class DataSavingService {
                         return __awaiter(this, void 0, void 0, function* () {
                             let buffer = null;
                             (0, fflate_1.zip)({
-                                "sensor_names_and_statuses": [(0, fflate_1.strToU8)(JSON.stringify(sensorName)), {}],
-                                "sensor_data": [(0, fflate_1.strToU8)(JSON.stringify(sensorData)), {}]
+                                "sensor_names_and_statuses.json": [(0, fflate_1.strToU8)(JSON.stringify(sensorName)), {}],
+                                "sensor_data.json": [(0, fflate_1.strToU8)(JSON.stringify(sensorData)), {}]
                             }, { level: 9 }, (err, data) => {
                                 if (err)
                                     throw err;
                                 buffer = Buffer.from(data);
-                                storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}`, buffer).then(() => {
+                                storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}.zip`, buffer).then(() => {
                                     constants_1.logger.debug("It worked ~ DataSavingService.ts line 128");
                                 }, (reason) => {
                                     constants_1.logger.error(`Error: ${reason} ~ DataSavingService.ts line 130`);

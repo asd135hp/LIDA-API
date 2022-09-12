@@ -70,8 +70,6 @@ const models = {
         "properties": {
             "newFileName": { "dataType": "string", "required": true },
             "downloadUrl": { "dataType": "string", "required": true },
-            "startDate": { "dataType": "double", "required": true },
-            "endDate": { "dataType": "double", "required": true },
             "decompressionByteLength": { "dataType": "double", "required": true },
             "note": { "dataType": "string", "required": true },
         },

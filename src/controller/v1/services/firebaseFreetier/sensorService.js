@@ -24,6 +24,7 @@ const shorthandOps_1 = require("../../../../utility/shorthandOps");
 const constants_2 = require("../../../../constants");
 const sensorService_1 = require("./utility/sensorService");
 const helper_1 = require("../../../../utility/helper");
+const databaseDeleteEvent_1 = __importDefault(require("../../../../model/v1/events/databaseDeleteEvent"));
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
 class SensorService {
@@ -264,6 +265,27 @@ class SensorService {
                 publisher: this.publisher,
                 serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 194"
             }, databaseAddEvent_1.default);
+        });
+    }
+    deleteSensorData() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield (0, shorthandOps_1.createWriteEvent)({
+                data: {},
+                protectedMethods: {
+                    write() {
+                        return __awaiter(this, void 0, void 0, function* () {
+                            yield firestore.deleteCollection(constants_2.COMPONENTS_PATH.sensorData);
+                        });
+                    },
+                    read() {
+                        return __awaiter(this, void 0, void 0, function* () {
+                            yield realtime.deleteContent(constants_2.COMPONENTS_PATH.sensorData);
+                        });
+                    }
+                },
+                publisher: this.publisher,
+                serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 194"
+            }, databaseDeleteEvent_1.default);
         });
     }
 }

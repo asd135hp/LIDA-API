@@ -12,6 +12,8 @@ import { DateTime } from 'luxon'
 import { Option, Some, None } from "../../../../model/patterns/option"
 import { createWriteEvent, getRealtimeContent } from "../../../../utility/shorthandOps";
 import { COMPONENTS_PATH as fbPath } from "../../../../constants";
+import { getEachSensorLatestData } from "./utility/sensorService";
+import { orderByProp } from "../../../../utility/helper";
 
 const realtime = persistentFirebaseConnection.realtimeService
 const firestore = persistentFirebaseConnection.firestoreService
@@ -91,7 +93,7 @@ export default class SensorService {
     logger.debug(`Sensor data by name: ${result}`)
     // converts all objects to DTO
     return result.map(data => {
-      const arr = data.map(val => SensorDataDTO.fromJson(val) as SensorDataDTO)
+      const arr = data.map(val => SensorDataDTO.fromJson(val) as SensorDataDTO).sort(orderByProp("timeStamp", false))
       return Some(arr)
     })
   }
@@ -123,11 +125,16 @@ export default class SensorService {
     logger.debug(`Sensor data by name: ${result}`)
     // converts all objects to DTO
     return result.map(data => {
-      const arr = data.map(val => SensorDataDTO.fromJson(val) as SensorDataDTO)
+      const arr = data.map(val => SensorDataDTO.fromJson(val) as SensorDataDTO).sort(orderByProp("timeStamp", false))
       return Some(arr)
     })
   }
 
+  /**
+   * 
+   * @param dateRange 
+   * @returns 
+   */
   async getSensorDataSnapshot(dateRange: FirebaseDateRange = {}): Promise<Option<SensorData[][]>> {
     dateRange = {
       startDate: dateRange.startDate || 0,
@@ -142,7 +149,7 @@ export default class SensorService {
       boundTimeObj.toUnixInteger(),
       boundTimeObj.minus({ day: currentDayCount++ }).toUnixInteger()
     ]
-    let result: SensorData[][] = null
+    let result: SensorData[][] = [[]]
     await realtime.getContent(fbPath.sensorData, async ref => {
       // get result bu filtration
       await ref.orderByChild("timeStamp").once('value', snapshot => {
@@ -156,31 +163,31 @@ export default class SensorService {
           const timestamp = json.timeStamp
           if(timestamp <= upperBoundTime) {
             if(timestamp < lowerBoundTime) {
+              // if the lower bound of current time range is indefinitely lower than what is specified,
+              // do not do anything
+              if(lowerBoundTime < dateRange.startDate) return
+
               // set time boundaries whenever the timestamp value is less trhan the current day
               [upperBoundTime, lowerBoundTime] = [
                 lowerBoundTime, 
                 boundTimeObj.minus({ day: currentDayCount++ }).toUnixInteger()
               ]
 
-              // if the lower bound of current time range is indefinitely lower than what is specified,
-              // do not do anything
-              if(lowerBoundTime < dateRange.startDate) return
-
               // else add a new array, indicating a storage for new day
               result.push([json])
               return
             }
 
-            // use the day count from before, add json data to the current day storage
+            // add json data to the current day storage to the final array sinceit is the latest
             // this is not supposed to be interfered by lowerBoundTime < dateRange.startDate
-            result[currentDayCount - 1].push(json)
+            result[result.length - 1].push(json)
           }
         })
       })
     })
 
     logger.debug(`SensorData by date: ${result}`)
-    return !result? None : Some(result.reverse())
+    return !result.length ? None : Some(result.reverse())
   }
 
   /**
@@ -193,17 +200,8 @@ export default class SensorService {
       const sensorNames = await this.getSensors()
       if(sensorNames.match.isNone()) return;
 
-      const recentData = []
-      for(const sensor of sensorNames.unwrapOr([])) {
-        const option = await getQueryResultAsArray(ref.orderByChild(sensor.name).limitToFirst(1))
-        const data = option.unwrapOr([]).pop()
-
-        // data cannot be fetched -> terminate???
-        if(!data) return
-        recentData.push(data)
-      }
-
-      result = Some(recentData)
+      result = await getQueryResultAsArray(ref.orderByChild("timeStamp").limitToLast(sensorNames.unwrapOr([]).length * 3))
+      result = result.map(val => Some(getEachSensorLatestData(val)))
     })
 
     logger.debug(`Sensor data by Name: ${result}`)

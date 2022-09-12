@@ -38,7 +38,7 @@ let DataSavingReadMethods = class DataSavingReadMethods extends tsoa_1.Controlle
     }
 };
 __decorate([
-    (0, tsoa_1.Get)("snapshot/{runNumber}/get"),
+    (0, tsoa_1.Get)("sensor/{runNumber}/get"),
     __param(0, (0, tsoa_1.Query)()),
     __param(1, (0, tsoa_1.Path)())
 ], DataSavingReadMethods.prototype, "retrieveSensorDataRunSnapshot", null);

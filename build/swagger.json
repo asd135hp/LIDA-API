@@ -679,7 +679,7 @@
 				]
 			}
 		},
-		"/api/v1/snapshot/snapshot/{runNumber}/get": {
+		"/api/v1/snapshot/sensor/{runNumber}/get": {
 			"get": {
 				"operationId": "RetrieveSensorDataRunSnapshot",
 				"responses": {

@@ -23,9 +23,17 @@ class APIKey {
   private getAuthFilePath(email: string) { return `auth/user/${email}/api_key.json` }
 
   
-  async getKey(uid: string): Promise<string>{
+  async getKey(uid: string, renewalRetries = 0): Promise<string>{
     const path = this.getAuthFilePath(uid)
-    if(!await this.storage.isFileExists(path)) return ""
+    if(!await this.storage.isFileExists(path)) {
+      // third time the charm, or else...
+      if(renewalRetries === 3) return ""
+
+      // try to renew the key since the account in the system
+      // but there is a change in environment
+      await this.renewKey(uid)
+      return this.getKey(uid, renewalRetries + 1)
+    }
 
     const data = (await this.storage.readFileFromStorage(path)).toString()
     logger.info("APIKey - getKey: " + data)

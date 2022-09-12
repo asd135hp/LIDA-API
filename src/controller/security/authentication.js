@@ -18,12 +18,18 @@ function expressAuthentication(request, securityName, scopes) {
         if (securityName === "api_key") {
             let token = (_a = request.query) === null || _a === void 0 ? void 0 : _a.accessToken;
             if (!token)
-                return Promise.reject({ message: "No authentication token is provided" });
+                return Promise.reject({ message: "No authentication token is provided", type: "Security" });
             if (Array.isArray(token))
-                return Promise.reject({ message: "Wrong token format - only one token is needed" });
+                return Promise.reject({
+                    message: "Wrong token format - only one token is needed",
+                    type: "Security"
+                });
             const unpacked = (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(token.toString(), 'hex')).split('|');
             if (unpacked.length != 2)
-                return Promise.reject({ message: "Wrong token format" });
+                return Promise.reject({
+                    message: "Wrong token format",
+                    type: "Security"
+                });
             const [userId, apiKey] = unpacked;
             const service = firebaseService_1.persistentFirebaseConnection.authService;
             return yield service.verifyApiKey(userId, apiKey);

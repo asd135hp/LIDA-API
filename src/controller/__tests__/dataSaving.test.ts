@@ -53,6 +53,7 @@ xdescribe("Data saving test - Integration test", ()=>{
   // const days = 2
   // const unixOffset = days * 24 * 3600
 
+  test("", ()=>{})
   // test(`Should get ${days} days worth of sensor snapshots`, async ()=>{
   //   const result = await dataSaving.retrieveSensorSnapshots(setup.getAccessToken(), startDate, startDate + unixOffset)
   //   result.map((dataByDay, index) => {

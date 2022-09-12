@@ -48,7 +48,11 @@ exports.DATABASE_TIMEZONE = constants_config_json_1.default.timezone || "Austral
 exports.LOG_LINES = constants_config_json_1.default.limit.logLines;
 exports.SENSOR_LIMIT = constants_config_json_1.default.limit.sensor;
 exports.ACTUATOR_LIMIT = constants_config_json_1.default.limit.actuator;
-const PROMISE_CATCH_METHOD = (reason) => { exports.logger.error(reason); return reason; };
+const PROMISE_CATCH_METHOD = (reason) => {
+    exports.logger.error(reason);
+    if (process.env.NODE_ENV !== 'production')
+        return reason;
+};
 exports.PROMISE_CATCH_METHOD = PROMISE_CATCH_METHOD;
 exports.COMPRESSION_SETTINGS = constants_config_json_1.default.compression;
 exports.TEST_SETUP_THROWS_ERROR = constants_config_json_1.default.test.setupThrowsError;

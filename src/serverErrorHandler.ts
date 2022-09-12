@@ -3,7 +3,11 @@ import { ValidateError } from "tsoa";
 import { logger } from "./constants";
 
 function validationError(err: ValidateError, req: Request){
-  logger.error(`Caught Validation Error for ${req.path}: ${JSON.stringify(err.fields)}\nMessage named ${err.name}: ${err.message}`);
+  logger.error(`
+    Caught Validation Error for ${req.path}: ${JSON.stringify(err.fields)}.
+    Message named ${err.name}: ${err.message}.
+    Stack trace: ${err.stack}.`
+  );
   return {
     message: "Validation Failed",
     details: err?.fields,
@@ -11,14 +15,25 @@ function validationError(err: ValidateError, req: Request){
 }
 
 function genericError(err: Error, req: Request){
-  logger.error(`Caught Error for ${req.path}: ${err.message}`)
+  logger.error(`
+    Caught Error for ${req.path}: ${err.message}.
+    Stack trace: ${err.stack}.
+  `)
+  if(err.message === "Unsupported state or unable to authenticate data")
+    return {
+      message: "Wrong credentials. Unable to authenticate data"
+    }
+
   return {
     message: "Internal Server Error"
   }
 }
 
 function typeError(err: TypeError, req: Request){
-  logger.error(`Caught TypeError for ${req.path}: ${err.message}`)
+  logger.error(`
+    Caught TypeError for ${req.path}: ${err.message}.
+    Stack trace: ${err.stack}.`
+  )
   return {
     message: "Internal Server Error"
   }

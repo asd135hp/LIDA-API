@@ -22,6 +22,8 @@ const luxon_1 = require("luxon");
 const option_1 = require("../../../../model/patterns/option");
 const shorthandOps_1 = require("../../../../utility/shorthandOps");
 const constants_2 = require("../../../../constants");
+const sensorService_1 = require("./utility/sensorService");
+const helper_1 = require("../../../../utility/helper");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
 class SensorService {
@@ -72,7 +74,7 @@ class SensorService {
             }));
             constants_1.logger.debug(`Sensor data by name: ${result}`);
             return result.map(data => {
-                const arr = data.map(val => sensorDto_1.SensorDataDTO.fromJson(val));
+                const arr = data.map(val => sensorDto_1.SensorDataDTO.fromJson(val)).sort((0, helper_1.orderByProp)("timeStamp", false));
                 return (0, option_1.Some)(arr);
             });
         });
@@ -90,7 +92,7 @@ class SensorService {
             }));
             constants_1.logger.debug(`Sensor data by name: ${result}`);
             return result.map(data => {
-                const arr = data.map(val => sensorDto_1.SensorDataDTO.fromJson(val));
+                const arr = data.map(val => sensorDto_1.SensorDataDTO.fromJson(val)).sort((0, helper_1.orderByProp)("timeStamp", false));
                 return (0, option_1.Some)(arr);
             });
         });
@@ -108,7 +110,7 @@ class SensorService {
                 boundTimeObj.toUnixInteger(),
                 boundTimeObj.minus({ day: currentDayCount++ }).toUnixInteger()
             ];
-            let result = null;
+            let result = [[]];
             yield realtime.getContent(constants_2.COMPONENTS_PATH.sensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
                 yield ref.orderByChild("timeStamp").once('value', snapshot => {
                     if (!snapshot.exists()) {
@@ -120,22 +122,22 @@ class SensorService {
                         const timestamp = json.timeStamp;
                         if (timestamp <= upperBoundTime) {
                             if (timestamp < lowerBoundTime) {
+                                if (lowerBoundTime < dateRange.startDate)
+                                    return;
                                 [upperBoundTime, lowerBoundTime] = [
                                     lowerBoundTime,
                                     boundTimeObj.minus({ day: currentDayCount++ }).toUnixInteger()
                                 ];
-                                if (lowerBoundTime < dateRange.startDate)
-                                    return;
                                 result.push([json]);
                                 return;
                             }
-                            result[currentDayCount - 1].push(json);
+                            result[result.length - 1].push(json);
                         }
                     });
                 });
             }));
             constants_1.logger.debug(`SensorData by date: ${result}`);
-            return !result ? option_1.None : (0, option_1.Some)(result.reverse());
+            return !result.length ? option_1.None : (0, option_1.Some)(result.reverse());
         });
     }
     getLatestSensorData() {
@@ -145,15 +147,8 @@ class SensorService {
                 const sensorNames = yield this.getSensors();
                 if (sensorNames.match.isNone())
                     return;
-                const recentData = [];
-                for (const sensor of sensorNames.unwrapOr([])) {
-                    const option = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild(sensor.name).limitToFirst(1));
-                    const data = option.unwrapOr([]).pop();
-                    if (!data)
-                        return;
-                    recentData.push(data);
-                }
-                result = (0, option_1.Some)(recentData);
+                result = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild("timeStamp").limitToLast(sensorNames.unwrapOr([]).length * 3));
+                result = result.map(val => (0, option_1.Some)((0, sensorService_1.getEachSensorLatestData)(val)));
             }));
             constants_1.logger.debug(`Sensor data by Name: ${result}`);
             return result;

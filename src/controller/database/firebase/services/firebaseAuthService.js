@@ -26,11 +26,15 @@ class APIKey {
         this.priviledge = priviledge;
     }
     getAuthFilePath(email) { return `auth/user/${email}/api_key.json`; }
-    getKey(uid) {
+    getKey(uid, renewalRetries = 0) {
         return __awaiter(this, void 0, void 0, function* () {
             const path = this.getAuthFilePath(uid);
-            if (!(yield this.storage.isFileExists(path)))
-                return "";
+            if (!(yield this.storage.isFileExists(path))) {
+                if (renewalRetries === 3)
+                    return "";
+                yield this.renewKey(uid);
+                return this.getKey(uid, renewalRetries + 1);
+            }
             const data = (yield this.storage.readFileFromStorage(path)).toString();
             constants_1.logger.info("APIKey - getKey: " + data);
             if (!data)

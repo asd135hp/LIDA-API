@@ -31,8 +31,11 @@ class DataSavingService {
     retrieveSensorSnapshot(runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const folderPath = `${constants_2.COMPONENTS_PATH.storage.sensor}/run${runNumber}`;
-            const [files] = yield storage.readFolderFromStorage(folderPath);
-            if (!files || !files.length)
+            const response = yield storage.readFolderFromStorage(folderPath);
+            if (!response)
+                return option_1.None;
+            const [files] = response;
+            if (!files.length)
                 return option_1.None;
             constants_1.logger.debug(`There are ${files.length} in ${folderPath}`);
             const result = [];
@@ -96,8 +99,12 @@ class DataSavingService {
                                 if (err)
                                     throw err;
                                 buffer = Buffer.from(data);
+                                storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}`, buffer).then(() => {
+                                    constants_1.logger.debug("It worked ~ DataSavingService.ts line 128");
+                                }, (reason) => {
+                                    constants_1.logger.error(`Error: ${reason} ~ DataSavingService.ts line 130`);
+                                });
                             });
-                            yield storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}`, buffer);
                         });
                     }
                 }

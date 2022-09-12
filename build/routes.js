@@ -290,7 +290,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/snapshot/snapshot/:runNumber/get', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods.prototype.retrieveSensorDataRunSnapshot)), function DataSavingReadMethods_retrieveSensorDataRunSnapshot(request, response, next) {
+    app.get('/api/v1/snapshot/sensor/:runNumber/get', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods.prototype.retrieveSensorDataRunSnapshot)), function DataSavingReadMethods_retrieveSensorDataRunSnapshot(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             runNumber: { "in": "path", "name": "runNumber", "required": true, "dataType": "double" },

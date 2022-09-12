@@ -45,7 +45,7 @@ export class DataSavingReadMethods extends Controller {
   //   return option.unwrapOr([])
   // }
   
-  @Get("snapshot/{runNumber}/get")
+  @Get("sensor/{runNumber}/get")
   async retrieveSensorDataRunSnapshot(
     @Query() accessToken: string,
     @Path() runNumber: number

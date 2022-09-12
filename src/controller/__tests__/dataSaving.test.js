@@ -24,5 +24,6 @@ xdescribe("Data saving test - Integration test", () => {
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield setup.tearDown();
     }), timeOut * 5);
+    test("", () => { });
 });
 //# sourceMappingURL=dataSaving.test.js.map

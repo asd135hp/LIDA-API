@@ -34,9 +34,13 @@ export default class DataSavingService {
    */
   async retrieveSensorSnapshot(runNumber: number): Promise<Option<SnapshotDownloadResponse[]>> {
     const folderPath = `${fbPath.storage.sensor}/run${runNumber}`
-    const [files] = await storage.readFolderFromStorage(folderPath)
-    if(!files || !files.length) return None
+    const response = await storage.readFolderFromStorage(folderPath)
+    if(!response) return None
     
+    // extract files from the response
+    const [files] = response
+    if(!files.length) return None
+
     logger.debug(`There are ${files.length} in ${folderPath}`)
     const result = []
     for(const file of files){
@@ -124,9 +128,12 @@ export default class DataSavingService {
           }, { level: 9 }, (err, data) => {
             if(err) throw err
             buffer =  Buffer.from(data)
+            storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}`, buffer).then(()=>{
+              logger.debug("It worked ~ DataSavingService.ts line 128")
+            }, (reason: any)=>{
+              logger.error(`Error: ${reason} ~ DataSavingService.ts line 130`)
+            })
           })
-
-          await storage.uploadBytesToStorage(`${folderName}/${buffer.byteLength}`, buffer)
         }
       }
     })

@@ -13,11 +13,19 @@ export async function expressAuthentication(
   if (securityName === "api_key") {
     let token = request.query?.accessToken
 
-    if(!token) return Promise.reject({ message: "No authentication token is provided" })
-    if(Array.isArray(token)) return Promise.reject({ message: "Wrong token format - only one token is needed"})
+    if(!token) return Promise.reject({ message: "No authentication token is provided", type: "Security" })
+    if(Array.isArray(token))
+      return Promise.reject({
+        message: "Wrong token format - only one token is needed",
+        type: "Security"
+      })
 
     const unpacked = asymmetricKeyDecryption(Buffer.from(token.toString(), 'hex')).split('|')
-    if(unpacked.length != 2) return Promise.reject({ message: "Wrong token format" })
+    if(unpacked.length != 2)
+      return Promise.reject({
+        message: "Wrong token format",
+        type: "Security"
+      })
 
     const [userId, apiKey] = unpacked
     const service = persistentFirebaseConnection.authService as FirebaseAuthService

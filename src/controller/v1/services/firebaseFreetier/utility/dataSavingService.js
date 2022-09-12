@@ -32,7 +32,7 @@ function mergeDefaultDateRange(dateRange) {
 exports.mergeDefaultDateRange = mergeDefaultDateRange;
 function parseStorageFileMetaData(rawMetaData) {
     const [metadata] = rawMetaData;
-    const rawFileName = metadata.name.match(/(?<=\/)[^\/]+(?=\.\w+)/g)[0];
+    const rawFileName = metadata.name.split(/[\/\\]/).pop();
     const fileName = Buffer.from(rawFileName, "base64").toString();
     const info = fileName.split(";").map(val => parseInt(val));
     constants_1.logger.debug(info);

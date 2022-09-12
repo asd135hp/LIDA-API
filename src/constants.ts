@@ -71,7 +71,11 @@ export const SENSOR_LIMIT = config.limit.sensor
 
 export const ACTUATOR_LIMIT = config.limit.actuator
 
-export const PROMISE_CATCH_METHOD = (reason: any) => { logger.error(reason); return reason }
+export const PROMISE_CATCH_METHOD = (reason: any) => {
+  logger.error(reason); 
+  // don't break the code when in production
+  if(process.env.NODE_ENV !== 'production' ) return reason
+}
 
 export const COMPRESSION_SETTINGS = config.compression
 

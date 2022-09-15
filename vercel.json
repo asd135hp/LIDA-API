@@ -3,6 +3,7 @@
   "github": {
     "enabled": false
   },
+  "buildCommand": "find . -name '*.ts' -delete",
   "builds": [
     {
       "src": "index.js",

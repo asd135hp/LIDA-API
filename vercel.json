@@ -1,9 +1,5 @@
 {
   "version": 2,
-  "rewrites": [{
-    "source": "/(.*)",
-    "destination": "index.js"
-  }],
   "buildCommand": "yarn run vercel-build",
   "outputDirectory": "public",
   "installCommand": "yarn install",
@@ -11,29 +7,6 @@
   "github": {
     "enabled": false
   },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers" : [
-        {
-          "key" : "X-Content-Type-Options",
-          "value" : "nosniff"
-        },
-        {
-          "key" : "X-Frame-Options",
-          "value" : "DENY"
-        },
-        {
-          "key" : "X-XSS-Protection",
-          "value" : "1; mode=block"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "max-age=60, public, must-revalidate"
-        }
-      ]
-    }
-  ],
   "builds": [
     {
       "src": "index.js",

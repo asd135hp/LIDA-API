@@ -2,7 +2,6 @@ import express, { NextFunction } from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
 import compression from "compression"
-import serveStatic from "serve-static"
 import expressSession from "express-session"
 
 import { RegisterRoutes } from "./build/routes"
@@ -21,8 +20,7 @@ app.use(express.urlencoded({
 app.use(cors());
 app.use(compression());       // can opt-out this option if the server is resource-limited
 
-// got these from passportjs npm page
-app.use(serveStatic(__dirname + "/public"))
+app.use(express.static('public'))
 app.use(expressSession({ secret: SESSION_SECRET, resave: true, saveUninitialized: true}))
 app.use(cookieParser(COOKIE_SECRET));
 

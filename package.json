@@ -6,7 +6,7 @@
   "scripts": {
     "routes": "tsoa spec-and-routes",
     "compile": "tsc --experimentalDecorators --esModuleInterop --outDir api",
-    "start": "node --optimize_for_size --max_old_space_size=460 index.js",
+    "start": "node --optimize_for_size index.js",
     "test": "jest --detectOpenHandles --forceExit || exit 0",
     "build": "npm run routes && npm run compile && npm test",
     "dev": "npm run build && npm start",
@@ -58,7 +58,6 @@
     "jest": "^27.3.1",
     "luxon": "^2.4.0",
     "multer": "^1.4.5-lts.1",
-    "serve-static": "^1.15.0",
     "tsoa": "^4.1.2",
     "winston": "^3.7.2",
     "@types/body-parser": "^1.19.1",

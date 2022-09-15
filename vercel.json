@@ -4,6 +4,8 @@
     "source": "/(.*)",
     "destination": "index.js"
   }],
+  "buildCommand": "npm run build",
+  "installCommand": "yarn install",
   "github": {
     "enabled": false
   },

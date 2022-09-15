@@ -21,16 +21,11 @@ exports.logger = winston_1.default.createLogger({
     format: winston_1.default.format.json(),
     defaultMeta: constants_config_json_1.default.logger.defaultMeta,
     transports: (() => {
-        if (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development')
-            return [
-                new winston_1.default.transports.Console({
-                    level: "info",
-                    format: winston_1.default.format.combine(winston_1.default.format.prettyPrint({ colorize: true }), winston_1.default.format.simple()),
-                })
-            ];
         return [
-            new winston_1.default.transports.File(constants_config_json_1.default.logger.transport.errorLog),
-            new winston_1.default.transports.File(constants_config_json_1.default.logger.transport.debugLog),
+            new winston_1.default.transports.Console({
+                level: "info",
+                format: winston_1.default.format.combine(winston_1.default.format.prettyPrint({ colorize: true }), winston_1.default.format.simple()),
+            })
         ];
     })(),
 });

@@ -31,7 +31,7 @@ export const logger = winston.createLogger({
   format: winston.format.json(),
   defaultMeta: config.logger.defaultMeta,
   transports: (()=>{
-    if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') return [
+    return [
       new winston.transports.Console({
         level: "info",
         format: winston.format.combine(
@@ -39,15 +39,6 @@ export const logger = winston.createLogger({
           winston.format.simple()
         ),
       })
-    ]
-
-    return [
-      //
-      // - Write all logs with importance level of `error` or less to `error.log`
-      // - Write all logs with importance level of `debug` or less to `debug.log`
-      //
-      new winston.transports.File(config.logger.transport.errorLog),
-      new winston.transports.File(config.logger.transport.debugLog),
     ]
   })(),
 })

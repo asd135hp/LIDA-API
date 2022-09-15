@@ -4,9 +4,10 @@
     "source": "/(.*)",
     "destination": "index.js"
   }],
-  "buildCommand": "yarn run build",
+  "buildCommand": "yarn run vercel-build",
   "outputDirectory": "public",
   "installCommand": "yarn install",
+  "devCommand": "yarn run start",
   "functions": {
     "api/index.js": {
       "memory": 1024,

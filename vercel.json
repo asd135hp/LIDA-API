@@ -8,12 +8,12 @@
   "outputDirectory": "public",
   "installCommand": "yarn install",
   "devCommand": "yarn run start",
-  "functions": {
-    "api/index.js": {
-      "memory": 1024,
-      "maxDuration": 10
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
     }
-  },
+  ],
   "github": {
     "enabled": false
   },

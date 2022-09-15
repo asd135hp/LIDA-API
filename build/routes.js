@@ -723,6 +723,7 @@ function RegisterRoutes(app) {
         try {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new systemLogsWriteMethods_1.SystemLogsWriteMethods();
+            console.log(controller, systemLogsWriteMethods_1.SystemLogsWriteMethods);
             const promise = controller.addSensorLog.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }

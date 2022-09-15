@@ -1111,6 +1111,7 @@ export function RegisterRoutes(app: express.Router) {
                 validatedArgs = getValidatedArgs(args, request, response);
 
                 const controller = new SystemLogsWriteMethods();
+                console.log(controller, SystemLogsWriteMethods)
 
 
               const promise = controller.addSensorLog.apply(controller, validatedArgs as any);

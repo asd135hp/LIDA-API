@@ -31,7 +31,7 @@ export const logger = winston.createLogger({
   format: winston.format.json(),
   defaultMeta: config.logger.defaultMeta,
   transports: (()=>{
-    if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'testing') return [
+    if(process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development') return [
       new winston.transports.Console({
         level: "info",
         format: winston.format.combine(

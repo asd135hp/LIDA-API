@@ -8,8 +8,12 @@
     "compile": "tsc --experimentalDecorators --esModuleInterop",
     "start": "node --optimize_for_size --max_old_space_size=460 index.js",
     "test": "jest --detectOpenHandles --forceExit || exit 0",
-    "build": "yarn install && npm run routes && npm run compile && npm test",
-    "dev": "npm run routes && npm run compile && npm test && npm start && vercel dev"
+    "build": "npm run routes && npm run compile && npm test",
+    "dev": "npm run build && npm start",
+    "add_remote": "git remote add LIDA-API $npm_package_repository_url",
+    "git": "git add -A && git commit -m \"Committed using npm run\" && npm run add_remote && git push LIDA-API",
+    "prod": "npm run build && npm run git && vercel --prod --force",
+    "preview": "npm run build && npm run git && vercel --force"
   },
   "repository": {
     "type": "git",

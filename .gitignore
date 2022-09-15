@@ -24,6 +24,3 @@ temp
 .vercel
 automation/python/*.txt
 automation/python/__pycache__/
-
-*.js.map
-*.js

@@ -8,7 +8,10 @@
   "outputDirectory": ".",
   "installCommand": "yarn install",
   "functions": {
-    "index.js": {}
+    "index.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
   },
   "github": {
     "enabled": false

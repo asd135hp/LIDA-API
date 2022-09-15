@@ -49,4 +49,4 @@ server.on("close", ()=>{
   logger.info("Closing server...")
 })
 
-module.exports = app
+export default app

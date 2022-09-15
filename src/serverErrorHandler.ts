@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ValidateError } from "tsoa";
 import { logger } from "./constants";
+import DatabaseErrorEvent from "./model/v1/events/databaseErrorEvent";
 
 function validationError(err: ValidateError, req: Request){
   logger.error(`
@@ -8,10 +9,11 @@ function validationError(err: ValidateError, req: Request){
     Message named ${err.name}: ${err.message}.
     Stack trace: ${err.stack}.`
   );
-  return {
-    message: "Validation Failed",
+
+  return new DatabaseErrorEvent(JSON.stringify({
+    message: "Validation Failed: ",
     details: err?.fields,
-  }
+  }), 500)
 }
 
 function genericError(err: Error, req: Request){
@@ -20,13 +22,9 @@ function genericError(err: Error, req: Request){
     Stack trace: ${err.stack}.
   `)
   if(err.message === "Unsupported state or unable to authenticate data")
-    return {
-      message: "Wrong credentials. Unable to authenticate data"
-    }
+    return new DatabaseErrorEvent("Wrong credentials. Unable to authenticate data", 500)
 
-  return {
-    message: "Internal Server Error"
-  }
+  return new DatabaseErrorEvent("Internal Server Error", 500)
 }
 
 function typeError(err: TypeError, req: Request){
@@ -34,9 +32,7 @@ function typeError(err: TypeError, req: Request){
     Caught TypeError for ${req.path}: ${err.message}.
     Stack trace: ${err.stack}.`
   )
-  return {
-    message: "Internal Server Error"
-  }
+  return new DatabaseErrorEvent("Internal Server Error", 500)
 }
 
 export default function serverErrorHandler(

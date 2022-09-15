@@ -5,16 +5,16 @@
   "main": "index.js",
   "scripts": {
     "routes": "tsoa spec-and-routes",
-    "compile": "tsc --experimentalDecorators --esModuleInterop",
-    "start": "node --optimize_for_size index.js",
+    "compile": "tsc --experimentalDecorators --esModuleInterop --outFile api/index.js",
+    "start": "node --optimize_for_size api/index.js",
     "test": "jest --detectOpenHandles --forceExit || exit 0",
     "build": "npm run routes && npm run compile && npm test",
     "vercel-build": "npm run routes && npm run compile",
     "dev": "npm run build && npm start",
     "add_remote": "git remote add LIDA-API $npm_package_repository_url || exit 0",
     "git": "git add -A && git commit -m \"Committed using npm run\" && npm run add_remote && git push LIDA-API",
-    "prod": "npm run git && vercel --prod --force",
-    "preview": "npm run git && vercel --force"
+    "prod": "npm run compile && npm run git && vercel --prod --force",
+    "preview": "npm run compile && npm run git && vercel --force"
   },
   "repository": {
     "type": "git",

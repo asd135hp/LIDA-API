@@ -2,7 +2,7 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "target": "es2016",
-    "module": "commonjs",
+    "module": "AMD",
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,

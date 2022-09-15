@@ -9,6 +9,7 @@ import index from "./src/view";
 import { COOKIE_SECRET, logger, SESSION_SECRET } from "./src/constants";
 import apiSetup from "./src/apiSetup";
 import serverErrorHandler from "./src/serverErrorHandler"
+import serveStatic from "serve-static"
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -20,7 +21,7 @@ app.use(express.urlencoded({
 app.use(cors());
 app.use(compression());       // can opt-out this option if the server is resource-limited
 
-app.use(express.static('public'))
+app.use(serveStatic('public'))
 app.use(expressSession({ secret: SESSION_SECRET, resave: true, saveUninitialized: true}))
 app.use(cookieParser(COOKIE_SECRET));
 

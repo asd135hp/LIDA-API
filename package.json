@@ -8,7 +8,7 @@
     "compile": "tsc --experimentalDecorators --esModuleInterop",
     "start": "node --optimize_for_size --max_old_space_size=460 index.js",
     "test": "jest --detectOpenHandles --forceExit || exit 0",
-    "build": "npm run routes && npm run compile && npm test",
+    "build": "yarn install && npm run routes && npm run compile && npm test",
     "dev": "npm run routes && npm run compile && npm test && npm start && vercel dev"
   },
   "repository": {

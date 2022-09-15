@@ -1,0 +1,975 @@
+{
+	"info": {
+		"_postman_id": "6b33d03d-938e-42c5-a604-5bf34335e2d7",
+		"name": "lida-api",
+		"description": "This is a REST API utilising the CQRS design pattern being exposed via Google Clouds serverless functions.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20666783"
+	},
+	"item": [
+		{
+			"name": "Sensor",
+			"item": [
+				{
+					"name": "Read All Sensors",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/sensor/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"get"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Ok",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/SensorData?startDate=12019777.57319814&endDate=12019777.57319814",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"SensorData"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "12019777.57319814"
+										},
+										{
+											"key": "endDate",
+											"value": "12019777.57319814"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"sensorName\": \"aliqua dolore voluptate \",\n    \"value\": -25571088.609024167,\n    \"timeStamp\": 62850.29284675419\n  },\n  {\n    \"sensorName\": \"enim deserunt\",\n    \"value\": -19210862.789335176,\n    \"timeStamp\": 2483727.21697399\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "Add Sensor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"sensor\": { \"name\": \"Temperature 1\", \"type\": \"Temperature\"}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sensor/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"add"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/SensorData",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"SensorData"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"isRunning\": true,\n  \"operationSucceeded\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Sensor",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"sensor\": { \"name\": \"Oxygen 1\", \"isRunning\": false }}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sensor/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"update"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/SensorData",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"SensorData"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"isRunning\": true,\n  \"operationSucceeded\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Add Sensor Data By Name",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"sensorData\": { \"value\": 35.5, \"timeStamp\": 100 }}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sensor/{{sensor_name}}/data/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"{{sensor_name}}",
+								"data",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Sensor By Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sensor/{{sensor_type}}/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"{{sensor_type}}",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Sensor By Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sensor/{{sensor_name}}/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"{{sensor_name}}",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Sensor Data By Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sensor/{{sensor_name}}/data/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"{{sensor_name}}",
+								"data",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Sensor Data By Date Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sensor/data/fetchAll",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"data",
+								"fetchAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read All Latest Sensor Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sensor/data/latest/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"data",
+								"latest",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Latest Sensor Data By Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/sensor/{{sensor_name}}/data/latest/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"{{sensor_name}}",
+								"data",
+								"latest",
+								"get"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Actuator",
+			"item": [
+				{
+					"name": "Read All Actuators",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/actuator/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"get"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Ok",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/SensorData?startDate=12019777.57319814&endDate=12019777.57319814",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"SensorData"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "12019777.57319814"
+										},
+										{
+											"key": "endDate",
+											"value": "12019777.57319814"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"sensorName\": \"aliqua dolore voluptate \",\n    \"value\": -25571088.609024167,\n    \"timeStamp\": 62850.29284675419\n  },\n  {\n    \"sensorName\": \"enim deserunt\",\n    \"value\": -19210862.789335176,\n    \"timeStamp\": 2483727.21697399\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "Add Actuator",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"actuator\": { \"name\": \"Air pump 1\", \"type\": \"Air pump\"}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/actuator/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"add"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/SensorData",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"SensorData"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"isRunning\": true,\n  \"operationSucceeded\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Update Sensor",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"actuator\": { \"name\": \"Air pump 3\", \"isRunning\": false }}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/actuator/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"update"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/SensorData",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"SensorData"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"isRunning\": true,\n  \"operationSucceeded\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Add Actuator Command By Name",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"actuatorCommand\": {\r\n        \"timesPerDay\": 1,\r\n        \"timeStamp\": 105,\r\n        \"toggleCommand\": {\"state\": false}\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/actuator/{{actuator_name}}/command/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"{{actuator_name}}",
+								"command",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Actuators By Type",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/{{actuator_type}}/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"{{actuator_type}}",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Actuator By Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/{{actuator_name}}/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"{{actuator_name}}",
+								"get"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "System Log",
+			"item": [
+				{
+					"name": "Read Sensor Log",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/log/sensor/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"log",
+								"sensor",
+								"get"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Ok",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/SystemLog?startDate=12019777.57319814&endDate=12019777.57319814",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"SystemLog"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "12019777.57319814"
+										},
+										{
+											"key": "endDate",
+											"value": "12019777.57319814"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "[\n  {\n    \"sensorName\": \"culpa nulla sed nostrud\",\n    \"timeStamp\": -55462433.775387734\n  },\n  {\n    \"sensorName\": \"reprehenderit\",\n    \"timeStamp\": 86357863.09498951\n  }\n]"
+						}
+					]
+				},
+				{
+					"name": "Read Actuator Log",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/log/actuator/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"log",
+								"actuator",
+								"get"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/SystemLog",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"SystemLog"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"isRunning\": true,\n  \"operationSucceeded\": true\n}"
+						}
+					]
+				},
+				{
+					"name": "Add Sensor Log",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"logContent\": \"Test sensor log\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/log/sensor/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"log",
+								"sensor",
+								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Actuator Log",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"logContent\": \"abc\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/log/actuator/add",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"log",
+								"actuator",
+								"add"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Data Saving",
+			"item": [
+				{
+					"name": "Save Sensor Snapshot",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/snapshot/sensor/save",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"snapshot",
+								"sensor",
+								"save"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Sensor Snapshot",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/snapshot/sensor/{{run_number}}/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"snapshot",
+								"sensor",
+								"{{run_number}}",
+								"get"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Security",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"email\": \"testaccount@gmail.com\", \"password\": \"123456789\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"email\": \"asd135hp1@gmail.com\", \"password\": \"123456789\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh credentials",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \"email\": \"asd135hp1@gmail.com\", \"password\": \"123456789\" }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{app_api_key}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "accessToken",
+				"type": "string"
+			},
+			{
+				"key": "in",
+				"value": "query",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"let base_url = pm.globals.get(\"base_url\")",
+					"for(const variable of base_url.match(/(?<=\\{\\{)\\w+(?=\\}\\})/g)){",
+					"    base_url = base_url.replace(`{{${variable}}}`, pm.globals.get(variable))",
+					"}",
+					"",
+					"pm.sendRequest({",
+					"    url: `${base_url}/login`,",
+					"    method: \"POST\",",
+					"    header: {",
+					"        \"Content-Type\": \"application/json\"",
+					"    },",
+					"    body: {",
+					"        mode: \"raw\",",
+					"        raw: JSON.stringify({",
+					"            email: \"testaccount@gmail.com\", ",
+					"            password: \"123456789\"",
+					"        })",
+					"    }",
+					"}, function (err, response) {",
+					"    try {",
+					"        pm.globals.set(\"app_api_key\", response.json().accessToken)",
+					"    } catch {",
+					"        console.log(\"Couldn't parse response into json\")",
+					"    }",
+					"});"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "/",
+			"type": "string",
+			"disabled": true
+		}
+	]
+}

@@ -2,17 +2,11 @@
   "version": 2,
   "rewrites": [{
     "source": "/(.*)",
-    "destination": "index.js"
+    "destination": "api/index.js"
   }],
   "buildCommand": "yarn run build",
-  "outputDirectory": ".",
+  "outputDirectory": "api",
   "installCommand": "yarn install",
-  "functions": {
-    "api/index.js": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  },
   "github": {
     "enabled": false
   },

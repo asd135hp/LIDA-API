@@ -27,3 +27,5 @@ automation/python/__pycache__/
 
 *.js.map
 *.js
+!api/*.js
+!api/*.js.map

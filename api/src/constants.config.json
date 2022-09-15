@@ -1,0 +1,96 @@
+{
+    "timezone": "utc",
+    "schemaName": "lida",
+    "apiPath": "api/v1",
+    "test": {
+        "setupThrowsError": true,
+        "account": {
+            "email": "doanquoctrungvn@gmail.com",
+            "password": "123456789"
+        }
+    },
+    "compression": {
+        "fileExtension": "zip"
+    },
+    "limit": {
+        "logLines": 100,
+        "sensor": 100,
+        "actuator": 100
+    },
+    "componentPath": {
+        "sensor": "sensors",
+        "sensorData": "sensorData",
+        "actuator": "actuators",
+        "actuatorConfig": "actuatorConfig",
+        "actuatorConfigProposed": "actuatorConfigProposed",
+        "systemCommand": "systemCommand/flags",
+        "systemCommandProposed": "systemCommand/flags",
+        "logs": {
+            "sensor": "logs/sensor",
+            "actuator": "logs/actuator",
+            "systemCommand": "logs/systemCommand"
+        },
+        "storage": {
+            "sensor": "sensor",
+            "log": "log"
+        },
+        "count": {
+            "run": "count/run",
+            "path": "count"
+        }
+    },
+    "firebase": {
+        "storage": {
+            "development": {
+                "realtimeUrl": "development/query",
+                "storageFolder": "snapshots/development",
+                "firestoreDocPath": "lida/development"
+            },
+            "production": {
+                "realtimeUrl": "production/query",
+                "storageFolder": "snapshots/production",
+                "firestoreDocPath": "lida/production"
+            },
+            "test": {
+                "realtimeUrl": "test/query",
+                "storageFolder": "snapshots/test",
+                "firestoreDocPath": "lida/test"
+            }
+        }
+    },
+    "logger": {
+        "level": "info",
+        "levels": {
+            "critical": 0,
+            "error": 1,
+            "warn": 2,
+            "info": 3,
+            "debug": 4,
+            "trace": 5,
+            "silly": 6
+        },
+        "defaultMeta": {
+            "service": "user-service"
+        },
+        "transport": {
+            "errorLog": {
+                "filename": "error.log",
+                "level": "error",
+                "maxsize": 52428800,
+                "maxFiles": 1
+            },
+            "infoLog": {
+                "filename": "info.log",
+                "level": "info",
+                "maxsize": 52428800,
+                "maxFiles": 2
+            },
+            "debugLog": {
+                "filename": "debug.log",
+                "level": "debug",
+                "maxsize": 52428800,
+                "maxFiles": 4
+            }
+        }
+    }
+}

@@ -6,8 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SERVICE_ACCOUNT_CREDENTIALS = exports.FIREBASE_CONFIG = exports.CIPHER_ALGORITHM = exports.RAW_CIPHER_IV = exports.RAW_CIPHER_KEY = exports.SESSION_SECRET = exports.COOKIE_SECRET = exports.COMPONENTS_PATH = exports.TEST_ACCOUNT = exports.TEST_SETUP_THROWS_ERROR = exports.COMPRESSION_SETTINGS = exports.PROMISE_CATCH_METHOD = exports.ACTUATOR_LIMIT = exports.SENSOR_LIMIT = exports.LOG_LINES = exports.DATABASE_TIMEZONE = exports.schemaName = exports.firebasePathConfig = exports.logger = exports.dbConnection = void 0;
 const winston_1 = __importDefault(require("winston"));
 const constants_config_json_1 = __importDefault(require("./constants.config.json"));
+const fs_1 = require("fs");
 (() => {
-    require('dotenv').config({ path: `${__dirname}/../.env` });
+    let count = 0;
+    while (!(0, fs_1.existsSync)(`${__dirname}/${Array(count).fill("../").join("")}.env`)) {
+        count++;
+    }
+    require('dotenv').config({ path: `${__dirname}/${Array(count).fill("../").join("")}.env` });
 })();
 exports.dbConnection = (() => {
     return {

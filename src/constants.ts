@@ -1,5 +1,6 @@
 import winston from "winston";
 import config from "./constants.config.json"
+import { existsSync } from "fs";
 
 // describe a table for creating a new one
 export interface TableProps {
@@ -12,7 +13,11 @@ export interface TableProps {
 
 // set up
 (()=>{
-  require('dotenv').config({ path: `${__dirname}/../.env`})
+  let count = 0
+  while(!existsSync(`${__dirname}/${Array(count).fill("../").join("")}.env`)){
+    count++
+  }
+  require('dotenv').config({ path: `${__dirname}/${Array(count).fill("../").join("")}.env`})
 })()
 
 // database connection

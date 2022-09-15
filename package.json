@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "routes": "tsoa spec-and-routes",
-    "compile": "tsc --experimentalDecorators --esModuleInterop",
-    "start": "node --optimize_for_size index.js",
+    "compile": "tsc --experimentalDecorators --esModuleInterop --outDir api",
+    "start": "node --optimize_for_size api/index.js",
     "test": "jest --detectOpenHandles --forceExit || exit 0",
     "build": "npm run routes && npm run compile && npm test",
     "vercel-build": "npm run routes && npm run compile",

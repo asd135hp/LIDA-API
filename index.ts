@@ -7,7 +7,7 @@ import expressSession from "express-session"
 import { RegisterRoutes } from "./build/routes"
 import index from "./src/view";
 import { COOKIE_SECRET, logger, SESSION_SECRET } from "./src/constants";
-import apiSetup from "./src/apiSetup";
+import apiSetup, { apiSetupMiddleware, closeApiSetup, onTermination } from "./src/apiSetup";
 import serverErrorHandler from "./src/serverErrorHandler"
 import serveStatic from "serve-static"
 
@@ -31,6 +31,9 @@ const app = express();
   app.use('/', index)     // web page - login + data saving
   RegisterRoutes(app)     // api routes
   app.use(serverErrorHandler);
+  app.use(apiSetupMiddleware);
+
+  onTermination(closeApiSetup);
 
   const server = app.listen(port, ()=>{
     logger.info("Start setting up API")
@@ -39,7 +42,8 @@ const app = express();
     //   dropAllTables().then(()=>setupPostgreSQL())
     //   logger.info("Finished setting up fresh version of API database")
     // }
-    apiSetup(server)
+    
+    //apiSetup(server)
     logger.info("Finished setting up API")
     logger.info(`Express: Listening on port ${port}`)
   })

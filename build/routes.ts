@@ -29,7 +29,6 @@ import { expressAuthentication } from './../src/controller/security/authenticati
 const promiseAny = require('promise.any');
 import type { RequestHandler } from 'express';
 import * as express from 'express';
-import { logger } from '../src/constants';
 
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
@@ -1112,7 +1111,6 @@ export function RegisterRoutes(app: express.Router) {
                 validatedArgs = getValidatedArgs(args, request, response);
 
                 const controller = new SystemLogsWriteMethods();
-                logger.info(controller.toString() + "\n" + SystemLogsWriteMethods.toString())
 
 
               const promise = controller.addSensorLog.apply(controller, validatedArgs as any);

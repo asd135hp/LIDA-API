@@ -24,7 +24,6 @@ const systemLogsWriteMethods_1 = require("./../src/controller/v1/methods/write/s
 const securityMethods_1 = require("./../src/controller/security/methods/securityMethods");
 const authentication_1 = require("./../src/controller/security/authentication");
 const promiseAny = require('promise.any');
-const constants_1 = require("../src/constants");
 const models = {
     "ActuatorDTO": {
         "dataType": "refObject",
@@ -724,7 +723,6 @@ function RegisterRoutes(app) {
         try {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new systemLogsWriteMethods_1.SystemLogsWriteMethods();
-            constants_1.logger.info(controller.toString() + "\n" + systemLogsWriteMethods_1.SystemLogsWriteMethods.toString());
             const promise = controller.addSensorLog.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }

@@ -1,7 +1,7 @@
 import { Post, Patch, Route, SuccessResponse, Response, Controller, Security, BodyProp, Path, Header, Query } from "tsoa";
 import { logger } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
-import { Sensor, SensorData, UpdatingSensor } from "../../../../model/v1/write/sensors";
+import { DatabaseSensorData, Sensor, SensorData, UpdatingSensor } from "../../../../model/v1/write/sensors";
 import SensorService from "../../services/firebaseFreetier/sensorService";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 
@@ -67,6 +67,22 @@ export class SensorWriteMethods extends Controller {
 
     // return appropriate status code from internal system
     const event = await this.service.addSensorData(sensorName, sensorData)
+    if(event instanceof DatabaseErrorEvent){
+      this.setStatus(event.content.values.statusCode)
+    }
+
+    return getEvent(event)
+  }
+
+  @Post("data/addAll")
+  async addSensorDataByBundle(
+    @Query() accessToken: string,
+    @BodyProp() sensorData: DatabaseSensorData[]): Promise<DatabaseEvent>
+  {
+    logger.info(`SensorWriteMethods: Try adding ${sensorData.length} sensor data to the database`)
+
+    // return appropriate status code from internal system
+    const event = await this.service.addSensorDataByBundle(sensorData)
     if(event instanceof DatabaseErrorEvent){
       this.setStatus(event.content.values.statusCode)
     }

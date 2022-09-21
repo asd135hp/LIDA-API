@@ -201,6 +201,15 @@ const models = {
         },
         "additionalProperties": false,
     },
+    "DatabaseSensorData": {
+        "dataType": "refObject",
+        "properties": {
+            "sensorName": { "dataType": "string", "required": true },
+            "value": { "dataType": "double", "required": true },
+            "timeStamp": { "dataType": "double", "required": true },
+        },
+        "additionalProperties": false,
+    },
     "SystemCommand": {
         "dataType": "refObject",
         "properties": {
@@ -638,6 +647,22 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
+    app.post('/api/v1/sensor/data/addAll', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods.prototype.addSensorDataByBundle)), function SensorWriteMethods_addSensorDataByBundle(request, response, next) {
+        const args = {
+            accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
+            sensorData: { "in": "body-prop", "name": "sensorData", "required": true, "dataType": "array", "array": { "dataType": "refObject", "ref": "DatabaseSensorData" } },
+        };
+        let validatedArgs = [];
+        try {
+            validatedArgs = getValidatedArgs(args, request, response);
+            const controller = new sensorWriteMethods_1.SensorWriteMethods();
+            const promise = controller.addSensorDataByBundle.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, undefined, next);
+        }
+        catch (err) {
+            return next(err);
+        }
+    });
     app.post('/api/v1/systemCommand/startSystem', authenticateMiddleware([{ "api_key": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.startSystem)), function SystemCommandWriteMethods_startSystem(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
@@ -762,22 +787,6 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/register', ...((0, runtime_1.fetchMiddlewares)(securityMethods_1.SecurityMethods)), ...((0, runtime_1.fetchMiddlewares)(securityMethods_1.SecurityMethods.prototype.register)), function SecurityMethods_register(request, response, next) {
-        const args = {
-            email: { "in": "body-prop", "name": "email", "required": true, "dataType": "string" },
-            password: { "in": "body-prop", "name": "password", "required": true, "dataType": "string" },
-        };
-        let validatedArgs = [];
-        try {
-            validatedArgs = getValidatedArgs(args, request, response);
-            const controller = new securityMethods_1.SecurityMethods();
-            const promise = controller.register.apply(controller, validatedArgs);
-            promiseHandler(controller, promise, response, undefined, next);
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
     app.post('/api/v1/login', ...((0, runtime_1.fetchMiddlewares)(securityMethods_1.SecurityMethods)), ...((0, runtime_1.fetchMiddlewares)(securityMethods_1.SecurityMethods.prototype.login)), function SecurityMethods_login(request, response, next) {
         const args = {
             email: { "in": "body-prop", "name": "email", "required": true, "dataType": "string" },
@@ -788,22 +797,6 @@ function RegisterRoutes(app) {
             validatedArgs = getValidatedArgs(args, request, response);
             const controller = new securityMethods_1.SecurityMethods();
             const promise = controller.login.apply(controller, validatedArgs);
-            promiseHandler(controller, promise, response, undefined, next);
-        }
-        catch (err) {
-            return next(err);
-        }
-    });
-    app.post('/api/v1/login/refresh', ...((0, runtime_1.fetchMiddlewares)(securityMethods_1.SecurityMethods)), ...((0, runtime_1.fetchMiddlewares)(securityMethods_1.SecurityMethods.prototype.refreshLoginCredentials)), function SecurityMethods_refreshLoginCredentials(request, response, next) {
-        const args = {
-            email: { "in": "body-prop", "name": "email", "required": true, "dataType": "string" },
-            password: { "in": "body-prop", "name": "password", "required": true, "dataType": "string" },
-        };
-        let validatedArgs = [];
-        try {
-            validatedArgs = getValidatedArgs(args, request, response);
-            const controller = new securityMethods_1.SecurityMethods();
-            const promise = controller.refreshLoginCredentials.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, undefined, next);
         }
         catch (err) {

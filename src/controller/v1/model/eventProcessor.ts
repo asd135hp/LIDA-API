@@ -3,6 +3,7 @@ import { Publisher } from "../../../model/patterns/subscription";
 import { SubscriberImplementor } from "../../../model/patterns/subscriptionImplementor";
 import DatabaseErrorEvent from "../../../model/v1/events/databaseErrorEvent";
 import DatabaseEvent from "../../../model/v1/events/databaseEvent";
+import parseError from "./utility/parseError";
 
 export default class EventProcessor extends SubscriberImplementor<DatabaseEvent> {
   constructor(publisher: Publisher<DatabaseEvent>){
@@ -23,13 +24,8 @@ export default class EventProcessor extends SubscriberImplementor<DatabaseEvent>
       () => event,
       (reason: any) => {
         logger.error("Failed in processing procedure for updating query database")
-        logger.error(`Reason of failure: "${reason}"`)
-        const isStr = reason && typeof(reason) === 'string'
-        const e = new DatabaseErrorEvent(
-          isStr ? reason.slice(3) : "Could not retrieve data from query database, please try again later!",
-          // HTTP error status code starts from 400
-          isStr ? Math.max(parseInt(reason.slice(0, 3)), 400) : 408
-        )
+        logger.error(`Reason of failure: "${JSON.stringify(reason)}"`)
+        const e = parseError(reason)
         e.content.warning = event.content.warning
         return e
       }

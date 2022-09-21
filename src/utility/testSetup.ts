@@ -1,5 +1,5 @@
 import apiSetup from "../apiSetup";
-import { TEST_ACCOUNT } from "../constants";
+import { logger, TEST_ACCOUNT } from "../constants";
 import QueryFacade from "../controller/queryFacade";
 import User from "../model/v1/auth/user";
 import { setTimeout } from "timers/promises";
@@ -7,6 +7,7 @@ import {
   persistentFirebaseConnection, setNewPersistentFirebaseConnection
 } from "../controller/v1/services/firebaseFreetier/firebaseService";
 import { asymmetricKeyDecryption } from "./encryption";
+import winston from "winston";
 
 export default class TestSetup {
   private closeHandler: Function = null
@@ -19,11 +20,15 @@ export default class TestSetup {
 
     this.prevEnv = process.env.NODE_ENV
     process.env.NODE_ENV = 'test'
+    this.setFileLogging()
+
     this.closeHandler = apiSetup(null);
     //setNewPersistentFirebaseConnection()
 
     // register and login
-    await QueryFacade.security.register(email, password).then(async ()=>await setTimeout(2000), ()=>{})
+    await persistentFirebaseConnection.authService
+      .registerWithEmail(email, password)
+      .then(async ()=>await setTimeout(2000), ()=>{})
     this.user = await QueryFacade.security.login(email, password).catch(()=>null)
   }
 
@@ -44,5 +49,46 @@ export default class TestSetup {
     await new Promise<string>(resolve => global.setTimeout(() => resolve(""), 500))
 
     this.closeHandler?.call(null);
+  }
+
+  suppressLogger() {
+    while(logger.transports.length != 0) {
+      const temp = logger.transports.at(-1)
+      logger.remove(temp)
+    }
+  }
+
+  setConsoleLogging(suppress = true) {
+    suppress && this.suppressLogger()
+    logger.add(
+      new winston.transports.Console({
+        level: "info",
+        format: winston.format.combine(
+          winston.format.prettyPrint({ colorize: true }),
+          winston.format.simple()
+        ),
+      })
+    )
+  }
+
+  setFileLogging(suppress = true) {
+    suppress && this.suppressLogger()
+
+    logger.add(
+      new winston.transports.File({
+        level: "debug",
+        maxFiles: 3,
+        maxsize: 1024 * 1024 * 1024 * 20, // 20MB
+        filename: "debug.log"
+      })
+    )
+    logger.add(
+      new winston.transports.File({
+        level: "error",
+        maxFiles: 3,
+        maxsize: 1024 * 1024 * 512, // 512KB
+        filename: "error.log"
+      }),
+    )
   }
 }

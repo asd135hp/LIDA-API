@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const constants_1 = require("../../../../constants");
+const databaseEvent_1 = __importDefault(require("../../../../model/v1/events/databaseEvent"));
 const sensorDto_1 = require("../../../../model/v1/read/sensorDto");
 const databaseAddEvent_1 = __importDefault(require("../../../../model/v1/events/databaseAddEvent"));
 const databaseUpdateEvent_1 = __importDefault(require("../../../../model/v1/events/databaseUpdateEvent"));
@@ -132,7 +133,7 @@ class SensorService {
                                 result.push([json]);
                                 return;
                             }
-                            result[result.length - 1].push(json);
+                            result.at(-1).push(json);
                         }
                     });
                 });
@@ -194,7 +195,7 @@ class SensorService {
                     }
                 },
                 publisher: this.publisher,
-                serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 187"
+                serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 266"
             }, databaseAddEvent_1.default);
         });
     }
@@ -234,7 +235,7 @@ class SensorService {
                     }
                 },
                 publisher: this.publisher,
-                serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 239"
+                serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 275"
             }, databaseUpdateEvent_1.default);
         });
     }
@@ -263,7 +264,70 @@ class SensorService {
                     }
                 },
                 publisher: this.publisher,
-                serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 194"
+                serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 356"
+            }, databaseAddEvent_1.default);
+        });
+    }
+    addSensorDataByBundle(sensorData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield (0, shorthandOps_1.createWriteEvent)({
+                data: { numberOfSensorData: sensorData.length },
+                protectedMethods: {
+                    write() {
+                        return __awaiter(this, void 0, void 0, function* () {
+                            let error = 0;
+                            for (const data of sensorData) {
+                                const result = yield firestore.queryCollection(constants_2.COMPONENTS_PATH.sensor, collectionRef => collectionRef.where("name", "==", data.sensorName).get());
+                                if (result.empty) {
+                                    error++;
+                                    continue;
+                                }
+                                yield firestore.addContentToCollection(constants_2.COMPONENTS_PATH.sensorData, data);
+                            }
+                            if (error > 0)
+                                return Promise.reject({
+                                    message: `There ${error > 1 ? "are" : "is"} ${error} sensor data for sensor names that are not registered in the database`,
+                                    statusCode: 404,
+                                    ignore: error !== sensorData.length,
+                                    eventWhenIgnored: new databaseEvent_1.default({
+                                        info: `${sensorData.length - error} sensor data is added to the database`,
+                                        error: `${error} sensor data could not be added due to using sensor names that are not already in the database`,
+                                        warning: "Some sensor data is added to the database but not all of them",
+                                        type: "Ok"
+                                    })
+                                });
+                        });
+                    },
+                    read() {
+                        return __awaiter(this, void 0, void 0, function* () {
+                            let error = 0;
+                            for (const data of sensorData) {
+                                let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.sensor, "name", {
+                                    equalToValue: data.sensorName
+                                });
+                                if (result.match.isNone()) {
+                                    error++;
+                                    continue;
+                                }
+                                yield realtime.pushContent(data, constants_2.COMPONENTS_PATH.sensorData);
+                            }
+                            if (error > 0)
+                                return Promise.reject({
+                                    message: `There ${error > 1 ? "are" : "is"} ${error} sensor data for sensor names that are not registered in the database`,
+                                    statusCode: 404,
+                                    ignore: error !== sensorData.length,
+                                    eventWhenIgnored: new databaseEvent_1.default({
+                                        info: `${sensorData.length - error} sensor data is added to the database`,
+                                        error: `${error} sensor data could not be added due to using sensor names that are not already in the database`,
+                                        warning: "Some sensor data is added to the database but not all of them",
+                                        type: "Ok"
+                                    })
+                                });
+                        });
+                    }
+                },
+                publisher: this.publisher,
+                serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 436"
             }, databaseAddEvent_1.default);
         });
     }

@@ -3,7 +3,7 @@ import { FirebaseDateRange } from "../../../../model/dateRange";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import { PublisherImplementor } from "../../../../model/patterns/subscriptionImplementor";
 import { SensorDTO, SensorDataDTO } from "../../../../model/v1/read/sensorDto";
-import { Sensor, SensorData, UpdatingSensor } from "../../../../model/v1/write/sensors";
+import { DatabaseSensorData, Sensor, SensorData, UpdatingSensor } from "../../../../model/v1/write/sensors";
 import DatabaseAddEvent from "../../../../model/v1/events/databaseAddEvent";
 import DatabaseUpdateEvent from "../../../../model/v1/events/databaseUpdateEvent";
 import { persistentFirebaseConnection } from "./firebaseService";
@@ -16,6 +16,7 @@ import { getEachSensorLatestData } from "./utility/sensorService";
 import { orderByProp } from "../../../../utility/helper";
 import FirebaseFirestoreService from "../../../database/firebase/services/firebaseFirestoreService";
 import DatabaseDeleteEvent from "../../../../model/v1/events/databaseDeleteEvent";
+import { CQRSError } from "../../../../model/v1/error";
 
 const realtime = persistentFirebaseConnection.realtimeService
 const firestore = persistentFirebaseConnection.firestoreService
@@ -182,7 +183,7 @@ export default class SensorService {
 
             // add json data to the current day storage to the final array sinceit is the latest
             // this is not supposed to be interfered by lowerBoundTime < dateRange.startDate
-            result[result.length - 1].push(json)
+            result.at(-1).push(json)
           }
         })
       })
@@ -263,7 +264,7 @@ export default class SensorService {
         }
       },
       publisher: this.publisher,
-      serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 187"
+      serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 266"
     }, DatabaseAddEvent)
   }
 
@@ -315,7 +316,7 @@ export default class SensorService {
         }
       },
       publisher: this.publisher,
-      serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 239"
+      serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 275"
     }, DatabaseUpdateEvent)
   }
 
@@ -353,7 +354,86 @@ export default class SensorService {
         }
       },
       publisher: this.publisher,
-      serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 194"
+      serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 356"
+    }, DatabaseAddEvent)
+  }
+
+  /**
+   * Add a bundle of sensor data to the database
+   * @param sensorData Data related to a sensor, related by name
+   * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
+   */
+  async addSensorDataByBundle(sensorData: DatabaseSensorData[]): Promise<DatabaseEvent> {
+    return await createWriteEvent({
+      data: { numberOfSensorData: sensorData.length },
+      protectedMethods: {
+        async write(){
+          let error = 0
+          for(const data of sensorData) {
+            // check the existance of the sensor in the database first before adding new sensor data
+            const result = await firestore.queryCollection(
+              fbPath.sensor,
+              collectionRef => collectionRef.where("name", "==", data.sensorName).get()
+            )
+
+            if(result.empty) {
+              error++
+              continue
+            }
+
+            await firestore.addContentToCollection(fbPath.sensorData, data)
+          }
+
+          // some data is added to the database so it might not necessarily be an error
+          if(error > 0) return Promise.reject(
+            {
+              message: `There ${error > 1 ? "are" : "is"} ${error} sensor data for sensor names that are not registered in the database`,
+              statusCode: 404,
+              ignore: error !== sensorData.length,
+              eventWhenIgnored: new DatabaseEvent({
+                info: `${sensorData.length - error} sensor data is added to the database`,
+                error: `${error} sensor data could not be added due to using sensor names that are not already in the database`,
+                warning: "Some sensor data is added to the database but not all of them",
+                type: "Ok"
+              })
+            } as CQRSError
+          )
+        },
+        async read(){
+          // check the existance of the sensor in the database first before adding new sensor data
+          let error = 0
+          
+          for(const data of sensorData){
+            let result: Option<any[]> = await getRealtimeContent(fbPath.sensor, "name", {
+              equalToValue: data.sensorName
+            })
+
+            if(result.match.isNone()){
+              error++
+              continue
+            }
+
+            await realtime.pushContent(data, fbPath.sensorData)
+          }
+
+          // some data is added to the database so it might not necessarily be an error
+          if(error > 0) return Promise.reject(
+            {
+              message: `There ${error > 1 ? "are" : "is"} ${error} sensor data for sensor names that are not registered in the database`,
+              statusCode: 404,
+              ignore: error !== sensorData.length,
+              eventWhenIgnored: new DatabaseEvent({
+                info: `${sensorData.length - error} sensor data is added to the database`,
+                error: `${error} sensor data could not be added due to using sensor names that are not already in the database`,
+                warning: "Some sensor data is added to the database but not all of them",
+                type: "Ok"
+              })
+            } as CQRSError
+          )
+        }
+      },
+      publisher: this.publisher,
+      serverLogErrorMsg: "SensorService: DatabaseEvent filtration leads to all error ~ 436"
     }, DatabaseAddEvent)
   }
 

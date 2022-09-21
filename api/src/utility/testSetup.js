@@ -18,6 +18,7 @@ const queryFacade_1 = __importDefault(require("../controller/queryFacade"));
 const promises_1 = require("timers/promises");
 const firebaseService_1 = require("../controller/v1/services/firebaseFreetier/firebaseService");
 const encryption_1 = require("./encryption");
+const winston_1 = __importDefault(require("winston"));
 class TestSetup {
     constructor() {
         this.closeHandler = null;
@@ -29,8 +30,11 @@ class TestSetup {
             const { email, password } = constants_1.TEST_ACCOUNT;
             this.prevEnv = process.env.NODE_ENV;
             process.env.NODE_ENV = 'test';
+            this.setFileLogging();
             this.closeHandler = (0, apiSetup_1.default)(null);
-            yield queryFacade_1.default.security.register(email, password).then(() => __awaiter(this, void 0, void 0, function* () { return yield (0, promises_1.setTimeout)(2000); }), () => { });
+            yield firebaseService_1.persistentFirebaseConnection.authService
+                .registerWithEmail(email, password)
+                .then(() => __awaiter(this, void 0, void 0, function* () { return yield (0, promises_1.setTimeout)(2000); }), () => { });
             this.user = yield queryFacade_1.default.security.login(email, password).catch(() => null);
         });
     }
@@ -52,6 +56,34 @@ class TestSetup {
             yield new Promise(resolve => global.setTimeout(() => resolve(""), 500));
             (_a = this.closeHandler) === null || _a === void 0 ? void 0 : _a.call(null);
         });
+    }
+    suppressLogger() {
+        while (constants_1.logger.transports.length != 0) {
+            const temp = constants_1.logger.transports.at(-1);
+            constants_1.logger.remove(temp);
+        }
+    }
+    setConsoleLogging(suppress = true) {
+        suppress && this.suppressLogger();
+        constants_1.logger.add(new winston_1.default.transports.Console({
+            level: "info",
+            format: winston_1.default.format.combine(winston_1.default.format.prettyPrint({ colorize: true }), winston_1.default.format.simple()),
+        }));
+    }
+    setFileLogging(suppress = true) {
+        suppress && this.suppressLogger();
+        constants_1.logger.add(new winston_1.default.transports.File({
+            level: "debug",
+            maxFiles: 3,
+            maxsize: 1024 * 1024 * 1024 * 20,
+            filename: "debug.log"
+        }));
+        constants_1.logger.add(new winston_1.default.transports.File({
+            level: "error",
+            maxFiles: 3,
+            maxsize: 1024 * 1024 * 512,
+            filename: "error.log"
+        }));
     }
 }
 exports.default = TestSetup;

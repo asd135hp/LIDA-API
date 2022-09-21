@@ -2,9 +2,16 @@ import { setTimeout } from "timers/promises";
 import { TEST_ACCOUNT } from "../../constants";
 import User from "../../model/v1/auth/user";
 import { asymmetricKeyDecryption } from "../../utility/encryption";
+import TestSetup from "../../utility/testSetup";
 import { persistentFirebaseConnection } from "../v1/services/firebaseFreetier/firebaseService";
 
 describe("Test firebase service as a whole", ()=>{
+  const testSetup = new TestSetup()
+  
+  beforeAll(()=>{
+    testSetup.setFileLogging()
+  })
+
   const service = persistentFirebaseConnection
   // 1 minutes
   const TIMEOUT = 1000 * 10

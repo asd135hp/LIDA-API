@@ -4,7 +4,7 @@ import { SubscriberImplementor, PublisherImplementor } from "../../../model/patt
 import DatabaseErrorEvent from "../../../model/v1/events/databaseErrorEvent";
 import DatabaseEvent from "../../../model/v1/events/databaseEvent";
 import { filterDatabaseEvent } from "../../../utility/filterDatabaseEvent";
-import { persistentFirebaseConnection } from "../services/firebaseFreetier/firebaseService";
+import parseError from "./utility/parseError";
 
 type Ev = DatabaseEvent
 
@@ -96,13 +96,8 @@ export default class WriteModel extends PublisherImplementor<Ev> {
       () => (logger.debug("Finished processing procedure for command database"), event),
       (reason: any) => {
         logger.error("Failed in processing procedure for command database")
-        logger.error(`Reason of failure: "${reason}"`)
-        const isStr = reason && typeof(reason) === 'string'
-        const e = new DatabaseErrorEvent(
-          isStr ? reason.slice(3) : "Could not retrieve data from the database, please try again later!",
-          // HTTP error status code starts from 400
-          isStr ? Math.max(parseInt(reason.slice(0, 3)), 400) : 408
-        )
+        logger.error(`Reason of failure: "${JSON.stringify(reason)}"`)
+        const e = parseError(reason)
         e.content.warning = event.content.warning
         return e
       }

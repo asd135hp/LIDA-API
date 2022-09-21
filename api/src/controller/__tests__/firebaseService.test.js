@@ -8,12 +8,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const promises_1 = require("timers/promises");
 const constants_1 = require("../../constants");
 const encryption_1 = require("../../utility/encryption");
+const testSetup_1 = __importDefault(require("../../utility/testSetup"));
 const firebaseService_1 = require("../v1/services/firebaseFreetier/firebaseService");
 describe("Test firebase service as a whole", () => {
+    const testSetup = new testSetup_1.default();
+    beforeAll(() => {
+        testSetup.setFileLogging();
+    });
     const service = firebaseService_1.persistentFirebaseConnection;
     const TIMEOUT = 1000 * 10;
     test("Test firebase storage service", () => __awaiter(void 0, void 0, void 0, function* () {

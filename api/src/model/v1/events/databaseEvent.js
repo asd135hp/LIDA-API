@@ -8,8 +8,9 @@ class DatabaseEvent {
         this.content = Object.assign(Object.assign({}, report), { timeStamp: now.toUnixInteger(), isoTimeStamp: now.toISO(), normalTimeStamp: now.toLocaleString(luxon_1.DateTime.DATETIME_FULL_WITH_SECONDS) });
     }
     static getCompactEvent(event) {
-        const values = event.content.values;
-        delete values.protected;
+        const values = event.content.values || {};
+        if (values.protected)
+            delete values.protected;
         return new DatabaseEvent({
             type: event.content.type,
             info: event.content.info,

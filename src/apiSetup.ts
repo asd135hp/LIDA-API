@@ -16,6 +16,8 @@ let dataSavingModel = new DataSavingModel(commandBus);
 let eventBus = new EventBus(writeModel);
 let processEvent = new EventProcessor(eventBus);
 
+// a little bit bad since these are global variables but it is what it is.
+// what's matter is that it works perfectly fine on production server
 export function apiSetupMiddleware(req: Express.Request, res: Express.Response, next: NextFunction) {
   start ||= new CommandFacade();
   commandBus ||= new CommandBus(start);

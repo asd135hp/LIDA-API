@@ -16,6 +16,7 @@ const constants_1 = require("../../../constants");
 const subscriptionImplementor_1 = require("../../../model/patterns/subscriptionImplementor");
 const databaseErrorEvent_1 = __importDefault(require("../../../model/v1/events/databaseErrorEvent"));
 const filterDatabaseEvent_1 = require("../../../utility/filterDatabaseEvent");
+const parseError_1 = __importDefault(require("./utility/parseError"));
 class WriteModelSubscriber extends subscriptionImplementor_1.SubscriberImplementor {
     constructor(linkedPublisher) {
         super();
@@ -73,9 +74,8 @@ class WriteModel extends subscriptionImplementor_1.PublisherImplementor {
             }
             return yield protectedSpec.write(event).then(() => (constants_1.logger.debug("Finished processing procedure for command database"), event), (reason) => {
                 constants_1.logger.error("Failed in processing procedure for command database");
-                constants_1.logger.error(`Reason of failure: "${reason}"`);
-                const isStr = reason && typeof (reason) === 'string';
-                const e = new databaseErrorEvent_1.default(isStr ? reason.slice(3) : "Could not retrieve data from the database, please try again later!", isStr ? Math.max(parseInt(reason.slice(0, 3)), 400) : 408);
+                constants_1.logger.error(`Reason of failure: "${JSON.stringify(reason)}"`);
+                const e = (0, parseError_1.default)(reason);
                 e.content.warning = event.content.warning;
                 return e;
             });

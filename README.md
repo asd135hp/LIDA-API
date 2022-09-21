@@ -6,7 +6,6 @@ This is a REST API utilising the CQRS design pattern being exposed via Google Cl
 
 - [LIDA-API](#lida-api)
 - [Table of Contents](#table-of-contents)
-	- [Docker](#docker)
 	- [Architecture](#architecture)
 	- [Deployment and Operations](#deployment-and-operations)
 		- [Local](#local)
@@ -56,23 +55,19 @@ This API is designed to specifically use Heroku container over the internet to a
 
 ### Required works before running commands
 - Set up Firebase solution on the personal account. It is recommended to use a paid plan but a free plan is alright since the current API is developed to adapt with that free plan.
+- Set up a Vercel account to deploy apps
+- Install Vercel CLI and login to CLI using your account credentials
+- 
 - Install the latest version of Python and set it as the default system python version for [Windows](https://stackoverflow.com/questions/5087831/how-should-i-set-default-python-version-in-windows), [MacOS](https://stackoverflow.com/questions/5846167/how-to-change-default-python-version) or [Linux](https://unix.stackexchange.com/questions/410579/change-the-python3-default-version-in-ubuntu). The python scripts in this project is written using Python 3.9.
 
 ### Local 
-To run the project locally, use `python run_script.py -la` and point the postman collection against the supplied local-host URL (normally it is just localhost).
-This action includes:
-- Generate routes for the API
-- Compile Typescript code
-- Test Typescript code
-- Deploy server locally
+To run the project locally, use `npm run dev`
 
-To read all available options, please use `python run_script.py --help` or `python run_script.py -h`
+### Test
+All test commands are within npm scripts
 
-### Deploy to production (Heroku container)
-To deploy the solution to production, which resides on Heroku container, use `python run_script.py -pa`. This action is the same as deploying solution locally but instead of using a local server, Heroku container over the internet holds the server and serves the complete solution on there.
-
-## Tests
-To run the test suite, use `python run_script.py -lc -lt` or `python run_script.py -pc -pt`. As to what the command do, `-lc` and `-pc` flags compile the application and `-lt` and `-pt` flags test the compiled solution
+### Deployment
+To deploy the project, use `npm run prod` for production deployment. Testing environment should be deployed via `npm run preview` instead
 
 ## Consumers
 Front-End: https://github.com/asd135hp/LIDA-UI

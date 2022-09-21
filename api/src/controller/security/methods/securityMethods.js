@@ -23,37 +23,17 @@ const tsoa_1 = require("tsoa");
 const firebaseService_1 = require("../../v1/services/firebaseFreetier/firebaseService");
 const auth = firebaseService_1.persistentFirebaseConnection.authService;
 let SecurityMethods = class SecurityMethods extends tsoa_1.Controller {
-    register(email, password) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield auth.registerWithEmail(email, password);
-        });
-    }
     login(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield auth.loginWithEmail(email, password);
         });
     }
-    refreshLoginCredentials(email, password) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return yield auth.reauthenticationWithEmail(email, password);
-        });
-    }
 };
-__decorate([
-    (0, tsoa_1.Post)("register"),
-    __param(0, (0, tsoa_1.BodyProp)()),
-    __param(1, (0, tsoa_1.BodyProp)())
-], SecurityMethods.prototype, "register", null);
 __decorate([
     (0, tsoa_1.Post)("login"),
     __param(0, (0, tsoa_1.BodyProp)()),
     __param(1, (0, tsoa_1.BodyProp)())
 ], SecurityMethods.prototype, "login", null);
-__decorate([
-    (0, tsoa_1.Post)("login/refresh"),
-    __param(0, (0, tsoa_1.BodyProp)()),
-    __param(1, (0, tsoa_1.BodyProp)())
-], SecurityMethods.prototype, "refreshLoginCredentials", null);
 SecurityMethods = __decorate([
     (0, tsoa_1.Route)(`api/v1`),
     (0, tsoa_1.SuccessResponse)(200, "Ok"),

@@ -32,8 +32,8 @@ export default class DatabaseEvent {
   }
 
   static getCompactEvent(event: DatabaseEvent){
-    const values = event.content.values
-    delete values.protected
+    const values = event.content.values || {}
+    if(values.protected) delete values.protected
     return new DatabaseEvent({
       type: event.content.type,
       info: event.content.info,

@@ -231,6 +231,16 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "DatabaseSensorData": {
+        "dataType": "refObject",
+        "properties": {
+            "sensorName": {"dataType":"string","required":true},
+            "value": {"dataType":"double","required":true},
+            "timeStamp": {"dataType":"double","required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "SystemCommand": {
         "dataType": "refObject",
         "properties": {
@@ -963,6 +973,33 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.post('/api/v1/sensor/data/addAll',
+            authenticateMiddleware([{"api_key":[]}]),
+            ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods)),
+            ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods.prototype.addSensorDataByBundle)),
+
+            function SensorWriteMethods_addSensorDataByBundle(request: any, response: any, next: any) {
+            const args = {
+                    accessToken: {"in":"query","name":"accessToken","required":true,"dataType":"string"},
+                    sensorData: {"in":"body-prop","name":"sensorData","required":true,"dataType":"array","array":{"dataType":"refObject","ref":"DatabaseSensorData"}},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new SensorWriteMethods();
+
+
+              const promise = controller.addSensorDataByBundle.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/systemCommand/startSystem',
             authenticateMiddleware([{"api_key":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods)),
@@ -1172,32 +1209,6 @@ export function RegisterRoutes(app: express.Router) {
             }
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v1/register',
-            ...(fetchMiddlewares<RequestHandler>(SecurityMethods)),
-            ...(fetchMiddlewares<RequestHandler>(SecurityMethods.prototype.register)),
-
-            function SecurityMethods_register(request: any, response: any, next: any) {
-            const args = {
-                    email: {"in":"body-prop","name":"email","required":true,"dataType":"string"},
-                    password: {"in":"body-prop","name":"password","required":true,"dataType":"string"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new SecurityMethods();
-
-
-              const promise = controller.register.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/login',
             ...(fetchMiddlewares<RequestHandler>(SecurityMethods)),
             ...(fetchMiddlewares<RequestHandler>(SecurityMethods.prototype.login)),
@@ -1218,32 +1229,6 @@ export function RegisterRoutes(app: express.Router) {
 
 
               const promise = controller.login.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.post('/api/v1/login/refresh',
-            ...(fetchMiddlewares<RequestHandler>(SecurityMethods)),
-            ...(fetchMiddlewares<RequestHandler>(SecurityMethods.prototype.refreshLoginCredentials)),
-
-            function SecurityMethods_refreshLoginCredentials(request: any, response: any, next: any) {
-            const args = {
-                    email: {"in":"body-prop","name":"email","required":true,"dataType":"string"},
-                    password: {"in":"body-prop","name":"password","required":true,"dataType":"string"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new SecurityMethods();
-
-
-              const promise = controller.refreshLoginCredentials.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

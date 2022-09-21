@@ -63,6 +63,16 @@ let SensorWriteMethods = SensorWriteMethods_1 = class SensorWriteMethods extends
             return getEvent(event);
         });
     }
+    addSensorDataByBundle(accessToken, sensorData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            constants_1.logger.info(`SensorWriteMethods: Try adding ${sensorData.length} sensor data to the database`);
+            const event = yield this.service.addSensorDataByBundle(sensorData);
+            if (event instanceof databaseErrorEvent_1.default) {
+                this.setStatus(event.content.values.statusCode);
+            }
+            return getEvent(event);
+        });
+    }
 };
 __decorate([
     (0, tsoa_1.Post)("add"),
@@ -80,6 +90,11 @@ __decorate([
     __param(1, (0, tsoa_1.Path)()),
     __param(2, (0, tsoa_1.BodyProp)())
 ], SensorWriteMethods.prototype, "addSensorData", null);
+__decorate([
+    (0, tsoa_1.Post)("data/addAll"),
+    __param(0, (0, tsoa_1.Query)()),
+    __param(1, (0, tsoa_1.BodyProp)())
+], SensorWriteMethods.prototype, "addSensorDataByBundle", null);
 SensorWriteMethods = SensorWriteMethods_1 = __decorate([
     (0, tsoa_1.Security)("api_key"),
     (0, tsoa_1.Route)(`api/v1/sensor`),

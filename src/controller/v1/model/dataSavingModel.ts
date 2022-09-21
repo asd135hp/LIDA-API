@@ -3,6 +3,7 @@ import { Publisher } from "../../../model/patterns/subscription";
 import { SubscriberImplementor, PublisherImplementor } from "../../../model/patterns/subscriptionImplementor";
 import DatabaseErrorEvent from "../../../model/v1/events/databaseErrorEvent";
 import DatabaseEvent from "../../../model/v1/events/databaseEvent";
+import parseError from "./utility/parseError";
 
 type Ev = DatabaseEvent
 
@@ -68,13 +69,8 @@ export default class DataSavingModel extends PublisherImplementor<Ev> {
       () => event,
       (reason: any) => {
         logger.error("Failed in processing storage procedure")
-        logger.error(`Reason of failure: "${reason}"`)
-        const isStr = reason && typeof(reason) === 'string'
-        const e = new DatabaseErrorEvent(
-          isStr ? reason.slice(3) : "Could not retrieve data from the database, please try again later!",
-          // HTTP error status code starts from 400
-          isStr ? Math.max(parseInt(reason.slice(0, 3)), 400) : 408
-        )
+        logger.error(`Reason of failure: "${JSON.stringify(reason)}"`)
+        const e = parseError(reason)
         e.content.warning = event.content.warning
         return e
       }

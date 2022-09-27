@@ -18,7 +18,7 @@ export class SecurityMethods extends Controller {
   ): Promise<User> {
     // https://stackoverflow.com/questions/13895679/how-do-i-secure-rest-api-calls
     // should refresh key when trying to login
-    // await auth.reauthenticationWithEmail(email, password)
+    await auth.reauthenticationWithEmail(email, password)
     return await auth.loginWithEmail(email, password)
   }
 }

@@ -3,7 +3,9 @@ export interface DateRange {
   endDate?: string;
 }
 
-export interface FirebaseDateRange {
+export interface FirebaseDateRange extends UnixDateRange {}
+
+export interface UnixDateRange {
   startDate?: number;
   endDate?: number;
 }

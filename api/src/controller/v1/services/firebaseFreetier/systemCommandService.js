@@ -20,12 +20,10 @@ const systemCommandDto_1 = require("../../../../model/v1/read/systemCommandDto")
 const constants_1 = require("../../../../constants");
 const systemCommandService_1 = require("./utility/systemCommandService");
 const constants_2 = require("../../../../constants");
+const systemCommandServiceFacade_1 = require("../../../../model/v1/services/systemCommandServiceFacade");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
-class SystemCommandService {
-    constructor(publisher) {
-        this.publisher = publisher;
-    }
+class SystemCommandService extends systemCommandServiceFacade_1.SystemCommandServiceFacade {
     toggleFlag(flag) {
         return (0, shorthandOps_1.createWriteEvent)({
             data: { [flag]: true },

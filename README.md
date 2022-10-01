@@ -71,3 +71,21 @@ To deploy the project, use `npm run prod` for production deployment. Testing env
 
 ## Consumers
 Front-End: https://github.com/asd135hp/LIDA-UI
+
+# Note
+## What to do when Firebase Free plan limits resources/operations
+Either caching responses in Firebase Storage if we are intending to use the free plan for a long time, or move the database to
+"pay as you go" plan. Either way will not affect the code much.
+
+If, by chance, we would like to use AWS, for instance, we will have to rewrite the code to make it use AWS instead. The partition
+to be rewritten will be discussed in the next section. It is not recommended to utilise AWS if the scaling is not a problem.
+
+## What to rewrite in order to use the new database solution
+Please follow these steps to rewrite the code:
+- Step 1: Create a new folder in `./src/controller/v1/services` folder that reflects the database to be used (e.g. AWS or postgres)
+- Step 2: Implement new code that extends from abstracts classes, all defined in `./src/model/v1/services`
+- Step 3: Change all imports that uses `firebaseFreetier` folder for example to the new folder containing new code
+- Step 4: Test
+
+If there are any problems in rewriting new code then all old code can be seen in `./src/controller/v1/services/firebaseFreetier` folder.
+The folder consists of all base implementation for a backend system that uses Firebase Free plan

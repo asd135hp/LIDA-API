@@ -1,7 +1,6 @@
 import { ActuatorDTO, ActuatorConfigDTO } from "../../../../model/v1/read/actuatorDto";
 import { Actuator, ActuatorConfig, UpdatingActuator } from "../../../../model/v1/write/actuators";
 import { ACTUATOR_LIMIT, logger } from "../../../../constants";
-import { PublisherImplementor } from "../../../../model/patterns/subscriptionImplementor";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import DatabaseAddEvent from "../../../../model/v1/events/databaseAddEvent";
 import DatabaseUpdateEvent from "../../../../model/v1/events/databaseUpdateEvent";
@@ -9,21 +8,12 @@ import { persistentFirebaseConnection } from "./firebaseService";
 import { Option, Some, None } from "../../../../model/patterns/option"
 import { createWriteEvent, getRealtimeContent } from "../../../../utility/shorthandOps";
 import { COMPONENTS_PATH as fbPath } from "../../../../constants";
+import { ActuatorServiceFacade } from "../../../../model/v1/services/actuatorServiceFacade";
 
 const realtime = persistentFirebaseConnection.realtimeService
 const firestore = persistentFirebaseConnection.firestoreService
 
-export default class ActuatorService {
-  private publisher: PublisherImplementor<DatabaseEvent>;
-
-  constructor(publisher?: PublisherImplementor<DatabaseEvent>){
-    this.publisher = publisher
-  }
-
-  /**
-   * Dumps all actuator details in the database
-   * @returns 
-   */
+export default class ActuatorService extends ActuatorServiceFacade {
   async getActuators(): Promise<Option<ActuatorDTO[]>> {
     let result: Option<any[]> = await getRealtimeContent(fbPath.actuator, null, { limitToFirst: ACTUATOR_LIMIT });
 
@@ -34,11 +24,6 @@ export default class ActuatorService {
     })
   }
 
-  /**
-   * Get all actuator details by its designated type
-   * @param type Type of actuator
-   * @returns All actuator details with matched type
-   */
   async getActuatorsByType(type: string): Promise<Option<ActuatorDTO[]>> {
     let result: Option<any[]> = await getRealtimeContent(fbPath.actuator, "type", { equalToValue: type })
 
@@ -49,11 +34,6 @@ export default class ActuatorService {
     })
   }
 
-  /**
-   * Get a single actuator detail by name
-   * @param name Name of the actuator, should be unique
-   * @returns A single actuator detail with a matched name
-   */
   async getActuatorByName(name: string): Promise<Option<ActuatorDTO>> {
     let result: Option<any[]> = await getRealtimeContent(fbPath.actuator, "name", { equalToValue: name })
 
@@ -62,10 +42,6 @@ export default class ActuatorService {
     return result.map(arr => Some(ActuatorDTO.fromJson(arr[0]) as ActuatorDTO))
   }
   
-  /**
-   * Get all actuator configs that is pending to be executed irl
-   * @returns List of actuator configs
-   */
   async getActuatorConfig(): Promise<Option<ActuatorConfigDTO[]>> {
     let result: Option<any[]> = await getRealtimeContent(fbPath.actuatorConfig)
 
@@ -76,10 +52,7 @@ export default class ActuatorService {
       return Some(newArr)
     })
   }
-
-  /**
-   * This is for hardware side usage for fetching relevant data
-   */
+  
   async getProposedActuatorConfig(): Promise<Option<ActuatorConfigDTO[]>> {
     let result: Option<any[]> = await getRealtimeContent(fbPath.actuatorConfigProposed)
 
@@ -91,11 +64,6 @@ export default class ActuatorService {
     })
   }
 
-  /**
-   * Add a single actuator detail to the database
-   * @param actuator Details about the actuator
-   * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
-   */
   async addActuator(actuator: Actuator): Promise<DatabaseEvent> {
     if(typeof(actuator.isRunning) === 'undefined') actuator.isRunning = true
 
@@ -132,11 +100,6 @@ export default class ActuatorService {
     }, DatabaseAddEvent)
   }
 
-  /**
-   * Update a single actuator to the database
-   * @param actuator Details about the actuator
-   * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
-   */
   async updateActuator(actuator: UpdatingActuator): Promise<DatabaseEvent> {
     return await createWriteEvent({
       data: actuator,
@@ -172,12 +135,6 @@ export default class ActuatorService {
     }, DatabaseUpdateEvent)
   }
 
-  /**
-   * Add a single actuator config to the database
-   * @param actuatorName Name of the actuator
-   * @param actuatorConfig An actuator config, related by name
-   * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
-   */
   async updateActuatorConfig(
     actuatorName: string,
     actuatorConfig: ActuatorConfig
@@ -218,13 +175,6 @@ export default class ActuatorService {
     }, DatabaseUpdateEvent)
   }
   
-  /**
-   * When the command is received, resolve it so that query database removes that specific command.
-   * 
-   * It is a must to keep id of the command when retrieved its DTO
-   * @param id Id of the actuator command, will be unique
-   * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
-   */
    async updateProposedActuatorConfig(
     actuatorName: string,
     actuatorConfig: ActuatorConfig

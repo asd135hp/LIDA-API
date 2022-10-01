@@ -50,8 +50,12 @@ export async function realtimeToggleFlag(field: string) {
   return realtimeUploadFlags(flags, true)
 }
 
-// cooporated feature??
-
+/**
+ * Use this method if we do not want to rely on frontend code
+ * 
+ * But it diminishes the properties of a REST API where methods/functions should be independent and pure
+ * @param publisher 
+ */
 export async function realtimeSaveSensorSnapshot(publisher: PublisherImplementor<DatabaseEvent>){
   const ref = await realtime.getContent(fbPath.count.run)
   const runCount = ref.exists() ? parseInt(ref.val()) : 1

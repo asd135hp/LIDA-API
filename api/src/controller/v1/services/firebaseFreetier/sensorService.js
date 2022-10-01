@@ -23,15 +23,12 @@ const luxon_1 = require("luxon");
 const option_1 = require("../../../../model/patterns/option");
 const shorthandOps_1 = require("../../../../utility/shorthandOps");
 const constants_2 = require("../../../../constants");
-const sensorService_1 = require("./utility/sensorService");
 const helper_1 = require("../../../../utility/helper");
 const databaseDeleteEvent_1 = __importDefault(require("../../../../model/v1/events/databaseDeleteEvent"));
+const sensorServiceFacade_1 = require("../../../../model/v1/services/sensorServiceFacade");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
-class SensorService {
-    constructor(publisher) {
-        this.publisher = publisher;
-    }
+class SensorService extends sensorServiceFacade_1.SensorServiceFacade {
     getSensors() {
         return __awaiter(this, void 0, void 0, function* () {
             let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.sensor, null, { limitToFirst: constants_1.SENSOR_LIMIT });
@@ -144,16 +141,18 @@ class SensorService {
     }
     getLatestSensorData() {
         return __awaiter(this, void 0, void 0, function* () {
-            let result = option_1.None;
-            yield realtime.getContent(constants_2.COMPONENTS_PATH.sensorData, (ref) => __awaiter(this, void 0, void 0, function* () {
-                const sensorNames = yield this.getSensors();
-                if (sensorNames.match.isNone())
-                    return;
-                result = yield (0, firebaseRealtimeService_1.getQueryResultAsArray)(ref.orderByChild("timeStamp").limitToLast(sensorNames.unwrapOr([]).length * 3));
-                result = result.map(val => (0, option_1.Some)((0, sensorService_1.getEachSensorLatestData)(val)));
-            }));
+            let result = [];
+            const sensorNames = yield this.getSensors();
+            if (sensorNames.match.isNone())
+                return;
+            for (const sensor of sensorNames.unwrapOr([])) {
+                const data = yield this.getLatestSensorDataByName(sensor.name);
+                if (data.match.isOk()) {
+                    result.push(data.unwrapOr(null));
+                }
+            }
             constants_1.logger.debug(`Sensor data by Name: ${result}`);
-            return result;
+            return result.length ? (0, option_1.Some)(result) : option_1.None;
         });
     }
     getLatestSensorDataByName(name) {

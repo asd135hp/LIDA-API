@@ -1,7 +1,6 @@
 import { DATABASE_TIMEZONE, logger, SENSOR_LIMIT } from "../../../../constants";
 import { FirebaseDateRange } from "../../../../model/dateRange";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
-import { PublisherImplementor } from "../../../../model/patterns/subscriptionImplementor";
 import { SensorDTO, SensorDataDTO } from "../../../../model/v1/read/sensorDto";
 import { DatabaseSensorData, Sensor, SensorData, UpdatingSensor } from "../../../../model/v1/write/sensors";
 import DatabaseAddEvent from "../../../../model/v1/events/databaseAddEvent";
@@ -12,26 +11,16 @@ import { DateTime } from 'luxon'
 import { Option, Some, None } from "../../../../model/patterns/option"
 import { createWriteEvent, getRealtimeContent } from "../../../../utility/shorthandOps";
 import { COMPONENTS_PATH as fbPath } from "../../../../constants";
-import { getEachSensorLatestData } from "./utility/sensorService";
 import { orderByProp } from "../../../../utility/helper";
 import FirebaseFirestoreService from "../../../database/firebase/services/firebaseFirestoreService";
 import DatabaseDeleteEvent from "../../../../model/v1/events/databaseDeleteEvent";
 import { CQRSError } from "../../../../model/v1/error";
+import { SensorServiceFacade } from "../../../../model/v1/services/sensorServiceFacade";
 
 const realtime = persistentFirebaseConnection.realtimeService
 const firestore = persistentFirebaseConnection.firestoreService
 
-export default class SensorService {
-  private publisher: PublisherImplementor<DatabaseEvent>;
-
-  constructor(publisher?: PublisherImplementor<DatabaseEvent>){
-    this.publisher = publisher
-  }
-
-  /**
-   * Dumps all sensor details stored in the database
-   * @returns All sensors in the database
-   */
+export default class SensorService extends SensorServiceFacade {
   async getSensors(): Promise<Option<SensorDTO[]>> {
     let result: Option<any[]> = await getRealtimeContent(fbPath.sensor, null, { limitToFirst: SENSOR_LIMIT });
 
@@ -42,11 +31,6 @@ export default class SensorService {
     })
   }
 
-  /**
-   * Get all sensor details by its designated type
-   * @param type Type of sensor
-   * @returns All sensor details with matched type
-   */
   async getSensorsByType(type: string): Promise<Option<SensorDTO[]>> {
     let result: Option<any[]> = await getRealtimeContent(fbPath.sensor, "type", { equalToValue: type });
 
@@ -57,11 +41,6 @@ export default class SensorService {
     })
   }
 
-  /**
-   * Get a single sensor detail by name
-   * @param name Name of the sensor, should be unique
-   * @returns A single sensor detail with a matched name
-   */
   async getSensorByName(name: string): Promise<Option<SensorDTO>> {
     let result: Option<any[]> = await getRealtimeContent(fbPath.sensor, "name", { equalToValue: name });
 
@@ -72,11 +51,6 @@ export default class SensorService {
     })
   }
 
-  /**
-   * Get all sensor data by date range
-   * @param dateRange Date range to limit how much data is downloaded
-   * @returns All sensor data filtered by date range
-   */
   async getSensorData(dateRange: FirebaseDateRange = {}): Promise<Option<SensorDataDTO[]>> {
     dateRange.startDate = dateRange.startDate || 0
     dateRange.endDate = dateRange.endDate || DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
@@ -101,12 +75,6 @@ export default class SensorService {
     })
   }
 
-  /**
-   * Get all sensor data by name and date range
-   * @param name Name associated with sensor data
-   * @param dateRange Date range to limit how much data is downloaded
-   * @returns All sensor data filtered by name and date range
-   */
   async getSensorDataByName(
     name: string,
     dateRange: FirebaseDateRange = {}
@@ -133,11 +101,6 @@ export default class SensorService {
     })
   }
 
-  /**
-   * 
-   * @param dateRange 
-   * @returns 
-   */
   async getSensorDataSnapshot(dateRange: FirebaseDateRange = {}): Promise<Option<SensorData[][]>> {
     dateRange = {
       startDate: dateRange.startDate || 0,
@@ -193,30 +156,28 @@ export default class SensorService {
     return !result.length ? None : Some(result.reverse())
   }
 
-  /**
-   * Get the latest sensot data from the database
-   */
   async getLatestSensorData(): Promise<Option<SensorDataDTO[]>>{
-    let result: Option<SensorDataDTO[]> = None
-    await realtime.getContent(fbPath.sensorData, async ref => {
-      // get resykt by filtration
-      const sensorNames = await this.getSensors()
-      if(sensorNames.match.isNone()) return;
+    let result: SensorDataDTO[] = []
+    
+    // get result by filtration
+    const sensorNames = await this.getSensors()
+    if(sensorNames.match.isNone()) return;
 
-      result = await getQueryResultAsArray(ref.orderByChild("timeStamp").limitToLast(sensorNames.unwrapOr([]).length * 3))
-      result = result.map(val => Some(getEachSensorLatestData(val)))
-    })
+    // iter though each sensor name and get the most recent data from the database
+    // no need to be afraid of rate limiting since realtime database limits how
+    // much is downloaded instead
+    for(const sensor of sensorNames.unwrapOr([])) {
+      const data = await this.getLatestSensorDataByName(sensor.name)
+      if(data.match.isOk()) {
+        // null will never be used
+        result.push(data.unwrapOr(null))
+      }
+    }
 
     logger.debug(`Sensor data by Name: ${result}`)
-    return result
+    return result.length ? Some(result) : None
   }
 
-  /**
-   * Get the latest sensor data by name.
-   * It is assumed that front-end will only need to use the most recent data sorted by sensor name
-   * @param name Sensor name
-   * @returns
-   */
   async getLatestSensorDataByName(name: string): Promise<Option<SensorDataDTO>>{
     let result: Option<SensorDataDTO> = None
     await realtime.getContent(fbPath.sensorData, async ref => {
@@ -229,11 +190,6 @@ export default class SensorService {
     return result
   }
 
-  /**
-   * Add a single sensor to the database, this is cooperated with an anti-duping method
-   * @param sensor Details about the sensor
-   * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
-   */
   async addSensor(sensor: Sensor): Promise<DatabaseEvent> {
     if(typeof(sensor.isRunning) === 'undefined') sensor.isRunning = true
     
@@ -268,11 +224,6 @@ export default class SensorService {
     }, DatabaseAddEvent)
   }
 
-  /**
-   * Update a single sensor to the database
-   * @param sensor Details about the sensor
-   * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
-   */
   async updateSensor(sensor: UpdatingSensor): Promise<DatabaseEvent> {
     return await createWriteEvent({
       data: sensor,
@@ -320,11 +271,6 @@ export default class SensorService {
     }, DatabaseUpdateEvent)
   }
 
-  /**
-   * Add a single sensor data to the database
-   * @param sensorData Data related to a sensor, related by name
-   * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
-   */
   async addSensorData(sensorName: string, sensorData: SensorData): Promise<DatabaseEvent> {
     return await createWriteEvent({
       data: { sensorName, ...sensorData },
@@ -358,11 +304,6 @@ export default class SensorService {
     }, DatabaseAddEvent)
   }
 
-  /**
-   * Add a bundle of sensor data to the database
-   * @param sensorData Data related to a sensor, related by name
-   * @returns A DatabaseEvent, an instance of either DatabaseErrorEvent or a modified DatabaseEvent
-   */
   async addSensorDataByBundle(sensorData: DatabaseSensorData[]): Promise<DatabaseEvent> {
     return await createWriteEvent({
       data: { numberOfSensorData: sensorData.length },
@@ -437,12 +378,6 @@ export default class SensorService {
     }, DatabaseAddEvent)
   }
 
-  /**
-   * WARNING: Avoid using this method unless it is necessary
-   * 
-   * Delete all sensor data stored in the firebase database
-   * @returns 
-   */
   async deleteSensorData(): Promise<DatabaseEvent> {
     return await createWriteEvent({
       data: {},

@@ -1,6 +1,7 @@
 import winston from "winston";
 import config from "./constants.config.json"
 import { existsSync } from "fs";
+import { Secret, SignOptions, VerifyOptions } from "jsonwebtoken";
 
 // describe a table for creating a new one
 export interface TableProps {
@@ -92,6 +93,8 @@ export const RAW_CIPHER_KEY = Buffer.from(process.env.SECRET_CIPHERKEY, "base64"
 export const RAW_CIPHER_IV = Buffer.from(process.env.SECRET_CIPHERIV, "base64")
 
 export const CIPHER_ALGORITHM = process.env.SECRET_CIPHERALGORITHM
+
+export const JWT_SECRET: Secret = process.env.SECRET_JWTPRIVATEKEY
 
 export const FIREBASE_CONFIG = {
   apiKey: process.env.SECRET_FIREBASECONFIG_APIKEY,

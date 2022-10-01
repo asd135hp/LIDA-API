@@ -23,11 +23,9 @@ const constants_2 = require("../../../../constants");
 const dataSavingService_1 = require("./utility/dataSavingService");
 const luxon_1 = require("luxon");
 const fflate_1 = require("fflate");
+const dataSavingServiceFacade_1 = require("../../../../model/v1/services/dataSavingServiceFacade");
 const storage = firebaseService_1.persistentFirebaseConnection.storageService;
-class DataSavingService {
-    constructor(publisher) {
-        this.publisher = publisher;
-    }
+class DataSavingService extends dataSavingServiceFacade_1.DataSavingServiceFacade {
     retrieveSensorSnapshot(runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const folderPath = `${constants_2.COMPONENTS_PATH.storage.sensor}/run${runNumber}`;

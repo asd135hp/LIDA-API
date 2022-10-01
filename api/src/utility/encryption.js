@@ -1,12 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.asymmetricKeyDecryption = exports.asymmetricKeyEncryption = void 0;
+exports.jwtVerify = exports.jwtSign = exports.asymmetricKeyDecryption = exports.asymmetricKeyEncryption = void 0;
 const crypto_1 = require("crypto");
 const constants_1 = require("../constants");
+const jsonwebtoken_1 = require("jsonwebtoken");
 let authTag = null;
 function asymmetricKeyEncryption(data) {
     const cipher = (0, crypto_1.createCipheriv)("aes-256-gcm", constants_1.RAW_CIPHER_KEY, constants_1.RAW_CIPHER_IV);
-    const buffer = Buffer.concat([cipher.update(data), cipher.final()]);
+    const updateBuffer = cipher.update(data);
+    const finalBuffer = cipher.final();
+    const buffer = Buffer.concat([updateBuffer, finalBuffer]);
     authTag = cipher.getAuthTag();
     return buffer;
 }
@@ -19,7 +22,26 @@ function asymmetricKeyDecryption(data) {
         authTag = cipher.getAuthTag();
     }
     decipher.setAuthTag(authTag);
-    return Buffer.concat([decipher.update(data), decipher.final()]).toString('utf-8');
+    const updateBuffer = decipher.update(data);
+    const finalBuffer = decipher.final();
+    return Buffer.concat([updateBuffer, finalBuffer]).toString('utf-8');
 }
 exports.asymmetricKeyDecryption = asymmetricKeyDecryption;
+function jwtSign(payload, expiresIn) {
+    return (0, jsonwebtoken_1.sign)(payload, constants_1.JWT_SECRET, {
+        algorithm: "HS384",
+        issuer: "lida-api",
+        expiresIn: expiresIn || "1d"
+    });
+}
+exports.jwtSign = jwtSign;
+function jwtVerify(token) {
+    const payload = (0, jsonwebtoken_1.verify)(token, constants_1.JWT_SECRET, {
+        algorithms: ["HS384", "ES384", "PS384", "RS512", "ES512", "HS512", "PS512"],
+        issuer: "lida-api",
+        ignoreExpiration: false
+    });
+    return typeof (payload) === 'string' ? {} : payload;
+}
+exports.jwtVerify = jwtVerify;
 //# sourceMappingURL=encryption.js.map

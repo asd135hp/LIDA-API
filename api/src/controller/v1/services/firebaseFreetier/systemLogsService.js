@@ -14,10 +14,8 @@ const systemLogDto_1 = require("../../../../model/v1/read/systemLogDto");
 const option_1 = require("../../../../model/patterns/option");
 const constants_2 = require("../../../../constants");
 const systemLogsService_1 = require("./utility/systemLogsService");
-class SystemLogsService {
-    constructor(publisher) {
-        this.publisher = publisher;
-    }
+const systemLogsServiceFacade_1 = require("../../../../model/v1/services/systemLogsServiceFacade");
+class SystemLogsService extends systemLogsServiceFacade_1.SystemLogsServiceFacade {
     getSensorLogs(oldestTimestamp = 0) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield (0, systemLogsService_1.getLog)(oldestTimestamp, constants_2.COMPONENTS_PATH.logs.sensor);

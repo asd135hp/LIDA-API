@@ -11,9 +11,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const firebaseService_1 = require("./firebaseService");
 const constants_1 = require("../../../../constants");
+const counterServiceFacade_1 = require("../../../../model/v1/services/counterServiceFacade");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
-class CounterService {
-    constructor() { }
+class CounterService extends counterServiceFacade_1.CounterServiceFacade {
     incrementLogCounter(whichCounter, by = 1, maxCounter = constants_1.LOG_LINES) {
         return __awaiter(this, void 0, void 0, function* () {
             let count = -1;

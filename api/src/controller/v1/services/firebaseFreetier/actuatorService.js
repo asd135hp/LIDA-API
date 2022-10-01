@@ -20,12 +20,10 @@ const firebaseService_1 = require("./firebaseService");
 const option_1 = require("../../../../model/patterns/option");
 const shorthandOps_1 = require("../../../../utility/shorthandOps");
 const constants_2 = require("../../../../constants");
+const actuatorServiceFacade_1 = require("../../../../model/v1/services/actuatorServiceFacade");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
-class ActuatorService {
-    constructor(publisher) {
-        this.publisher = publisher;
-    }
+class ActuatorService extends actuatorServiceFacade_1.ActuatorServiceFacade {
     getActuators() {
         return __awaiter(this, void 0, void 0, function* () {
             let result = yield (0, shorthandOps_1.getRealtimeContent)(constants_2.COMPONENTS_PATH.actuator, null, { limitToFirst: constants_1.ACTUATOR_LIMIT });

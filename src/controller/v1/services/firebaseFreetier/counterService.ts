@@ -1,16 +1,10 @@
 import { persistentFirebaseConnection } from "./firebaseService";
 import { COMPONENTS_PATH as fbPath, LOG_LINES } from "../../../../constants";
+import { CounterServiceFacade } from "../../../../model/v1/services/counterServiceFacade";
 
 const realtime = persistentFirebaseConnection.realtimeService
 
-export default class CounterService {
-  constructor(){}
-
-  /**
-   * Increment log counter based on which counter is used for this method
-   * @param whichCounter Name of the counter to be used. Can have alphanumerics, slashes and underscores but nothing else
-   * @param by BY how much will the counter increment
-   */
+export default class CounterService extends CounterServiceFacade {
   async incrementLogCounter(whichCounter: string, by = 1, maxCounter = LOG_LINES) {
     let count = -1
     await realtime.getContent(`${fbPath.count.path}/${whichCounter}`, async ref => {
@@ -24,11 +18,6 @@ export default class CounterService {
     return count
   }
   
-  /**
-   * Reset the log counter based on which counter is used for this method
-   * @param whichCounter Name of the counter to be used. Can have alphanumerics, slashes and underscores but nothing else
-   * @param to How much will the counter reset to (from 100 to 0 for example)
-   */
   async resetLogCounter(whichCounter: string, to = 1) {
     let count = -1
     await realtime.getContent(`${fbPath.count.path}/${whichCounter}`, async ref => {
@@ -38,10 +27,6 @@ export default class CounterService {
     return count
   }
   
-  /**
-   * Increment system run counter based on which counter is used for this method.
-   * Immutable
-   */
   async incrementSystemRunCounter() {
     let count = -1
     await realtime.getContent(`${fbPath.count.run}`, async ref => {

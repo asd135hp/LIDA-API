@@ -1,7 +1,6 @@
 import { logger } from "../../../../constants";
 import { FirebaseDateRange } from "../../../../model/dateRange";
 import { IterableJson } from "../../../../model/json";
-import { PublisherImplementor } from "../../../../model/patterns/subscriptionImplementor";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import { persistentFirebaseConnection } from "./firebaseService";
 import DatabaseCreateEvent from "../../../../model/v1/events/databaseCreateEvent";
@@ -17,21 +16,11 @@ import {
 } from "./utility/dataSavingService";
 import { DateTime } from "luxon";
 import { strToU8, zip } from "fflate";
+import { DataSavingServiceFacade } from "../../../../model/v1/services/dataSavingServiceFacade";
 
 const storage = persistentFirebaseConnection.storageService;
 
-export default class DataSavingService {
-  private publisher: PublisherImplementor<DatabaseEvent>;
-
-  constructor(publisher?: PublisherImplementor<DatabaseEvent>){
-    this.publisher = publisher
-  }
-
-  /**
-   * Retrive sensor snapshots in chunks by date
-   * @param runNumber Run number that is associated with that snapshot
-   * @returns None on an empty array, otherwise Some
-   */
+export default class DataSavingService extends DataSavingServiceFacade {
   async retrieveSensorSnapshot(runNumber: number): Promise<Option<SnapshotDownloadResponse[]>> {
     const folderPath = `${fbPath.storage.sensor}/run${runNumber}`
     const response = await storage.readFolderFromStorage(folderPath)
@@ -62,11 +51,6 @@ export default class DataSavingService {
     return Some(result)
   }
 
-  /**
-   * More performant log snapshots retrieval method since it will only apply filter only on sensor logs
-   * @param dateRange 
-   * @returns None on an empty array, otherwise Some
-   */
   async retrieveSensorLogSnapshots(dateRange?: FirebaseDateRange): Promise<Option<IterableJson[]>> {
     dateRange = mergeDefaultDateRange(dateRange)
     // get ready to merge multiple snapshots together
@@ -74,11 +58,6 @@ export default class DataSavingService {
     return customFlat(data, dateRange)
   }
 
-  /**
-   * More performant log snapshots retrieval method since it will only apply filter only on actuator logs
-   * @param dateRange 
-   * @returns None on an empty array, otherwise Some
-   */
   async retrieveActuatorLogSnapshots(dateRange?: FirebaseDateRange): Promise<Option<IterableJson[]>> {
     dateRange = mergeDefaultDateRange(dateRange)
     // get ready to merge multiple snapshots together
@@ -86,11 +65,6 @@ export default class DataSavingService {
     return customFlat(data, dateRange)
   }
 
-  /**
-   * More performant log snapshots retrieval method since it will only apply filter only on system command logs
-   * @param dateRange 
-   * @returns None on an empty array, otherwise Some
-   */
   async retrieveSystemCommandLogSnapshots(dateRange?: FirebaseDateRange): Promise<Option<IterableJson[]>> {
     dateRange = mergeDefaultDateRange(dateRange)
     // get ready to merge multiple snapshots together
@@ -98,12 +72,6 @@ export default class DataSavingService {
     return customFlat(data, dateRange)
   }
 
-  /**
-   * Upload what is considered to be a snapshot of sensor data in a period of time to a sensor folder on the server
-   * @param snapshots 
-   * @param runNumber
-   * @returns 
-   */
   async uploadSensorSnapshot(snapshots: SensorSnapshot, runNumber: number): Promise<DatabaseEvent> {
     const folderName = `${fbPath.storage.sensor}/run${runNumber}`
     const sensorName = snapshots.sensor.sort(orderByProp("name"))
@@ -143,12 +111,6 @@ export default class DataSavingService {
     })
   }
 
-  /**
-   * Upload what is considered to be a snapshot of logs in a period of time to a log folder on the server
-   * @param snapshot 
-   * @param dateRange 
-   * @returns 
-   */
   async uploadLogSnapshot(snapshot: IterableJson, dateRange: FirebaseDateRange): Promise<DatabaseEvent> {
     dateRange = mergeDefaultDateRange(dateRange)
     snapshot = {
@@ -164,11 +126,6 @@ export default class DataSavingService {
     ], DatabaseCreateEvent).unwrapOr(new DatabaseErrorEvent("Could not retrieve saved log snapshots", 404))
   }
 
-  /**
-   * Delete sensor snapshot of a specific run number
-   * @param runNumber 
-   * @returns 
-   */
   async deleteSensorSnapshot(runNumber: number): Promise<DatabaseEvent> {
     return await deleteSnapshots(
       `${fbPath.storage.sensor}/run${runNumber}`,
@@ -177,11 +134,6 @@ export default class DataSavingService {
     )
   }
 
-  /**
-   * Delete log snapshots of a specific date range - not functional
-   * @param runNumber 
-   * @returns 
-   */
   async deleteLogSnapshots(dateRange: FirebaseDateRange): Promise<DatabaseEvent> {
     return await deleteSnapshots(fbPath.storage.log, dateRange, this.publisher)
   }

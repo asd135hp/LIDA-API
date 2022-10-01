@@ -25,6 +25,7 @@ const auth = firebaseService_1.persistentFirebaseConnection.authService;
 let SecurityMethods = class SecurityMethods extends tsoa_1.Controller {
     login(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield auth.reauthenticationWithEmail(email, password);
             return yield auth.loginWithEmail(email, password);
         });
     }

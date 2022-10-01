@@ -49,6 +49,7 @@ export class DataSavingWriteMethods extends Controller {
     logger.info(`DataSavingWriteMethods: Saving sensor snapshot to the storage`)
 
     // return appropriate status code from internal system
+    // if time permits, might want to consider streaming data instead of downloading everything
     const sensorService = new SensorService()
     const counterService = new CounterService()
     const snapshot = await sensorService.getSensorDataSnapshot()

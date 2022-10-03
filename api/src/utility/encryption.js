@@ -39,7 +39,7 @@ function jwtVerify(token) {
     const payload = (0, jsonwebtoken_1.verify)(token, constants_1.JWT_SECRET, {
         algorithms: ["HS384", "ES384", "PS384", "RS512", "ES512", "HS512", "PS512"],
         issuer: "lida-api",
-        ignoreExpiration: false
+        ignoreExpiration: true
     });
     return typeof (payload) === 'string' ? {} : payload;
 }

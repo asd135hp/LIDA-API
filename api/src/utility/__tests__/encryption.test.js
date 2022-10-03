@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_1 = require("crypto");
 const constants_1 = require("../../constants");
 const encryption_1 = require("../encryption");
-const promises_1 = require("timers/promises");
 const data = "abcxyz";
 let authTag = null;
 const encryption = jest.fn((data) => {
@@ -37,7 +36,6 @@ test("should sign and verify jwt", () => __awaiter(void 0, void 0, void 0, funct
     console.log(constants_1.JWT_SECRET);
     for (let i = 0; i < 10; i++) {
         const a = (0, encryption_1.jwtSign)({ data: (0, crypto_1.randomBytes)(32).toString('hex') }, (200 * i).toString() + "ms");
-        yield (0, promises_1.setTimeout)(1000);
         try {
             (0, encryption_1.jwtVerify)(a);
             console.log("Success");

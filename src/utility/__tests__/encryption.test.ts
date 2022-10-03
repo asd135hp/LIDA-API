@@ -31,10 +31,9 @@ it("should encrypt and decipher data", ()=>{
 })
 
 test("should sign and verify jwt", async()=>{
-  console.log(JWT_SECRET)
   for(let i = 0; i < 10; i++){
     const a = jwtSign({ data: randomBytes(32).toString('hex') }, (200 * i).toString() + "ms")
-    await setTimeout(1000)
+    //await setTimeout(1000)
   
     try {
       jwtVerify(a)

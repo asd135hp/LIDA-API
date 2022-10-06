@@ -6,7 +6,7 @@ import { getDateRangeString } from "../../../../utility/helper";
 import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
 import { SnapshotDownloadResponse } from "../../../../model/v1/read/dataSaving";
 
-@Security("api_key")
+@Security("jwt")
 @Route(`api/v1/snapshot`)
 @SuccessResponse(200, "Ok")
 @Response("403", "Forbidden")

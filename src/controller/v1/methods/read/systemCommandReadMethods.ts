@@ -3,7 +3,7 @@ import { logger } from "../../../../constants";
 import { SystemCommandDTO } from "../../../../model/v1/read/systemCommandDto";
 import SystemCommandService from "../../services/firebaseFreetier/systemCommandService";
 
-@Security("api_key")
+@Security("jwt")
 @Route(`api/v1/systemCommand`)
 @SuccessResponse(200, "Ok")
 @Response(403, "Forbidden")

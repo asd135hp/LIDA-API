@@ -3,7 +3,7 @@ import { logger } from "../../../../constants";
 import { ActuatorDTO, ActuatorConfigDTO } from "../../../../model/v1/read/actuatorDto";
 import ActuatorService from "../../services/firebaseFreetier/actuatorService";
 
-@Security("api_key")
+@Security("jwt")
 @Route(`api/v1/actuator`)
 @SuccessResponse(200, "Ok")
 @Response(403, "Forbidden")

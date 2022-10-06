@@ -3,7 +3,7 @@ import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import { SystemCommand } from "../../../../model/v1/write/systemCommand";
 import SystemCommandService from "../../services/firebaseFreetier/systemCommandService";
 
-@Security("api_key")
+@Security("jwt")
 @Route(`api/v1/systemCommand`)
 @SuccessResponse(200, "Ok")
 @Response(403, "Forbidden")

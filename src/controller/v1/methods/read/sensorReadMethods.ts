@@ -7,7 +7,7 @@ import { SensorDTO, SensorDataDTO } from "../../../../model/v1/read/sensorDto";
 import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
 import SensorService from "../../services/firebaseFreetier/sensorService";
 
-@Security("api_key")
+@Security("jwt")
 @Route(`api/v1/sensor`)
 @SuccessResponse(200, "Ok")
 @Response(403, "Forbidden")

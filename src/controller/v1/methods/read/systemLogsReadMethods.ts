@@ -4,7 +4,7 @@ import { apiPath } from "../../../../constants.config.json"
 import { LogDTO } from "../../../../model/v1/read/systemLogDto";
 import LogsService from "../../services/firebaseFreetier/systemLogsService";
 
-@Security("api_key")
+@Security("jwt")
 @Route(`api/v1/log`)
 @SuccessResponse(200, "Ok")
 @Response("403", "Forbidden")

@@ -11,6 +11,7 @@ import FirebaseAuthService from "../../../database/firebase/services/firebaseAut
 import { FirebaseServiceType } from ".";
 import { randomInt } from "crypto";
 import { firebasePathConfig, FIREBASE_CONFIG, logger, SERVICE_ACCOUNT_CREDENTIALS } from "../../../../constants";
+import { AESKey } from "../../../database/firebase/token/aesKey";
 
 interface FirebaseRootPath {
   firestoreDocPath?: string;
@@ -50,7 +51,7 @@ export default class FirebaseService {
     if(this.verifyType(type, FirebaseServiceType.AUTH))
       this._auth = new FirebaseAuthService(
         this._app,
-        this._storageService || new FirebaseStorageService(this._app)
+        new AESKey(this._storageService || new FirebaseStorageService(this._app))
       )
   }
 

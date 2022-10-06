@@ -3,86 +3,11 @@ import { App } from "firebase-admin/app";
 import { Auth as AdminAuth } from "firebase-admin/auth";
 import { initializeApp } from "firebase/app";
 import { Auth as ClientAuth, getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { DATABASE_TIMEZONE, FIREBASE_CONFIG, logger, PROMISE_CATCH_METHOD } from "../../../../constants";
+import { FIREBASE_CONFIG, logger, PROMISE_CATCH_METHOD } from "../../../../constants";
 import User from "../../../../model/v1/auth/user";
 import FirebaseAuthFacade from "../interfaces/firebaseAuthFacade";
-import FirebaseStorageFacade from "../interfaces/firebaseStorageFacade";
-import { DateTime } from "luxon";
 import { randomInt, randomBytes } from "crypto";
-import { asymmetricKeyDecryption, asymmetricKeyEncryption } from "../../../../utility/encryption";
-
-class APIKey {
-  private storage: FirebaseStorageFacade;
-  private priviledge: string;
-
-  constructor(storage: FirebaseStorageFacade, priviledge = "admin"){
-    this.storage = storage
-    this.priviledge = priviledge
-  }
-
-  private getAuthFilePath(email: string) { return `auth/user/${email}/api_key.json` }
-
-  
-  async getKey(uid: string, renewalRetries = 0): Promise<string>{
-    const path = this.getAuthFilePath(uid)
-    if(!await this.storage.isFileExists(path)) {
-      // third time the charm, or else...
-      if(renewalRetries === 3) return ""
-
-      // try to renew the key since the account in the system
-      // but there is a change in environment
-      await this.renewKey(uid)
-      return this.getKey(uid, renewalRetries + 1)
-    }
-
-    const data = (await this.storage.readFileFromStorage(path)).toString()
-    logger.info("APIKey - getKey: " + data)
-    if(!data) return ""
-
-    const json = JSON.parse(data)
-    // admin priviledge, could be extended to handle multiple roles
-    if(!json || !json[this.priviledge]) return ""
-
-    const keyInfo = json[this.priviledge]
-    // check expirary date
-    if(keyInfo.expiraryDate <= DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()) return ""
-    return keyInfo.apiKey
-  }
-
-  async validateKey(uid: string, apiKey: string): Promise<boolean> {
-    const storedAPIKey = await this.getKey(uid)
-    logger.warn("FirebaseAuthService - validateKey: Stored API key" + storedAPIKey)
-    // check api key (could be more rigorous but this check could be good enough)
-    return storedAPIKey === apiKey
-  }
-
-  /**
-   * This forces key renewal immediately
-   */
-  async renewKey(
-    uid: string,
-    expiraryDateFromNow = 3600 * 24 * 30
-  ): Promise<string> {
-    // upload api key
-    const apiKey = randomBytes(64).toString("base64")
-    const data = (
-      await this.storage.isFileExists(this.getAuthFilePath(uid)) &&
-      (await this.storage.readFileFromStorage(this.getAuthFilePath(uid))).toString()
-    ) || "{}"
-    const json = JSON.parse(data)
-
-    // renew necessary section for validation
-    json[this.priviledge] = {
-      expirary: DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger() + expiraryDateFromNow,
-      apiKey
-    }
-
-    // upload new api key list
-    logger.debug("FirebaseAuthService - reauth: " + JSON.stringify(json))
-    return await this.storage.uploadBytesToStorage(this.getAuthFilePath(uid), JSON.stringify(json))
-      .then(() => apiKey, () => "")
-  }
-}
+import { BaseKey } from "../token/baseKey";
 
 /**
  * WARNING: This authentication service is not, in anyway possible, secure.
@@ -92,33 +17,32 @@ class APIKey {
 export default class FirebaseAuthService implements FirebaseAuthFacade {
   private clientAuth: ClientAuth
   private adminAuth: AdminAuth
-  private storage: FirebaseStorageFacade
+  private apiKey: BaseKey
 
-  constructor(firebaseApp: App, storageFacade: FirebaseStorageFacade){
+  constructor(firebaseApp: App, apiKey: BaseKey){
     this.clientAuth = getAuth(initializeApp(
       FIREBASE_CONFIG,
       Array(10).fill(0).map(_ => String.fromCharCode(randomInt(65, 90))).join('')
     ))
     this.adminAuth = firebaseAdmin.auth(firebaseApp)
-    this.storage = storageFacade
+    this.apiKey = apiKey
   }
 
   async loginWithEmail(email: string, password: string): Promise<User> {
     return await signInWithEmailAndPassword(this.clientAuth, email, password)
       .then(async credentials => {
-        const apiKeyObj = new APIKey(this.storage, "admin")
-        let apiKey = await apiKeyObj.getKey(credentials.user.uid)
+        let apiKey: string = ""
 
         try{
-          asymmetricKeyDecryption(Buffer.from(apiKey, 'hex'))
+          apiKey = await this.apiKey.getAPIKey(credentials.user.uid)
         } catch(e) {
-          apiKey = await apiKeyObj.renewKey(credentials.user.uid)
+          apiKey = await this.apiKey.renewKey(credentials.user.uid)
         }
         
         logger.info("FirebaseAuthService - loginWithEmail: New user logged in!")
         let accessToken: Buffer = null
         if(apiKey){
-          accessToken = asymmetricKeyEncryption(`${credentials.user.uid}|${apiKey}`)
+          accessToken = this.apiKey.generateToken(credentials.user.uid, apiKey)
           return new User(credentials.user, accessToken)
         }
         
@@ -137,8 +61,7 @@ export default class FirebaseAuthService implements FirebaseAuthFacade {
       password,
       displayName: randomBytes(15).toString("base64")
     }).then(async record => {
-        const apiKey = new APIKey(this.storage, "admin")
-        await apiKey.renewKey(record.uid)
+        await this.apiKey.renewKey(record.uid)
         logger.info("FirebaseAuthService - registerWithEmail: New user is registered")
       })
       .catch(PROMISE_CATCH_METHOD)
@@ -147,12 +70,12 @@ export default class FirebaseAuthService implements FirebaseAuthFacade {
   async reauthenticationWithEmail(email: string, password: string): Promise<User>{
     return await signInWithEmailAndPassword(this.clientAuth, email, password)
       .then(async credentials => {
-        const apiKey = await new APIKey(this.storage, "admin").renewKey(credentials.user.uid)
+        const apiKey = await this.apiKey.renewKey(credentials.user.uid)
         logger.info("FirebaseAuthService - reauthenticationWithEmail: New user logged in!")
 
         let accessToken: Buffer = null
         if(apiKey){
-          accessToken = asymmetricKeyEncryption(`${credentials.user.uid}|${apiKey}`)
+          accessToken = this.apiKey.generateToken(credentials.user.uid, apiKey)
           return new User(credentials.user, accessToken)
         }
         
@@ -165,7 +88,7 @@ export default class FirebaseAuthService implements FirebaseAuthFacade {
 
   async verifyApiKey(uid: string, apiKey: string): Promise<boolean> {
     logger.debug("FirebaseAuthService: Verifying API key")
-    return new APIKey(this.storage, "admin").validateKey(uid, apiKey)
+    return this.apiKey.validateKey(uid, apiKey)
   }
 
   async updatePassword(user: User, newPassword: string): Promise<void> {
@@ -206,8 +129,7 @@ export default class FirebaseAuthService implements FirebaseAuthFacade {
   
   async deleteUser(uid: string, apiKey: string): Promise<void> {
     // there should be a more secure way to update user info instead of relying on API keys
-    const key = new APIKey(this.storage, "admin")
-    if(!await key.validateKey(uid, apiKey)) return
+    if(!await this.apiKey.validateKey(uid, apiKey)) return
 
     await this.adminAuth.deleteUser(uid)
       .then(()=>logger.info(`User with uid ${uid} is deleted`))

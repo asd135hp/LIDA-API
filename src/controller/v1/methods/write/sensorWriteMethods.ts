@@ -7,7 +7,7 @@ import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 
 const getEvent = DatabaseEvent.getCompactEvent
 
-@Security("api_key")
+@Security("jwt")
 @Route(`api/v1/sensor`)
 @SuccessResponse(200, "Ok")
 @Response(400, "Bad Request")

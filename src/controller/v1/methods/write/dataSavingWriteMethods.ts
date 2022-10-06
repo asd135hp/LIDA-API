@@ -8,7 +8,7 @@ import CounterService from "../../services/firebaseFreetier/counterService";
 
 const getEvent = DatabaseEvent.getCompactEvent
 
-@Security("api_key")
+@Security("jwt")
 @Route(`api/v1/snapshot`)
 @SuccessResponse(200, "Ok")
 @Response(400, "Bad Request")

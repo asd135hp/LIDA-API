@@ -1,4 +1,6 @@
 import { UpdateRequest } from "firebase-admin/auth"
+import { defaultKeySchema } from "../../../constants"
+import { KeySchema } from "../../../controller/security/token/baseKey"
 
 export default class User {
   displayName: string
@@ -16,7 +18,7 @@ export default class User {
     this.phoneNumber = userData.phoneNumber
     this.photoURL = userData.photoURL
     this.isLoggedOut = false
-    this.accessToken = accessToken.toString('hex')
+    this.accessToken = accessToken.toString(defaultKeySchema == KeySchema.AES ? 'hex' : 'utf-8')
   }
 
   logOut() { this.isLoggedOut = true }

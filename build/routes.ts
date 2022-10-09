@@ -277,7 +277,7 @@ export function RegisterRoutes(app: express.Router) {
     //      Please look into the "controllerPathGlobs" config option described in the readme: https://github.com/lukeautry/tsoa
     // ###########################################################################################################
         app.get('/api/v1/actuator/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ActuatorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(ActuatorReadMethods.prototype.getActuators)),
 
@@ -303,7 +303,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/actuator/:typeOrName/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ActuatorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(ActuatorReadMethods.prototype.getCategorizedActuators)),
 
@@ -330,7 +330,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/actuator/config/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ActuatorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(ActuatorReadMethods.prototype.getActuatorConfigs)),
 
@@ -356,7 +356,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/actuator/config/proposed/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ActuatorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(ActuatorReadMethods.prototype.getProposedActuatorConfigs)),
 
@@ -382,7 +382,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/snapshot/sensor/:runNumber/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(DataSavingReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(DataSavingReadMethods.prototype.retrieveSensorDataRunSnapshot)),
 
@@ -409,7 +409,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/sensor/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods.prototype.getSensors)),
 
@@ -435,7 +435,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/sensor/:typeOrName/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods.prototype.getCategorizedSensors)),
 
@@ -462,7 +462,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/sensor/data/fetchAll',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods.prototype.getSensorData)),
 
@@ -490,7 +490,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/sensor/:name/data/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods.prototype.getSensorDataByName)),
 
@@ -519,7 +519,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/sensor/data/latest/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods.prototype.getLatestSensorData)),
 
@@ -545,7 +545,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/sensor/:name/data/latest/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods.prototype.getLatestSensorDataByName)),
 
@@ -572,7 +572,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/sensor/snapshot/:runNumber/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorReadMethods.prototype.getSensorDataRunSnapshot)),
 
@@ -599,7 +599,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/systemCommand/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandReadMethods.prototype.getSystemCommands)),
 
@@ -625,7 +625,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/systemCommand/proposed/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandReadMethods.prototype.getProposedSystemCommands)),
 
@@ -651,7 +651,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/log/sensor/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsReadMethods.prototype.getSensorLogs)),
 
@@ -677,7 +677,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/log/actuator/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsReadMethods.prototype.getActuatorLogs)),
 
@@ -703,7 +703,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/api/v1/log/systemCommand/get',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsReadMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsReadMethods.prototype.getSystemCommandLogs)),
 
@@ -729,7 +729,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/actuator/add',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ActuatorWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(ActuatorWriteMethods.prototype.addActuator)),
 
@@ -756,7 +756,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.patch('/api/v1/actuator/update',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ActuatorWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(ActuatorWriteMethods.prototype.updateActuator)),
 
@@ -783,7 +783,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/actuator/:actuatorName/config/update',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ActuatorWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(ActuatorWriteMethods.prototype.updateActuatorConfig)),
 
@@ -811,7 +811,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.patch('/api/v1/actuator/:actuatorName/config/proposed/update',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(ActuatorWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(ActuatorWriteMethods.prototype.updateProposedActuatorConfig)),
 
@@ -839,7 +839,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.patch('/api/v1/snapshot/sensor/:runNumber/delete',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(DataSavingWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(DataSavingWriteMethods.prototype.deleteSensorSnapshot)),
 
@@ -866,7 +866,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/snapshot/sensor/save',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(DataSavingWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(DataSavingWriteMethods.prototype.saveSensorSnapshot)),
 
@@ -892,7 +892,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/sensor/add',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods.prototype.addSensor)),
 
@@ -919,7 +919,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.patch('/api/v1/sensor/update',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods.prototype.updateSensor)),
 
@@ -946,7 +946,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/sensor/:sensorName/data/add',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods.prototype.addSensorData)),
 
@@ -974,7 +974,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/sensor/data/addAll',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SensorWriteMethods.prototype.addSensorDataByBundle)),
 
@@ -1001,7 +1001,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/systemCommand/startSystem',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods.prototype.startSystem)),
 
@@ -1027,7 +1027,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/systemCommand/pauseSystem',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods.prototype.pauseSystem)),
 
@@ -1053,7 +1053,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/systemCommand/stopSystem',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods.prototype.stopSystem)),
 
@@ -1079,7 +1079,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/systemCommand/restartSystem',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods.prototype.restartSystem)),
 
@@ -1105,7 +1105,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/systemCommand/flags/commit',
-            authenticateMiddleware([{"api_key":[]}]),
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemCommandWriteMethods.prototype.commitSystemFlags)),
 
@@ -1132,6 +1132,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/log/sensor/add',
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsWriteMethods.prototype.addSensorLog)),
 
@@ -1158,6 +1159,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/log/actuator/add',
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsWriteMethods.prototype.addActuatorLog)),
 
@@ -1184,6 +1186,7 @@ export function RegisterRoutes(app: express.Router) {
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.post('/api/v1/log/systemCommand/add',
+            authenticateMiddleware([{"jwt":[]}]),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsWriteMethods)),
             ...(fetchMiddlewares<RequestHandler>(SystemLogsWriteMethods.prototype.addSystemCommandLog)),
 

@@ -80,6 +80,7 @@ __decorate([
     __param(1, (0, tsoa_1.BodyProp)())
 ], SystemLogsWriteMethods.prototype, "addSystemCommandLog", null);
 SystemLogsWriteMethods = SystemLogsWriteMethods_1 = __decorate([
+    (0, tsoa_1.Security)(constants_1.defaultKeySchema),
     (0, tsoa_1.Route)(`api/v1/log`),
     (0, tsoa_1.SuccessResponse)(200, "Ok"),
     (0, tsoa_1.Response)(400, "Bad Request"),

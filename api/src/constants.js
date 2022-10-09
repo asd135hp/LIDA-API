@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SERVICE_ACCOUNT_CREDENTIALS = exports.FIREBASE_CONFIG = exports.JWT_SECRET = exports.CIPHER_ALGORITHM = exports.RAW_CIPHER_IV = exports.RAW_CIPHER_KEY = exports.SESSION_SECRET = exports.COOKIE_SECRET = exports.COMPONENTS_PATH = exports.TEST_ACCOUNT = exports.TEST_SETUP_THROWS_ERROR = exports.COMPRESSION_SETTINGS = exports.PROMISE_CATCH_METHOD = exports.ACTUATOR_LIMIT = exports.SENSOR_LIMIT = exports.LOG_LINES = exports.DATABASE_TIMEZONE = exports.schemaName = exports.firebasePathConfig = exports.logger = exports.dbConnection = void 0;
+exports.SERVICE_ACCOUNT_CREDENTIALS = exports.FIREBASE_CONFIG = exports.JWT_SECRET = exports.CIPHER_ALGORITHM = exports.RAW_CIPHER_IV = exports.RAW_CIPHER_KEY = exports.SESSION_SECRET = exports.COOKIE_SECRET = exports.COMPONENTS_PATH = exports.TEST_ACCOUNT = exports.TEST_SETUP_THROWS_ERROR = exports.COMPRESSION_SETTINGS = exports.PROMISE_CATCH_METHOD = exports.ACTUATOR_LIMIT = exports.SENSOR_LIMIT = exports.LOG_LINES = exports.DATABASE_TIMEZONE = exports.defaultKeySchema = exports.schemaName = exports.firebasePathConfig = exports.logger = exports.dbConnection = void 0;
 const winston_1 = __importDefault(require("winston"));
 const constants_config_json_1 = __importDefault(require("./constants.config.json"));
 const fs_1 = require("fs");
+const baseKey_1 = require("./controller/security/token/baseKey");
 (() => {
     let count = 0;
     while (!(0, fs_1.existsSync)(`${__dirname}/${Array(count).fill("../").join("")}.env`)) {
@@ -44,6 +45,7 @@ exports.firebasePathConfig = (() => {
     return constants_config_json_1.default.firebase.storage.test;
 })();
 exports.schemaName = constants_config_json_1.default.schemaName;
+exports.defaultKeySchema = baseKey_1.KeySchema.JWT;
 exports.DATABASE_TIMEZONE = constants_config_json_1.default.timezone || "Australia/Melbourne";
 exports.LOG_LINES = constants_config_json_1.default.limit.logLines;
 exports.SENSOR_LIMIT = constants_config_json_1.default.limit.sensor;

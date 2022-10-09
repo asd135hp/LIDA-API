@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const constants_1 = require("../../../constants");
+const baseKey_1 = require("../../../controller/security/token/baseKey");
 class User {
     constructor(userData, accessToken) {
         this.displayName = userData.displayName;
@@ -8,7 +10,7 @@ class User {
         this.phoneNumber = userData.phoneNumber;
         this.photoURL = userData.photoURL;
         this.isLoggedOut = false;
-        this.accessToken = accessToken.toString('hex');
+        this.accessToken = accessToken.toString(constants_1.defaultKeySchema == baseKey_1.KeySchema.AES ? 'hex' : 'utf-8');
     }
     logOut() { this.isLoggedOut = true; }
     toUpdateRequest() {

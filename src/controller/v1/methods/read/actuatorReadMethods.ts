@@ -1,9 +1,9 @@
 import { Get, Route, SuccessResponse, Response, Controller, Path, Security, Query } from "tsoa";
-import { logger } from "../../../../constants";
+import { defaultKeySchema, logger } from "../../../../constants";
 import { ActuatorDTO, ActuatorConfigDTO } from "../../../../model/v1/read/actuatorDto";
 import ActuatorService from "../../services/firebaseFreetier/actuatorService";
 
-@Security("jwt")
+@Security(defaultKeySchema)
 @Route(`api/v1/actuator`)
 @SuccessResponse(200, "Ok")
 @Response(403, "Forbidden")

@@ -1,8 +1,9 @@
 import { setTimeout } from "timers/promises";
-import { TEST_ACCOUNT } from "../../constants";
+import { defaultKeySchema, TEST_ACCOUNT } from "../../constants";
 import User from "../../model/v1/auth/user";
-import { asymmetricKeyDecryption } from "../../utility/encryption";
+import { asymmetricKeyDecryption, jwtVerify } from "../../utility/encryption";
 import TestSetup from "../../utility/testSetup";
+import { KeySchema } from "../security/token/baseKey";
 import { persistentFirebaseConnection } from "../v1/services/firebaseFreetier/firebaseService";
 
 describe("Test firebase service as a whole", ()=>{
@@ -139,17 +140,31 @@ describe("Test firebase service as a whole", ()=>{
     expect(user.email).toBe(email)
     
     // third verify api key
-    const [uid, apiKey] = asymmetricKeyDecryption(Buffer.from(user.accessToken, 'hex')).split("|")
-    expect(await auth.verifyApiKey(uid, apiKey)).toBe(true)
+    let currentApiKey = "", userId = ""
+    if(defaultKeySchema == KeySchema.JWT){
+      const { uid, apiKey } = jwtVerify(user.accessToken).split("|")
+      expect(await auth.verifyApiKey(uid, apiKey)).toBe(true)
+      currentApiKey = apiKey
+      userId = uid
+    } else {
+      const [uid, apiKey] = asymmetricKeyDecryption(Buffer.from(user.accessToken, 'hex')).split("|")
+      expect(await auth.verifyApiKey(uid, apiKey)).toBe(true)
+      currentApiKey = apiKey
+      userId = uid
+    }
     
     // fourth reauthentication
     // (which could be hard to do since the expirary duration for api keys are 30 days)
     user = await auth.reauthenticationWithEmail(email, password)
-    const [_, newApiKey] = asymmetricKeyDecryption(Buffer.from(user.accessToken, 'hex')).split("|")
-    expect(newApiKey).not.toBe(apiKey)
+    const payload = (defaultKeySchema == KeySchema.JWT ?
+      jwtVerify(user.accessToken) :
+      asymmetricKeyDecryption(Buffer.from(user.accessToken, "hex"))
+    ).split("|")
+    const newApiKey = defaultKeySchema == KeySchema.JWT ? payload.apiKey : payload[1]
+    expect(newApiKey).not.toBe(currentApiKey)
 
     // delete user first
-    await auth.deleteUser(uid, newApiKey)
+    await auth.deleteUser(userId, newApiKey)
 
     // finally logging out
     auth.logout(user)

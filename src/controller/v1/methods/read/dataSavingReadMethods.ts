@@ -1,12 +1,11 @@
-import { apiPath } from "../../../../constants.config.json"
 import { Get, Route, SuccessResponse, Response, Controller, Security, Query, Header, Path } from "tsoa";
-import { logger } from "../../../../constants";
+import { defaultKeySchema, logger } from "../../../../constants";
 import { IterableJson } from "../../../../model/json";
 import { getDateRangeString } from "../../../../utility/helper";
 import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
 import { SnapshotDownloadResponse } from "../../../../model/v1/read/dataSaving";
 
-@Security("jwt")
+@Security(defaultKeySchema)
 @Route(`api/v1/snapshot`)
 @SuccessResponse(200, "Ok")
 @Response("403", "Forbidden")

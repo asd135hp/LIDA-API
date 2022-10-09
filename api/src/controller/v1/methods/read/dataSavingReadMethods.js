@@ -43,7 +43,7 @@ __decorate([
     __param(1, (0, tsoa_1.Path)())
 ], DataSavingReadMethods.prototype, "retrieveSensorDataRunSnapshot", null);
 DataSavingReadMethods = __decorate([
-    (0, tsoa_1.Security)("api_key"),
+    (0, tsoa_1.Security)(constants_1.defaultKeySchema),
     (0, tsoa_1.Route)(`api/v1/snapshot`),
     (0, tsoa_1.SuccessResponse)(200, "Ok"),
     (0, tsoa_1.Response)("403", "Forbidden"),

@@ -10,13 +10,20 @@ import FirebaseAuthFacade from "../../../database/firebase/interfaces/firebaseAu
 import FirebaseAuthService from "../../../database/firebase/services/firebaseAuthService";
 import { FirebaseServiceType } from ".";
 import { randomInt } from "crypto";
-import { firebasePathConfig, FIREBASE_CONFIG, logger, SERVICE_ACCOUNT_CREDENTIALS } from "../../../../constants";
-import { AESKey } from "../../../database/firebase/token/aesKey";
+import { defaultKeySchema, firebasePathConfig, FIREBASE_CONFIG, logger, SERVICE_ACCOUNT_CREDENTIALS } from "../../../../constants";
+import { AESKey } from "../../../security/token/aesKey";
+import { JWTKey } from "../../../security/token/jwtToken";
+import { KeySchema } from "../../../security/token/baseKey";
 
 interface FirebaseRootPath {
   firestoreDocPath?: string;
   storageFolder?: string;
   realtimeUrl?: string;
+}
+
+// either AES or JWT, depending on popular demand of API methods
+const getKey = (storage: FirebaseStorageFacade) => {
+  return defaultKeySchema == KeySchema.JWT ? new JWTKey(storage) : new AESKey(storage)
 }
 
 // helper service that connects to firebase, reduces required code in other services
@@ -51,7 +58,7 @@ export default class FirebaseService {
     if(this.verifyType(type, FirebaseServiceType.AUTH))
       this._auth = new FirebaseAuthService(
         this._app,
-        new AESKey(this._storageService || new FirebaseStorageService(this._app))
+        getKey(this._storageService || new FirebaseStorageService(this._app))
       )
   }
 

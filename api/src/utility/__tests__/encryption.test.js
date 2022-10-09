@@ -33,7 +33,6 @@ it("should encrypt and decipher data", () => {
     }
 });
 test("should sign and verify jwt", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(constants_1.JWT_SECRET);
     for (let i = 0; i < 10; i++) {
         const a = (0, encryption_1.jwtSign)({ data: (0, crypto_1.randomBytes)(32).toString('hex') }, (200 * i).toString() + "ms");
         try {

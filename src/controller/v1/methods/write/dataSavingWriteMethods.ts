@@ -1,5 +1,5 @@
 import { Route, SuccessResponse, Response, Controller, Security, Query, Post, Path, Patch } from "tsoa";
-import { logger } from "../../../../constants";
+import { defaultKeySchema, logger } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
@@ -8,7 +8,7 @@ import CounterService from "../../services/firebaseFreetier/counterService";
 
 const getEvent = DatabaseEvent.getCompactEvent
 
-@Security("jwt")
+@Security(defaultKeySchema)
 @Route(`api/v1/snapshot`)
 @SuccessResponse(200, "Ok")
 @Response(400, "Bad Request")

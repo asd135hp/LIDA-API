@@ -16,6 +16,7 @@ const promises_1 = require("timers/promises");
 const constants_1 = require("../../constants");
 const encryption_1 = require("../../utility/encryption");
 const testSetup_1 = __importDefault(require("../../utility/testSetup"));
+const baseKey_1 = require("../security/token/baseKey");
 const firebaseService_1 = require("../v1/services/firebaseFreetier/firebaseService");
 describe("Test firebase service as a whole", () => {
     const testSetup = new testSetup_1.default();
@@ -122,12 +123,26 @@ describe("Test firebase service as a whole", () => {
         let user = yield auth.loginWithEmail(email, password).catch(() => null);
         expect(user).not.toBe(null);
         expect(user.email).toBe(email);
-        const [uid, apiKey] = (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(user.accessToken, 'hex')).split("|");
-        expect(yield auth.verifyApiKey(uid, apiKey)).toBe(true);
+        let currentApiKey = "", userId = "";
+        if (constants_1.defaultKeySchema == baseKey_1.KeySchema.JWT) {
+            const { uid, apiKey } = (0, encryption_1.jwtVerify)(user.accessToken).split("|");
+            expect(yield auth.verifyApiKey(uid, apiKey)).toBe(true);
+            currentApiKey = apiKey;
+            userId = uid;
+        }
+        else {
+            const [uid, apiKey] = (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(user.accessToken, 'hex')).split("|");
+            expect(yield auth.verifyApiKey(uid, apiKey)).toBe(true);
+            currentApiKey = apiKey;
+            userId = uid;
+        }
         user = yield auth.reauthenticationWithEmail(email, password);
-        const [_, newApiKey] = (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(user.accessToken, 'hex')).split("|");
-        expect(newApiKey).not.toBe(apiKey);
-        yield auth.deleteUser(uid, newApiKey);
+        const payload = (constants_1.defaultKeySchema == baseKey_1.KeySchema.JWT ?
+            (0, encryption_1.jwtVerify)(user.accessToken) :
+            (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(user.accessToken, "hex"))).split("|");
+        const newApiKey = constants_1.defaultKeySchema == baseKey_1.KeySchema.JWT ? payload.apiKey : payload[1];
+        expect(newApiKey).not.toBe(currentApiKey);
+        yield auth.deleteUser(userId, newApiKey);
         auth.logout(user);
         expect(user.isLoggedOut).toBe(true);
     }), TIMEOUT * 3);

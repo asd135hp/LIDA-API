@@ -20,6 +20,12 @@ const firebaseFirestoreService_1 = __importDefault(require("../../../database/fi
 const firebaseAuthService_1 = __importDefault(require("../../../database/firebase/services/firebaseAuthService"));
 const crypto_1 = require("crypto");
 const constants_1 = require("../../../../constants");
+const aesKey_1 = require("../../../security/token/aesKey");
+const jwtToken_1 = require("../../../security/token/jwtToken");
+const baseKey_1 = require("../../../security/token/baseKey");
+const getKey = (storage) => {
+    return constants_1.defaultKeySchema == baseKey_1.KeySchema.JWT ? new jwtToken_1.JWTKey(storage) : new aesKey_1.AESKey(storage);
+};
 class FirebaseService {
     constructor(type, path) {
         this._appName = Array(10).fill(0).map(_ => String.fromCharCode((0, crypto_1.randomInt)(65, 90))).join('');
@@ -33,7 +39,7 @@ class FirebaseService {
         if (this.verifyType(type, 4))
             this._firestoreService = new firebaseFirestoreService_1.default(this._app, path === null || path === void 0 ? void 0 : path.firestoreDocPath);
         if (this.verifyType(type, 8))
-            this._auth = new firebaseAuthService_1.default(this._app, this._storageService || new firebaseStorageService_1.default(this._app));
+            this._auth = new firebaseAuthService_1.default(this._app, getKey(this._storageService || new firebaseStorageService_1.default(this._app)));
     }
     get storageService() { return this._storageService; }
     get realtimeService() { return this._realtimeService; }

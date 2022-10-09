@@ -1,5 +1,5 @@
 import { Post, Patch, Route, SuccessResponse, Response, Controller, Security, BodyProp, Path, Header, Query } from "tsoa";
-import { logger } from "../../../../constants";
+import { defaultKeySchema, logger } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import { DatabaseSensorData, Sensor, SensorData, UpdatingSensor } from "../../../../model/v1/write/sensors";
 import SensorService from "../../services/firebaseFreetier/sensorService";
@@ -7,7 +7,7 @@ import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 
 const getEvent = DatabaseEvent.getCompactEvent
 
-@Security("jwt")
+@Security(defaultKeySchema)
 @Route(`api/v1/sensor`)
 @SuccessResponse(200, "Ok")
 @Response(400, "Bad Request")

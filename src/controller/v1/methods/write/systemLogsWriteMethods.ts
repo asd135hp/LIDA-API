@@ -1,13 +1,12 @@
-import { Route, SuccessResponse, Response, Controller, Security, BodyProp, Post, Header, Query } from "tsoa";
+import { Route, SuccessResponse, Response, Controller, Security, BodyProp, Post, Query } from "tsoa";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import SystemLogsService from "../../services/firebaseFreetier/systemLogsService";
-import { logger } from "../../../../constants";
-import { apiPath } from "../../../../constants.config.json"
+import { defaultKeySchema, logger } from "../../../../constants";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 
 const getEvent = DatabaseEvent.getCompactEvent
 
-// @Security("jwt")
+@Security(defaultKeySchema)
 @Route(`api/v1/log`)
 @SuccessResponse(200, "Ok")
 @Response(400, "Bad Request")

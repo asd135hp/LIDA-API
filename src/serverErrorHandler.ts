@@ -44,5 +44,10 @@ export default function serverErrorHandler(
   if (err instanceof ValidateError) return res.status(422).json(validationError(err, req));
   if (err instanceof TypeError) return res.status(500).json(typeError(err, req))
   if (err instanceof Error) return res.status(500).json(genericError(err, req))
+  if (typeof(err) == 'object') {
+    const newErr = err as { type: string, [name: string]: any }
+    if(!newErr) return res.status(500).json({ message: "Unknown error" })
+    return res.status(newErr.type == "Security" ? 403 : 500).json(err)
+  }
   next();
 }

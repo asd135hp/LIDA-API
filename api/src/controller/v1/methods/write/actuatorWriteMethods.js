@@ -97,7 +97,7 @@ __decorate([
     __param(2, (0, tsoa_1.BodyProp)())
 ], ActuatorWriteMethods.prototype, "updateProposedActuatorConfig", null);
 ActuatorWriteMethods = ActuatorWriteMethods_1 = __decorate([
-    (0, tsoa_1.Security)("api_key"),
+    (0, tsoa_1.Security)(constants_1.defaultKeySchema),
     (0, tsoa_1.Route)(`api/v1/actuator`),
     (0, tsoa_1.SuccessResponse)(200, "Ok"),
     (0, tsoa_1.Response)(400, "Bad Request"),

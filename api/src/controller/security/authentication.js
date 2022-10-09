@@ -10,21 +10,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.expressAuthentication = void 0;
-const encryption_1 = require("../../utility/encryption");
 const firebaseService_1 = require("../v1/services/firebaseFreetier/firebaseService");
+const aesKey_1 = require("./token/aesKey");
+const jwtToken_1 = require("./token/jwtToken");
 function expressAuthentication(request, securityName, scopes) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
+        const token = (_a = request.query) === null || _a === void 0 ? void 0 : _a.accessToken;
+        if (!token)
+            return Promise.reject({ message: "No authentication token is provided", type: "Security" });
+        if (Array.isArray(token))
+            return Promise.reject({
+                message: "Wrong token format - only one token is needed",
+                type: "Security"
+            });
+        let key;
         if (securityName === "api_key") {
-            let token = (_a = request.query) === null || _a === void 0 ? void 0 : _a.accessToken;
-            if (!token)
-                return Promise.reject({ message: "No authentication token is provided", type: "Security" });
-            if (Array.isArray(token))
-                return Promise.reject({
-                    message: "Wrong token format - only one token is needed",
-                    type: "Security"
-                });
-            const unpacked = (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(token.toString(), 'hex')).split('|');
+            key = new aesKey_1.AESKey();
+            const unpacked = key.parseToken(token.toString());
             if (unpacked.length != 2)
                 return Promise.reject({
                     message: "Wrong token format",
@@ -33,6 +36,18 @@ function expressAuthentication(request, securityName, scopes) {
             const [userId, apiKey] = unpacked;
             const service = firebaseService_1.persistentFirebaseConnection.authService;
             return yield service.verifyApiKey(userId, apiKey);
+        }
+        if (securityName === 'jwt') {
+            key = new jwtToken_1.JWTKey();
+            const unpacked = key.parseToken(token.toString());
+            if (typeof (unpacked) != 'object')
+                return Promise.reject({
+                    message: "Wrong token format",
+                    type: "Security"
+                });
+            const { uid, apiKey } = unpacked;
+            const service = firebaseService_1.persistentFirebaseConnection.authService;
+            return yield service.verifyApiKey(uid, apiKey);
         }
     });
 }

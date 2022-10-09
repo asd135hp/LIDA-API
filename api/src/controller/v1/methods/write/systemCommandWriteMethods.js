@@ -21,6 +21,7 @@ var SystemCommandWriteMethods_1;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SystemCommandWriteMethods = void 0;
 const tsoa_1 = require("tsoa");
+const constants_1 = require("../../../../constants");
 let SystemCommandWriteMethods = SystemCommandWriteMethods_1 = class SystemCommandWriteMethods extends tsoa_1.Controller {
     constructor() {
         super();
@@ -74,7 +75,7 @@ __decorate([
     __param(1, (0, tsoa_1.BodyProp)())
 ], SystemCommandWriteMethods.prototype, "commitSystemFlags", null);
 SystemCommandWriteMethods = SystemCommandWriteMethods_1 = __decorate([
-    (0, tsoa_1.Security)("api_key"),
+    (0, tsoa_1.Security)(constants_1.defaultKeySchema),
     (0, tsoa_1.Route)(`api/v1/systemCommand`),
     (0, tsoa_1.SuccessResponse)(200, "Ok"),
     (0, tsoa_1.Response)(403, "Forbidden"),

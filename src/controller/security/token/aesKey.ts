@@ -1,7 +1,4 @@
-import { randomBytes } from "crypto";
-import { DateTime } from "luxon";
-import { logger, DATABASE_TIMEZONE } from "../../../../constants";
-import { asymmetricKeyDecryption, asymmetricKeyEncryption } from "../../../../utility/encryption";
+import { asymmetricKeyDecryption, asymmetricKeyEncryption } from "../../../utility/encryption";
 import { BaseKey } from "./baseKey";
 
 export class AESKey extends BaseKey {
@@ -21,6 +18,7 @@ export class AESKey extends BaseKey {
   }
 
   generateToken(uid: string, apiKey: string) {
+    // very buggy to say the least due to .final() method
     return asymmetricKeyEncryption(`${uid}|${apiKey}`)
   }
 

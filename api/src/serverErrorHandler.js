@@ -38,6 +38,12 @@ function serverErrorHandler(err, req, res, next) {
         return res.status(500).json(typeError(err, req));
     if (err instanceof Error)
         return res.status(500).json(genericError(err, req));
+    if (typeof (err) == 'object') {
+        const newErr = err;
+        if (!newErr)
+            return res.status(500).json({ message: "Unknown error" });
+        return res.status(newErr.type == "Security" ? 403 : 500).json(err);
+    }
     next();
 }
 exports.default = serverErrorHandler;

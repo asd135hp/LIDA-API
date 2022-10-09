@@ -7,7 +7,7 @@ import { FIREBASE_CONFIG, logger, PROMISE_CATCH_METHOD } from "../../../../const
 import User from "../../../../model/v1/auth/user";
 import FirebaseAuthFacade from "../interfaces/firebaseAuthFacade";
 import { randomInt, randomBytes } from "crypto";
-import { BaseKey } from "../token/baseKey";
+import { BaseKey } from "../../../security/token/baseKey";
 
 /**
  * WARNING: This authentication service is not, in anyway possible, secure.

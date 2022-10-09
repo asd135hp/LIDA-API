@@ -1,7 +1,8 @@
 import winston from "winston";
 import config from "./constants.config.json"
 import { existsSync } from "fs";
-import { Secret, SignOptions, VerifyOptions } from "jsonwebtoken";
+import { Secret } from "jsonwebtoken";
+import { KeySchema } from "./controller/security/token/baseKey";
 
 // describe a table for creating a new one
 export interface TableProps {
@@ -57,6 +58,8 @@ export const firebasePathConfig = (()=>{
 })();
 
 export const schemaName = config.schemaName
+
+export const defaultKeySchema: KeySchema = KeySchema.JWT
 
 // Australia/Melbourne here if the server is designated in this zone
 // but this is "utc", based on constants.config.json file

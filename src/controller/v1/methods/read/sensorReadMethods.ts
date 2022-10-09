@@ -1,13 +1,12 @@
 import { DateTime } from "luxon";
 import { Get, Route, SuccessResponse, Response, Controller, Path, Security, Query, Header } from "tsoa";
-import { DATABASE_TIMEZONE, logger } from "../../../../constants";
-import { apiPath } from "../../../../constants.config.json"
+import { DATABASE_TIMEZONE, defaultKeySchema, logger } from "../../../../constants";
 import { SnapshotDownloadResponse } from "../../../../model/v1/read/dataSaving";
 import { SensorDTO, SensorDataDTO } from "../../../../model/v1/read/sensorDto";
 import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
 import SensorService from "../../services/firebaseFreetier/sensorService";
 
-@Security("jwt")
+@Security(defaultKeySchema)
 @Route(`api/v1/sensor`)
 @SuccessResponse(200, "Ok")
 @Response(403, "Forbidden")

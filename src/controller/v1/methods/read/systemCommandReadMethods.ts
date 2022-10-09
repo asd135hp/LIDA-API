@@ -1,9 +1,9 @@
 import { Get, Route, SuccessResponse, Response, Controller, Security, Query } from "tsoa";
-import { logger } from "../../../../constants";
+import { defaultKeySchema, logger } from "../../../../constants";
 import { SystemCommandDTO } from "../../../../model/v1/read/systemCommandDto";
 import SystemCommandService from "../../services/firebaseFreetier/systemCommandService";
 
-@Security("jwt")
+@Security(defaultKeySchema)
 @Route(`api/v1/systemCommand`)
 @SuccessResponse(200, "Ok")
 @Response(403, "Forbidden")

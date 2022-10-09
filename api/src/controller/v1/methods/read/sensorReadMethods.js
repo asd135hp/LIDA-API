@@ -138,7 +138,7 @@ __decorate([
     __param(1, (0, tsoa_1.Path)())
 ], SensorReadMethods.prototype, "getSensorDataRunSnapshot", null);
 SensorReadMethods = __decorate([
-    (0, tsoa_1.Security)("api_key"),
+    (0, tsoa_1.Security)(constants_1.defaultKeySchema),
     (0, tsoa_1.Route)(`api/v1/sensor`),
     (0, tsoa_1.SuccessResponse)(200, "Ok"),
     (0, tsoa_1.Response)(403, "Forbidden"),

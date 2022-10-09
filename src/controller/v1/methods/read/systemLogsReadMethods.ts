@@ -1,10 +1,9 @@
-import { Get, Route, SuccessResponse, Response, Controller, Security, Path, Header, Query } from "tsoa";
-import { logger } from "../../../../constants";
-import { apiPath } from "../../../../constants.config.json"
+import { Get, Route, SuccessResponse, Response, Controller, Security, Query } from "tsoa";
+import { defaultKeySchema, logger } from "../../../../constants";
 import { LogDTO } from "../../../../model/v1/read/systemLogDto";
 import LogsService from "../../services/firebaseFreetier/systemLogsService";
 
-@Security("jwt")
+@Security(defaultKeySchema)
 @Route(`api/v1/log`)
 @SuccessResponse(200, "Ok")
 @Response("403", "Forbidden")

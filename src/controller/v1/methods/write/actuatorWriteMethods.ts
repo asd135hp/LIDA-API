@@ -1,8 +1,7 @@
 import {
   Post, Patch, Route, SuccessResponse,
-  Response, Controller, Security, BodyProp, Path, Header, Query } from "tsoa";
-import { logger } from "../../../../constants";
-import { apiPath } from "../../../../constants.config.json"
+  Response, Controller, Security, BodyProp, Path, Query } from "tsoa";
+import { defaultKeySchema, logger } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import { Actuator, ActuatorConfig, UpdatingActuator } from "../../../../model/v1/write/actuators";
 import ActuatorService from "../../services/firebaseFreetier/actuatorService";
@@ -11,7 +10,7 @@ import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 
 const getEvent = DatabaseEvent.getCompactEvent
 
-@Security("jwt")
+@Security(defaultKeySchema)
 @Route(`api/v1/actuator`)
 @SuccessResponse(200, "Ok")
 @Response(400, "Bad Request")

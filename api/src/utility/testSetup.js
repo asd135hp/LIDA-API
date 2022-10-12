@@ -16,9 +16,9 @@ const apiSetup_1 = __importDefault(require("../apiSetup"));
 const constants_1 = require("../constants");
 const queryFacade_1 = __importDefault(require("../controller/queryFacade"));
 const promises_1 = require("timers/promises");
-const firebaseService_1 = require("../controller/v1/services/firebaseFreetier/firebaseService");
 const encryption_1 = require("./encryption");
 const winston_1 = __importDefault(require("winston"));
+const serviceEntries_1 = require("../controller/v1/services/serviceEntries");
 class TestSetup {
     constructor() {
         this.closeHandler = null;
@@ -32,7 +32,7 @@ class TestSetup {
             process.env.NODE_ENV = 'test';
             this.setFileLogging();
             this.closeHandler = (0, apiSetup_1.default)(null);
-            yield firebaseService_1.persistentFirebaseConnection.authService
+            yield serviceEntries_1.persistentAuthService
                 .registerWithEmail(email, password)
                 .then(() => __awaiter(this, void 0, void 0, function* () { return yield (0, promises_1.setTimeout)(2000); }), () => { });
             this.user = yield queryFacade_1.default.security.login(email, password).catch(() => null);
@@ -52,7 +52,7 @@ class TestSetup {
         return __awaiter(this, void 0, void 0, function* () {
             process.env.NODE_ENV = this.prevEnv;
             const [uid, apiKey] = (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(this.getAccessToken(), "hex")).split("|");
-            yield firebaseService_1.persistentFirebaseConnection.authService.deleteUser(uid, apiKey);
+            yield serviceEntries_1.persistentAuthService.deleteUser(uid, apiKey);
             yield new Promise(resolve => global.setTimeout(() => resolve(""), 500));
             (_a = this.closeHandler) === null || _a === void 0 ? void 0 : _a.call(null);
         });

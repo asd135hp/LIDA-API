@@ -1,8 +1,5 @@
-import { createDecipheriv, CipherCCMOptions, createCipheriv, randomBytes } from "crypto"
-import { DateTime } from "luxon"
-import { CIPHER_ALGORITHM, RAW_CIPHER_KEY, RAW_CIPHER_IV, JWT_SECRET } from "../../constants"
-import { jwtSign, jwtVerify } from "../encryption"
-import { setTimeout } from "timers/promises"
+import { createDecipheriv, createCipheriv } from "crypto"
+import { RAW_CIPHER_KEY, RAW_CIPHER_IV } from "../../constants"
 
 const data = "abcxyz"
 let authTag: Buffer = null
@@ -29,17 +26,3 @@ it("should encrypt and decipher data", ()=>{
     expect(text).toBe(data)
   }
 })
-
-test("should sign and verify jwt", async()=>{
-  for(let i = 0; i < 10; i++){
-    const a = jwtSign({ data: randomBytes(32).toString('hex') }, (200 * i).toString() + "ms")
-    //await setTimeout(1000)
-  
-    try {
-      jwtVerify(a)
-      console.log("Success")
-    } catch(e) {
-      console.log("Failed", e)
-    }
-  }
-}, 100000)

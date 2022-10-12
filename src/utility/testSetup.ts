@@ -3,11 +3,9 @@ import { logger, TEST_ACCOUNT } from "../constants";
 import QueryFacade from "../controller/queryFacade";
 import User from "../model/v1/auth/user";
 import { setTimeout } from "timers/promises";
-import {
-  persistentFirebaseConnection, setNewPersistentFirebaseConnection
-} from "../controller/v1/services/firebaseFreetier/firebaseService";
 import { asymmetricKeyDecryption } from "./encryption";
 import winston from "winston";
+import { persistentAuthService } from "../controller/v1/services/serviceEntries";
 
 export default class TestSetup {
   private closeHandler: Function = null
@@ -26,7 +24,7 @@ export default class TestSetup {
     //setNewPersistentFirebaseConnection()
 
     // register and login
-    await persistentFirebaseConnection.authService
+    await persistentAuthService
       .registerWithEmail(email, password)
       .then(async ()=>await setTimeout(2000), ()=>{})
     this.user = await QueryFacade.security.login(email, password).catch(()=>null)
@@ -44,8 +42,7 @@ export default class TestSetup {
   async tearDown() {
     process.env.NODE_ENV = this.prevEnv
     const [uid, apiKey] = asymmetricKeyDecryption(Buffer.from(this.getAccessToken(), "hex")).split("|")
-    await persistentFirebaseConnection.authService.deleteUser(uid, apiKey)
-    //await persistentFirebaseConnection.close();
+    await persistentAuthService.deleteUser(uid, apiKey)
     await new Promise<string>(resolve => global.setTimeout(() => resolve(""), 500))
 
     this.closeHandler?.call(null);

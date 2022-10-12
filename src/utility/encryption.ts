@@ -1,6 +1,6 @@
+import { CompactEncrypt, JWTPayload, UnsecuredJWT, compactDecrypt, decodeJwt, importSPKI, importPKCS8 } from 'jose'
 import { createCipheriv, createDecipheriv } from "crypto"
-import { JWT_SECRET, RAW_CIPHER_IV, RAW_CIPHER_KEY } from "../constants"
-import { sign, JwtPayload, verify } from 'jsonwebtoken'
+import { JWT_PUBLIC_KEY, JWT_PRIVATE_KEY, RAW_CIPHER_IV, RAW_CIPHER_KEY, logger } from "../constants"
 
 let authTag: Buffer = null
 
@@ -13,14 +13,10 @@ export function asymmetricKeyEncryption(data: string): Buffer {
   return buffer
 }
 
-export function asymmetricKeyDecryption(data: Buffer): string {
+function decipher(data: Buffer, autoPadding: boolean) {
   const decipher = createDecipheriv("aes-256-gcm", RAW_CIPHER_KEY, RAW_CIPHER_IV)
-  // impromptu auth tag generation. could throw an error
-  if(!authTag) {
-    const cipher = createCipheriv("aes-256-gcm", RAW_CIPHER_KEY, RAW_CIPHER_IV)
-    cipher.final()
-    authTag = cipher.getAuthTag()
-  }
+  
+  decipher.setAutoPadding(autoPadding)
   decipher.setAuthTag(authTag)
 
   const updateBuffer = decipher.update(data)
@@ -28,20 +24,58 @@ export function asymmetricKeyDecryption(data: Buffer): string {
   return Buffer.concat([updateBuffer, finalBuffer]).toString('utf-8')
 }
 
-export function jwtSign(payload: JwtPayload, expiresIn?: number | string): string {
-  return sign(payload, JWT_SECRET, {
-    algorithm: "HS384",
-    issuer: "lida-api",
-    expiresIn: expiresIn || "1d"
-  })
+export function asymmetricKeyDecryption(data: Buffer): string {
+  // impromptu auth tag generation. could throw an error
+  if(!authTag) {
+    try {
+      const cipher = createCipheriv("aes-256-gcm", RAW_CIPHER_KEY, RAW_CIPHER_IV)
+      cipher.final()
+      authTag = cipher.getAuthTag()
+    } catch(e) {
+      logger.error(`Asymmetric Key Decryption failed when setting auth tag with error: ${e}.\nStack trace: ${e.trace}` )
+    }
+  }
+
+  try {
+    return decipher(data, false)
+  } catch(e) {
+    logger.error(`Asymmetric Key Decryption failed with error: ${e}.\nStack trace: ${e.trace}` )
+    try {
+      return decipher(data, true)
+    } catch(e1) {
+      logger.error(`Asymmetric Key Decryption failed with error: ${e1}.\nStack trace: ${e1.trace}` )
+      return ""
+    }
+  }
 }
 
-export function jwtVerify(token: string): JwtPayload {
-  const payload = verify(token, JWT_SECRET, {
-    algorithms: ["HS384", "ES384", "PS384", "RS512", "ES512", "HS512", "PS512"],
-    issuer: "lida-api",
-    ignoreExpiration: true
-  })
+const protectedHeader = { alg: "HS256", enc: "aes-256-cbc" }
 
-  return typeof(payload) === 'string' ? {} : payload
+function formatKey(key: string) {
+  return key.replace("\n", "\r\n")
+}
+
+export async function getJWE(payload: JWTPayload, expiresIn?: number): Promise<string> {
+  const jwt = new UnsecuredJWT(payload)
+    .setIssuer("lida-api")
+    .setExpirationTime(expiresIn || 0)
+    .encode()
+  const jweEnc = new CompactEncrypt(Buffer.from(JSON.stringify(jwt)))
+  jweEnc.setProtectedHeader(protectedHeader)
+  return jweEnc.encrypt(await importSPKI(formatKey(JWT_PUBLIC_KEY), "RS384"))
+}
+
+export async function parseJWE(jwe: string): Promise<JWTPayload & { [name: string]: any }> {
+  let unsecuredJwt = ""
+  const jwt = await compactDecrypt(jwe, await importPKCS8(formatKey(JWT_PRIVATE_KEY), "RS384"))
+  const { alg, enc } = jwt.protectedHeader
+
+  if(protectedHeader.alg != alg || protectedHeader.enc != enc)
+    return Promise.reject({
+      message: "Wrong token format",
+      type: "Security"
+    })
+  unsecuredJwt = Buffer.from(jwt.plaintext).toString('utf-8')
+
+  return decodeJwt(unsecuredJwt)
 }

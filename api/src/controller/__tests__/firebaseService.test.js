@@ -125,7 +125,7 @@ describe("Test firebase service as a whole", () => {
         expect(user.email).toBe(email);
         let currentApiKey = "", userId = "";
         if (constants_1.defaultKeySchema == baseKey_1.KeySchema.JWT) {
-            const { uid, apiKey } = (0, encryption_1.jwtVerify)(user.accessToken).split("|");
+            const { uid, apiKey } = yield (0, encryption_1.parseJWE)(user.accessToken);
             expect(yield auth.verifyApiKey(uid, apiKey)).toBe(true);
             currentApiKey = apiKey;
             userId = uid;
@@ -138,7 +138,7 @@ describe("Test firebase service as a whole", () => {
         }
         user = yield auth.reauthenticationWithEmail(email, password);
         const payload = (constants_1.defaultKeySchema == baseKey_1.KeySchema.JWT ?
-            (0, encryption_1.jwtVerify)(user.accessToken) :
+            yield (0, encryption_1.parseJWE)(user.accessToken) :
             (0, encryption_1.asymmetricKeyDecryption)(Buffer.from(user.accessToken, "hex"))).split("|");
         const newApiKey = constants_1.defaultKeySchema == baseKey_1.KeySchema.JWT ? payload.apiKey : payload[1];
         expect(newApiKey).not.toBe(currentApiKey);

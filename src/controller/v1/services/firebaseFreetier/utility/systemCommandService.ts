@@ -6,7 +6,7 @@ import DatabaseEvent from "../../../../../model/v1/events/databaseEvent"
 import { SystemCommand, SystemCommandIterable } from "../../../../../model/v1/write/systemCommand"
 import { orderByProp } from "../../../../../utility/helper"
 import { persistentFirebaseConnection } from "../firebaseService"
-import SensorService from "../sensorService"
+import { SensorService } from "../../serviceEntries"
 import { uploadSnapshot } from "./dataSavingService"
 
 const realtime = persistentFirebaseConnection.realtimeService

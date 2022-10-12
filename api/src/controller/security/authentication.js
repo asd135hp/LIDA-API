@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.expressAuthentication = void 0;
-const firebaseService_1 = require("../v1/services/firebaseFreetier/firebaseService");
 const aesKey_1 = require("./token/aesKey");
 const jwtToken_1 = require("./token/jwtToken");
+const serviceEntries_1 = require("../v1/services/serviceEntries");
 function expressAuthentication(request, securityName, scopes) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -34,7 +34,7 @@ function expressAuthentication(request, securityName, scopes) {
                     type: "Security"
                 });
             const [userId, apiKey] = unpacked;
-            const service = firebaseService_1.persistentFirebaseConnection.authService;
+            const service = serviceEntries_1.persistentAuthService;
             return yield service.verifyApiKey(userId, apiKey);
         }
         if (securityName === 'jwt') {
@@ -46,7 +46,7 @@ function expressAuthentication(request, securityName, scopes) {
                     type: "Security"
                 });
             const { uid, apiKey } = unpacked;
-            const service = firebaseService_1.persistentFirebaseConnection.authService;
+            const service = serviceEntries_1.persistentAuthService;
             return yield service.verifyApiKey(uid, apiKey);
         }
     });

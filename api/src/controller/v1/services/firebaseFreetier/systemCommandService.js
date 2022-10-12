@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const firebaseService_1 = require("./firebaseService");
 const option_1 = require("../../../../model/patterns/option");
 const databaseUpdateEvent_1 = __importDefault(require("../../../../model/v1/events/databaseUpdateEvent"));
-const shorthandOps_1 = require("../../../../utility/shorthandOps");
+const shorthandOps_1 = require("../../../../utility/firebase/shorthandOps");
 const systemCommandDto_1 = require("../../../../model/v1/read/systemCommandDto");
 const constants_1 = require("../../../../constants");
 const systemCommandService_1 = require("./utility/systemCommandService");

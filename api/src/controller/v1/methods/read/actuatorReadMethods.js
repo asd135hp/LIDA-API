@@ -17,19 +17,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActuatorReadMethods = void 0;
 const tsoa_1 = require("tsoa");
 const constants_1 = require("../../../../constants");
-const actuatorService_1 = __importDefault(require("../../services/firebaseFreetier/actuatorService"));
+const serviceEntries_1 = require("../../services/serviceEntries");
 let ActuatorReadMethods = class ActuatorReadMethods extends tsoa_1.Controller {
     getActuators(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info("ActuatorReadMethods: Getting all actuators from the database");
-            const option = yield new actuatorService_1.default().getActuators();
+            const option = yield new serviceEntries_1.ActuatorService().getActuators();
             return option.unwrapOrElse(() => {
                 this.setStatus(408);
                 return [];
@@ -39,7 +36,7 @@ let ActuatorReadMethods = class ActuatorReadMethods extends tsoa_1.Controller {
     getCategorizedActuators(accessToken, typeOrName) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`ActuatorReadMethods: Getting categorized actuators from the database "${typeOrName}"`);
-            const actuatorService = new actuatorService_1.default();
+            const actuatorService = new serviceEntries_1.ActuatorService();
             const actuatorsByType = yield actuatorService.getActuatorsByType(typeOrName);
             return yield actuatorsByType.unwrapOrElseAsync(() => __awaiter(this, void 0, void 0, function* () {
                 const actuatorByName = yield actuatorService.getActuatorByName(typeOrName);
@@ -53,7 +50,7 @@ let ActuatorReadMethods = class ActuatorReadMethods extends tsoa_1.Controller {
     getActuatorConfigs(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info("ActuatorReadMethods: Getting actuator configs from the database");
-            const option = yield new actuatorService_1.default().getActuatorConfig();
+            const option = yield new serviceEntries_1.ActuatorService().getActuatorConfig();
             return option.unwrapOrElse(() => {
                 this.setStatus(408);
                 return [];
@@ -63,7 +60,7 @@ let ActuatorReadMethods = class ActuatorReadMethods extends tsoa_1.Controller {
     getProposedActuatorConfigs(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info("ActuatorReadMethods: Getting proposed actuator configs from the database");
-            const option = yield new actuatorService_1.default().getProposedActuatorConfig();
+            const option = yield new serviceEntries_1.ActuatorService().getProposedActuatorConfig();
             return option.unwrapOrElse(() => {
                 this.setStatus(408);
                 return [];

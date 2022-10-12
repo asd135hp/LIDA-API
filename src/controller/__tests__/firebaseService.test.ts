@@ -1,10 +1,11 @@
 import { setTimeout } from "timers/promises";
 import { defaultKeySchema, TEST_ACCOUNT } from "../../constants";
 import User from "../../model/v1/auth/user";
-import { asymmetricKeyDecryption, jwtVerify } from "../../utility/encryption";
+import { asymmetricKeyDecryption, parseJWE } from "../../utility/encryption";
 import TestSetup from "../../utility/testSetup";
 import { KeySchema } from "../security/token/baseKey";
 import { persistentFirebaseConnection } from "../v1/services/firebaseFreetier/firebaseService";
+
 
 describe("Test firebase service as a whole", ()=>{
   const testSetup = new TestSetup()
@@ -142,7 +143,7 @@ describe("Test firebase service as a whole", ()=>{
     // third verify api key
     let currentApiKey = "", userId = ""
     if(defaultKeySchema == KeySchema.JWT){
-      const { uid, apiKey } = jwtVerify(user.accessToken).split("|")
+      const { uid, apiKey } = await parseJWE(user.accessToken)
       expect(await auth.verifyApiKey(uid, apiKey)).toBe(true)
       currentApiKey = apiKey
       userId = uid
@@ -157,7 +158,7 @@ describe("Test firebase service as a whole", ()=>{
     // (which could be hard to do since the expirary duration for api keys are 30 days)
     user = await auth.reauthenticationWithEmail(email, password)
     const payload = (defaultKeySchema == KeySchema.JWT ?
-      jwtVerify(user.accessToken) :
+      await parseJWE(user.accessToken) :
       asymmetricKeyDecryption(Buffer.from(user.accessToken, "hex"))
     ).split("|")
     const newApiKey = defaultKeySchema == KeySchema.JWT ? payload.apiKey : payload[1]

@@ -27,8 +27,7 @@ const tsoa_1 = require("tsoa");
 const constants_1 = require("../../../../constants");
 const databaseEvent_1 = __importDefault(require("../../../../model/v1/events/databaseEvent"));
 const databaseErrorEvent_1 = __importDefault(require("../../../../model/v1/events/databaseErrorEvent"));
-const sensorService_1 = __importDefault(require("../../services/firebaseFreetier/sensorService"));
-const counterService_1 = __importDefault(require("../../services/firebaseFreetier/counterService"));
+const serviceEntries_1 = require("../../services/serviceEntries");
 const getEvent = databaseEvent_1.default.getCompactEvent;
 let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMethods extends tsoa_1.Controller {
     constructor() {
@@ -47,8 +46,8 @@ let DataSavingWriteMethods = DataSavingWriteMethods_1 = class DataSavingWriteMet
     saveSensorSnapshot(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`DataSavingWriteMethods: Saving sensor snapshot to the storage`);
-            const sensorService = new sensorService_1.default();
-            const counterService = new counterService_1.default();
+            const sensorService = new serviceEntries_1.SensorService();
+            const counterService = new serviceEntries_1.CounterService();
             const snapshot = yield sensorService.getSensorDataSnapshot();
             let event = yield this.service.uploadSensorSnapshot({
                 sensor: (yield sensorService.getSensors()).unwrapOr([]),

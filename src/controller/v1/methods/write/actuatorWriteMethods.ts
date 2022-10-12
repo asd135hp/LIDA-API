@@ -4,8 +4,7 @@ import {
 import { defaultKeySchema, logger } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import { Actuator, ActuatorConfig, UpdatingActuator } from "../../../../model/v1/write/actuators";
-import ActuatorService from "../../services/firebaseFreetier/actuatorService";
-import SystemLogsService from "../../services/firebaseFreetier/systemLogsService";
+import { ActuatorService, SystemLogsService } from "../../services/serviceEntries";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 
 const getEvent = DatabaseEvent.getCompactEvent

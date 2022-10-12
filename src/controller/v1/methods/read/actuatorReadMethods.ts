@@ -1,7 +1,7 @@
 import { Get, Route, SuccessResponse, Response, Controller, Path, Security, Query } from "tsoa";
 import { defaultKeySchema, logger } from "../../../../constants";
 import { ActuatorDTO, ActuatorConfigDTO } from "../../../../model/v1/read/actuatorDto";
-import ActuatorService from "../../services/firebaseFreetier/actuatorService";
+import { ActuatorService } from "../../services/serviceEntries";
 
 @Security(defaultKeySchema)
 @Route(`api/v1/actuator`)

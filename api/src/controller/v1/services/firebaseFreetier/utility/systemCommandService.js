@@ -18,7 +18,7 @@ const constants_1 = require("../../../../../constants");
 const databaseErrorEvent_1 = __importDefault(require("../../../../../model/v1/events/databaseErrorEvent"));
 const helper_1 = require("../../../../../utility/helper");
 const firebaseService_1 = require("../firebaseService");
-const sensorService_1 = __importDefault(require("../sensorService"));
+const serviceEntries_1 = require("../../serviceEntries");
 const dataSavingService_1 = require("./dataSavingService");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
@@ -67,7 +67,7 @@ function realtimeSaveSensorSnapshot(publisher) {
         const ref = yield realtime.getContent(constants_1.COMPONENTS_PATH.count.run);
         const runCount = ref.exists() ? parseInt(ref.val()) : 1;
         const folderName = `${constants_1.COMPONENTS_PATH.storage.sensor}/run${runCount}`;
-        const sensorService = new sensorService_1.default();
+        const sensorService = new serviceEntries_1.SensorService();
         const sensorEvent = yield (0, dataSavingService_1.uploadSnapshot)((yield sensorService.getSensors()).unwrapOr([]).sort((0, helper_1.orderByProp)("name")), { startDate: -1, endDate: -1 }, folderName, publisher, 65);
         if (sensorEvent instanceof databaseErrorEvent_1.default)
             Promise.reject("500Could not process upload data event. Please try again!");

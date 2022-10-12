@@ -2,9 +2,7 @@ import { Route, SuccessResponse, Response, Controller, Security, Query, Post, Pa
 import { defaultKeySchema, logger } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
-import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
-import SensorService from "../../services/firebaseFreetier/sensorService";
-import CounterService from "../../services/firebaseFreetier/counterService";
+import { SensorService, DataSavingService, CounterService } from "../../services/serviceEntries";
 
 const getEvent = DatabaseEvent.getCompactEvent
 

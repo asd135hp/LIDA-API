@@ -5,12 +5,10 @@ import { PublisherImplementor } from "../model/patterns/subscriptionImplementor"
 import { DataSavingWriteMethods } from "./v1/methods/write/dataSavingWriteMethods";
 import { logger } from "../constants";
 import DatabaseEvent from "../model/v1/events/databaseEvent";
-import SensorService from "./v1/services/firebaseFreetier/sensorService";
-import ActuatorService from "./v1/services/firebaseFreetier/actuatorService";
-import SystemLogsService from "./v1/services/firebaseFreetier/systemLogsService";
-import DataSavingService from "./v1/services/firebaseFreetier/dataSavingService";
+import {
+  SensorService, ActuatorService, SystemLogsService, SystemCommandService, DataSavingService
+} from "./v1/services/serviceEntries"
 import { SystemCommandWriteMethods } from "./v1/methods/write/systemCommandWriteMethods";
-import SystemCommandService from "./v1/services/firebaseFreetier/systemCommandService";
 
 export default class CommandFacade extends PublisherImplementor<DatabaseEvent> {
   static sensor: SensorWriteMethods;

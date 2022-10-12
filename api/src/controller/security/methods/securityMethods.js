@@ -20,13 +20,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SecurityMethods = void 0;
 const tsoa_1 = require("tsoa");
-const firebaseService_1 = require("../../v1/services/firebaseFreetier/firebaseService");
-const auth = firebaseService_1.persistentFirebaseConnection.authService;
+const serviceEntries_1 = require("../../v1/services/serviceEntries");
 let SecurityMethods = class SecurityMethods extends tsoa_1.Controller {
     login(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield auth.reauthenticationWithEmail(email, password);
-            return yield auth.loginWithEmail(email, password);
+            yield serviceEntries_1.persistentAuthService.reauthenticationWithEmail(email, password);
+            return yield serviceEntries_1.persistentAuthService.loginWithEmail(email, password);
         });
     }
 };

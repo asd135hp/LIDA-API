@@ -1,10 +1,5 @@
-import CommandFacade from "../commandFacade";
 import QueryFacade from "../queryFacade"
 import testCase from "./testcases.json"
-import DatabaseErrorEvent from "../../model/v1/events/databaseErrorEvent";
-import FirebaseFirestoreService from "../database/firebase/services/firebaseFirestoreService";
-import { persistentFirebaseConnection } from "../v1/services/firebaseFreetier/firebaseService";
-import { logger, TEST_SETUP_THROWS_ERROR } from "../../constants";
 import TestSetup from "../../utility/testSetup";
 import { ActuatorConfigDTO } from "../../model/v1/read/actuatorDto";
 

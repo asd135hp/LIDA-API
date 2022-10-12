@@ -2,7 +2,7 @@ import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import { persistentFirebaseConnection } from "./firebaseService";
 import { Option, Some, None } from "../../../../model/patterns/option"
 import DatabaseUpdateEvent from "../../../../model/v1/events/databaseUpdateEvent";
-import { createWriteEvent } from "../../../../utility/shorthandOps";
+import { createWriteEvent } from "../../../../utility/firebase/shorthandOps";
 import { SystemCommandDTO } from "../../../../model/v1/read/systemCommandDto";
 import { logger } from "../../../../constants";
 import FirebaseFirestoreService from "../../../database/firebase/services/firebaseFirestoreService";

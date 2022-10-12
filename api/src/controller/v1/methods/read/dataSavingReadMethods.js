@@ -17,19 +17,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataSavingReadMethods = void 0;
 const tsoa_1 = require("tsoa");
 const constants_1 = require("../../../../constants");
-const dataSavingService_1 = __importDefault(require("../../services/firebaseFreetier/dataSavingService"));
+const serviceEntries_1 = require("../../services/serviceEntries");
 let DataSavingReadMethods = class DataSavingReadMethods extends tsoa_1.Controller {
     retrieveSensorDataRunSnapshot(accessToken, runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`DataSavingReadMethods: Getting run #${runNumber} sensor snapshot from the database`);
-            const option = yield new dataSavingService_1.default().retrieveSensorSnapshot(runNumber);
+            const option = yield new serviceEntries_1.DataSavingService().retrieveSensorSnapshot(runNumber);
             return option.unwrapOrElse(() => {
                 this.setStatus(404);
                 return [];

@@ -9,7 +9,7 @@ import { persistentFirebaseConnection } from "./firebaseService";
 import { getQueryResultAsArray } from "../../../database/firebase/services/firebaseRealtimeService";
 import { DateTime } from 'luxon'
 import { Option, Some, None } from "../../../../model/patterns/option"
-import { createWriteEvent, getRealtimeContent } from "../../../../utility/shorthandOps";
+import { createWriteEvent, getRealtimeContent } from "../../../../utility/firebase/shorthandOps";
 import { COMPONENTS_PATH as fbPath } from "../../../../constants";
 import { orderByProp } from "../../../../utility/helper";
 import FirebaseFirestoreService from "../../../database/firebase/services/firebaseFirestoreService";

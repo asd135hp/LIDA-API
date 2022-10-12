@@ -1,12 +1,4 @@
-import { logger, TEST_ACCOUNT, TEST_SETUP_THROWS_ERROR } from "../../constants";
-import DatabaseErrorEvent from "../../model/v1/events/databaseErrorEvent";
-import binarySearch from "../../utility/binarySearch";
-import { orderByProp } from "../../utility/helper";
 import TestSetup from "../../utility/testSetup";
-import CommandFacade from "../commandFacade";
-import QueryFacade from "../queryFacade";
-import DataSavingService from "../v1/services/firebaseFreetier/dataSavingService";
-import { persistentFirebaseConnection } from "../v1/services/firebaseFreetier/firebaseService";
 import testCase from "./testcases.json"
 
 xdescribe("Data saving test - Integration test", ()=>{

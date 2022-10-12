@@ -3,8 +3,7 @@ import { Get, Route, SuccessResponse, Response, Controller, Path, Security, Quer
 import { DATABASE_TIMEZONE, defaultKeySchema, logger } from "../../../../constants";
 import { SnapshotDownloadResponse } from "../../../../model/v1/read/dataSaving";
 import { SensorDTO, SensorDataDTO } from "../../../../model/v1/read/sensorDto";
-import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
-import SensorService from "../../services/firebaseFreetier/sensorService";
+import { SensorService, DataSavingService } from "../../services/serviceEntries";
 
 @Security(defaultKeySchema)
 @Route(`api/v1/sensor`)

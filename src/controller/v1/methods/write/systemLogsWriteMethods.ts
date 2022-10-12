@@ -1,6 +1,6 @@
 import { Route, SuccessResponse, Response, Controller, Security, BodyProp, Post, Query } from "tsoa";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
-import SystemLogsService from "../../services/firebaseFreetier/systemLogsService";
+import { SystemLogsService } from "../../services/serviceEntries";
 import { defaultKeySchema, logger } from "../../../../constants";
 import DatabaseErrorEvent from "../../../../model/v1/events/databaseErrorEvent";
 

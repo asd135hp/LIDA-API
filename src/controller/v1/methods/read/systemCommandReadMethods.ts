@@ -1,7 +1,7 @@
 import { Get, Route, SuccessResponse, Response, Controller, Security, Query } from "tsoa";
 import { defaultKeySchema, logger } from "../../../../constants";
 import { SystemCommandDTO } from "../../../../model/v1/read/systemCommandDto";
-import SystemCommandService from "../../services/firebaseFreetier/systemCommandService";
+import { SystemCommandService } from "../../services/serviceEntries";
 
 @Security(defaultKeySchema)
 @Route(`api/v1/systemCommand`)

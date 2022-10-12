@@ -17,19 +17,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SystemCommandReadMethods = void 0;
 const tsoa_1 = require("tsoa");
 const constants_1 = require("../../../../constants");
-const systemCommandService_1 = __importDefault(require("../../services/firebaseFreetier/systemCommandService"));
+const serviceEntries_1 = require("../../services/serviceEntries");
 let SystemCommandReadMethods = class SystemCommandReadMethods extends tsoa_1.Controller {
     getSystemCommands(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info("SystemCommandReadMethods: Getting system commands from the database");
-            const option = yield new systemCommandService_1.default().getSystemFlags();
+            const option = yield new serviceEntries_1.SystemCommandService().getSystemFlags();
             return option.unwrapOrElse(() => {
                 constants_1.logger.error("SystemCommandReadMethods - Something happened to either the code or the database");
                 throw new Error("Internal error");
@@ -39,7 +36,7 @@ let SystemCommandReadMethods = class SystemCommandReadMethods extends tsoa_1.Con
     getProposedSystemCommands(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info("SystemCommandReadMethods: Getting proposed system commands from the database");
-            const option = yield new systemCommandService_1.default().getProposedSystemFlags();
+            const option = yield new serviceEntries_1.SystemCommandService().getProposedSystemFlags();
             return option.unwrapOrElse(() => {
                 constants_1.logger.error("SystemCommandReadMethods - Something happened to either the code or the database");
                 throw new Error("Internal error");

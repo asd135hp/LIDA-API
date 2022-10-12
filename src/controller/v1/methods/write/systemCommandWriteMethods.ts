@@ -2,7 +2,7 @@ import { Route, SuccessResponse, Response, Controller, Security, Query, Post, Bo
 import { defaultKeySchema } from "../../../../constants";
 import DatabaseEvent from "../../../../model/v1/events/databaseEvent";
 import { SystemCommand } from "../../../../model/v1/write/systemCommand";
-import SystemCommandService from "../../services/firebaseFreetier/systemCommandService";
+import { SystemCommandService } from "../../services/serviceEntries";
 
 @Security(defaultKeySchema)
 @Route(`api/v1/systemCommand`)

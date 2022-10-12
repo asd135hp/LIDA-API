@@ -1,13 +1,12 @@
 import { DateTime } from "luxon"
-import { COMPONENTS_PATH, DATABASE_TIMEZONE, LOG_LINES } from "../../../../../constants"
+import { DATABASE_TIMEZONE, LOG_LINES } from "../../../../../constants"
 import { PublisherImplementor } from "../../../../../model/patterns/subscriptionImplementor"
 import DatabaseAddEvent from "../../../../../model/v1/events/databaseAddEvent"
 import DatabaseEvent from "../../../../../model/v1/events/databaseEvent"
 import { Log } from "../../../../../model/v1/write/systemLog"
-import { createWriteEvent } from "../../../../../utility/shorthandOps"
+import { createWriteEvent } from "../../../../../utility/firebase/shorthandOps"
 import { getQueryResult, getQueryResultAsArray } from "../../../../database/firebase/services/firebaseRealtimeService"
-import CounterService from "../counterService"
-import DataSavingService from "../dataSavingService"
+import { CounterService, DataSavingService } from "../../serviceEntries"
 import { persistentFirebaseConnection } from "../firebaseService"
 
 const realtime = persistentFirebaseConnection.realtimeService

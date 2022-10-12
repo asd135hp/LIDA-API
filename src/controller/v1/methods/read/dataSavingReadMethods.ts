@@ -1,8 +1,6 @@
-import { Get, Route, SuccessResponse, Response, Controller, Security, Query, Header, Path } from "tsoa";
+import { Get, Route, SuccessResponse, Response, Controller, Security, Query, Path } from "tsoa";
 import { defaultKeySchema, logger } from "../../../../constants";
-import { IterableJson } from "../../../../model/json";
-import { getDateRangeString } from "../../../../utility/helper";
-import DataSavingService from "../../services/firebaseFreetier/dataSavingService";
+import { DataSavingService } from "../../services/serviceEntries";
 import { SnapshotDownloadResponse } from "../../../../model/v1/read/dataSaving";
 
 @Security(defaultKeySchema)

@@ -16,10 +16,9 @@ exports.getLog = exports.pushLog = void 0;
 const luxon_1 = require("luxon");
 const constants_1 = require("../../../../../constants");
 const databaseAddEvent_1 = __importDefault(require("../../../../../model/v1/events/databaseAddEvent"));
-const shorthandOps_1 = require("../../../../../utility/shorthandOps");
+const shorthandOps_1 = require("../../../../../utility/firebase/shorthandOps");
 const firebaseRealtimeService_1 = require("../../../../database/firebase/services/firebaseRealtimeService");
-const counterService_1 = __importDefault(require("../counterService"));
-const dataSavingService_1 = __importDefault(require("../dataSavingService"));
+const serviceEntries_1 = require("../../serviceEntries");
 const firebaseService_1 = require("../firebaseService");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
@@ -36,7 +35,7 @@ const pushLog = (path, log, publisher) => __awaiter(void 0, void 0, void 0, func
             },
             read() {
                 return __awaiter(this, void 0, void 0, function* () {
-                    const count = yield new counterService_1.default().incrementLogCounter(path);
+                    const count = yield new serviceEntries_1.CounterService().incrementLogCounter(path);
                     if (count >= constants_1.LOG_LINES)
                         yield realtime.getContent(path, (ref) => __awaiter(this, void 0, void 0, function* () {
                             const temp = yield (0, firebaseRealtimeService_1.getQueryResult)(ref.orderByChild("timeStamp").limitToFirst(1));
@@ -53,7 +52,7 @@ const pushLog = (path, log, publisher) => __awaiter(void 0, void 0, void 0, func
 });
 exports.pushLog = pushLog;
 const getLog = (oldestTimestamp, path) => __awaiter(void 0, void 0, void 0, function* () {
-    const dataSavingService = new dataSavingService_1.default();
+    const dataSavingService = new serviceEntries_1.DataSavingService();
     let result = (yield dataSavingService.retrieveActuatorLogSnapshots({
         startDate: oldestTimestamp
     })).unwrapOr([]);

@@ -1,10 +1,10 @@
 import { Request } from "express";
-import { persistentFirebaseConnection } from "../v1/services/firebaseFreetier/firebaseService";
 import FirebaseAuthService from "../database/firebase/services/firebaseAuthService";
 import { BaseKey } from "./token/baseKey";
 import { AESKey } from "./token/aesKey";
 import { JWTKey } from "./token/jwtToken";
 import { JwtPayload } from "jsonwebtoken";
+import { persistentAuthService } from "../v1/services/serviceEntries";
 
 /**
  * Please extend this method since it is really insecure. Well, in the context of this project scope,
@@ -41,7 +41,7 @@ export async function expressAuthentication(
       })
 
     const [userId, apiKey] = unpacked
-    const service = persistentFirebaseConnection.authService as FirebaseAuthService
+    const service = persistentAuthService as FirebaseAuthService
 
     // could add scope to the path of the file to read
     return await service.verifyApiKey(userId, apiKey)
@@ -58,7 +58,7 @@ export async function expressAuthentication(
       })
 
     const { uid, apiKey } = unpacked
-    const service = persistentFirebaseConnection.authService as FirebaseAuthService
+    const service = persistentAuthService as FirebaseAuthService
     // could add scope to the path of the file to read
     return await service.verifyApiKey(uid, apiKey)
   }

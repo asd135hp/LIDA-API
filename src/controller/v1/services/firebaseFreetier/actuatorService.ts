@@ -6,7 +6,7 @@ import DatabaseAddEvent from "../../../../model/v1/events/databaseAddEvent";
 import DatabaseUpdateEvent from "../../../../model/v1/events/databaseUpdateEvent";
 import { persistentFirebaseConnection } from "./firebaseService";
 import { Option, Some, None } from "../../../../model/patterns/option"
-import { createWriteEvent, getRealtimeContent } from "../../../../utility/shorthandOps";
+import { createWriteEvent, getRealtimeContent } from "../../../../utility/firebase/shorthandOps";
 import { COMPONENTS_PATH as fbPath } from "../../../../constants";
 import { ActuatorServiceFacade } from "../../../../model/v1/services/actuatorServiceFacade";
 

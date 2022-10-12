@@ -97,7 +97,9 @@ export const RAW_CIPHER_IV = Buffer.from(process.env.SECRET_CIPHERIV, "base64")
 
 export const CIPHER_ALGORITHM = process.env.SECRET_CIPHERALGORITHM
 
-export const JWT_SECRET: Secret = process.env.SECRET_JWTPRIVATEKEY
+export const JWT_PUBLIC_KEY = JSON.parse(process.env.SECRET_JWTPUBLICKEY)
+
+export const JWT_PRIVATE_KEY = JSON.parse(process.env.SECRET_JWTPRIVATEKEY)
 
 export const FIREBASE_CONFIG = {
   apiKey: process.env.SECRET_FIREBASECONFIG_APIKEY,

@@ -1,9 +1,6 @@
 import { Route, SuccessResponse, Response, Controller, Post, BodyProp } from "tsoa";
 import User from "../../../model/v1/auth/user";
-import { persistentFirebaseConnection } from "../../v1/services/firebaseFreetier/firebaseService";
-
-// entry point for the security of this application
-const auth = persistentFirebaseConnection.authService
+import { persistentAuthService } from "../../v1/services/serviceEntries";
 
 @Route(`api/v1`)
 @SuccessResponse(200, "Ok")
@@ -18,7 +15,7 @@ export class SecurityMethods extends Controller {
   ): Promise<User> {
     // https://stackoverflow.com/questions/13895679/how-do-i-secure-rest-api-calls
     // should refresh key when trying to login
-    await auth.reauthenticationWithEmail(email, password)
-    return await auth.loginWithEmail(email, password)
+    await persistentAuthService.reauthenticationWithEmail(email, password)
+    return await persistentAuthService.loginWithEmail(email, password)
   }
 }

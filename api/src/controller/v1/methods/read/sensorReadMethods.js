@@ -17,29 +17,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SensorReadMethods = void 0;
 const luxon_1 = require("luxon");
 const tsoa_1 = require("tsoa");
 const constants_1 = require("../../../../constants");
 const sensorDto_1 = require("../../../../model/v1/read/sensorDto");
-const dataSavingService_1 = __importDefault(require("../../services/firebaseFreetier/dataSavingService"));
-const sensorService_1 = __importDefault(require("../../services/firebaseFreetier/sensorService"));
+const serviceEntries_1 = require("../../services/serviceEntries");
 let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
     getSensors(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info("SensorReadMethods: Getting all sensors from the database");
-            const option = yield new sensorService_1.default().getSensors();
+            const option = yield new serviceEntries_1.SensorService().getSensors();
             return option.unwrapOr([]);
         });
     }
     getCategorizedSensors(accessToken, typeOrName) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`SensorReadMethods: Getting categorized sensors from "${typeOrName}"`);
-            const sensorService = new sensorService_1.default();
+            const sensorService = new serviceEntries_1.SensorService();
             const sensorsByType = yield sensorService.getSensorsByType(typeOrName);
             return yield sensorsByType.unwrapOrElseAsync(() => __awaiter(this, void 0, void 0, function* () {
                 const sensorByName = yield sensorService.getSensorByName(typeOrName);
@@ -53,7 +49,7 @@ let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
     getSensorData(accessToken, startDate = 0, endDate = luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger()) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`SensorReadMethods: Getting sensor data from the database from ${startDate} to ${endDate}`);
-            const option = yield new sensorService_1.default().getSensorData({ startDate, endDate });
+            const option = yield new serviceEntries_1.SensorService().getSensorData({ startDate, endDate });
             return option.unwrapOrElse(() => {
                 this.setStatus(404);
                 return [];
@@ -63,7 +59,7 @@ let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
     getSensorDataByName(accessToken, name, startDate = 0, endDate = luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger()) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`SensorReadMethods: Getting sensor data from the database with sensor name of "${name}"`);
-            const option = yield new sensorService_1.default().getSensorDataByName(name, { startDate, endDate });
+            const option = yield new serviceEntries_1.SensorService().getSensorDataByName(name, { startDate, endDate });
             return option.unwrapOrElse(() => {
                 this.setStatus(404);
                 return [];
@@ -73,7 +69,7 @@ let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
     getLatestSensorData(accessToken) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`SensorReadMethods: Getting all latest sensor data from the database`);
-            const option = yield new sensorService_1.default().getLatestSensorData();
+            const option = yield new serviceEntries_1.SensorService().getLatestSensorData();
             return option.unwrapOrElse(() => {
                 this.setStatus(404);
                 return [];
@@ -83,7 +79,7 @@ let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
     getLatestSensorDataByName(accessToken, name) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`SensorReadMethods: Getting latest sensor data from the database with sensor name of "${name}"`);
-            const option = yield new sensorService_1.default().getLatestSensorDataByName(name);
+            const option = yield new serviceEntries_1.SensorService().getLatestSensorDataByName(name);
             return option.unwrapOrElse(() => {
                 this.setStatus(404);
                 return sensorDto_1.SensorDataDTO.fromJson({});
@@ -93,7 +89,7 @@ let SensorReadMethods = class SensorReadMethods extends tsoa_1.Controller {
     getSensorDataRunSnapshot(accessToken, runNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             constants_1.logger.info(`SensorReadMethods: Getting sensor data of the previous run#${runNumber} from the database`);
-            const option = yield new dataSavingService_1.default().retrieveSensorSnapshot(runNumber);
+            const option = yield new serviceEntries_1.DataSavingService().retrieveSensorSnapshot(runNumber);
             return option.unwrapOrElse(() => {
                 this.setStatus(404);
                 return [];

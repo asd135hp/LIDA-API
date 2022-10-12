@@ -1,12 +1,12 @@
 import { Query } from "@firebase/database-types";
-import { None, Option } from "../model/patterns/option";
-import { getQueryResultAsArray } from "../controller/database/firebase/services/firebaseRealtimeService";
-import { persistentFirebaseConnection } from "../controller/v1/services/firebaseFreetier/firebaseService";
-import { logger } from "../constants";
-import DatabaseErrorEvent from "../model/v1/events/databaseErrorEvent";
-import DatabaseEvent from "../model/v1/events/databaseEvent";
-import { filterDatabaseEvent } from "./filterDatabaseEvent";
-import { PublisherImplementor } from "../model/patterns/subscriptionImplementor";
+import { None, Option } from "../../model/patterns/option";
+import { getQueryResultAsArray } from "../../controller/database/firebase/services/firebaseRealtimeService";
+import { persistentFirebaseConnection } from "../../controller/v1/services/firebaseFreetier/firebaseService";
+import { logger } from "../../constants";
+import DatabaseErrorEvent from "../../model/v1/events/databaseErrorEvent";
+import DatabaseEvent from "../../model/v1/events/databaseEvent";
+import { filterDatabaseEvent } from "../filterDatabaseEvent";
+import { PublisherImplementor } from "../../model/patterns/subscriptionImplementor";
 
 const realtime = persistentFirebaseConnection.realtimeService
 

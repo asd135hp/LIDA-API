@@ -1,8 +1,6 @@
-import CommandFacade from "../commandFacade";
 import QueryFacade from "../queryFacade"
-import { LOG_LINES, TEST_SETUP_THROWS_ERROR } from "../../constants";
+import { LOG_LINES } from "../../constants";
 import testCase from "./testcases.json"
-import DatabaseErrorEvent from "../../model/v1/events/databaseErrorEvent";
 import TestSetup from "../../utility/testSetup";
 
 describe("Test sensor actions - Integration test", ()=>{

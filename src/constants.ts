@@ -59,7 +59,7 @@ export const firebasePathConfig = (()=>{
 
 export const schemaName = config.schemaName
 
-export const defaultKeySchema: KeySchema = KeySchema.JWT
+export const defaultKeySchema: KeySchema = KeySchema.AES
 
 // Australia/Melbourne here if the server is designated in this zone
 // but this is "utc", based on constants.config.json file

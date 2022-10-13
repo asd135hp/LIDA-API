@@ -236,7 +236,7 @@ const models = {
 };
 const validationService = new runtime_1.ValidationService(models);
 function RegisterRoutes(app) {
-    app.get('/api/v1/actuator/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods.prototype.getActuators)), function ActuatorReadMethods_getActuators(request, response, next) {
+    app.get('/api/v1/actuator/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods.prototype.getActuators)), function ActuatorReadMethods_getActuators(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -251,7 +251,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/actuator/:typeOrName/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods.prototype.getCategorizedActuators)), function ActuatorReadMethods_getCategorizedActuators(request, response, next) {
+    app.get('/api/v1/actuator/:typeOrName/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods.prototype.getCategorizedActuators)), function ActuatorReadMethods_getCategorizedActuators(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             typeOrName: { "in": "path", "name": "typeOrName", "required": true, "dataType": "string" },
@@ -267,7 +267,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/actuator/config/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods.prototype.getActuatorConfigs)), function ActuatorReadMethods_getActuatorConfigs(request, response, next) {
+    app.get('/api/v1/actuator/config/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods.prototype.getActuatorConfigs)), function ActuatorReadMethods_getActuatorConfigs(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -282,7 +282,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/actuator/config/proposed/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods.prototype.getProposedActuatorConfigs)), function ActuatorReadMethods_getProposedActuatorConfigs(request, response, next) {
+    app.get('/api/v1/actuator/config/proposed/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorReadMethods_1.ActuatorReadMethods.prototype.getProposedActuatorConfigs)), function ActuatorReadMethods_getProposedActuatorConfigs(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -297,7 +297,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/snapshot/sensor/:runNumber/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods.prototype.retrieveSensorDataRunSnapshot)), function DataSavingReadMethods_retrieveSensorDataRunSnapshot(request, response, next) {
+    app.get('/api/v1/snapshot/sensor/:runNumber/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingReadMethods_1.DataSavingReadMethods.prototype.retrieveSensorDataRunSnapshot)), function DataSavingReadMethods_retrieveSensorDataRunSnapshot(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             runNumber: { "in": "path", "name": "runNumber", "required": true, "dataType": "double" },
@@ -313,7 +313,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/sensor/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getSensors)), function SensorReadMethods_getSensors(request, response, next) {
+    app.get('/api/v1/sensor/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getSensors)), function SensorReadMethods_getSensors(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -328,7 +328,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/sensor/:typeOrName/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getCategorizedSensors)), function SensorReadMethods_getCategorizedSensors(request, response, next) {
+    app.get('/api/v1/sensor/:typeOrName/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getCategorizedSensors)), function SensorReadMethods_getCategorizedSensors(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             typeOrName: { "in": "path", "name": "typeOrName", "required": true, "dataType": "string" },
@@ -344,7 +344,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/sensor/data/fetchAll', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getSensorData)), function SensorReadMethods_getSensorData(request, response, next) {
+    app.get('/api/v1/sensor/data/fetchAll', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getSensorData)), function SensorReadMethods_getSensorData(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             startDate: { "default": 0, "in": "query", "name": "startDate", "dataType": "double" },
@@ -361,7 +361,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/sensor/:name/data/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getSensorDataByName)), function SensorReadMethods_getSensorDataByName(request, response, next) {
+    app.get('/api/v1/sensor/:name/data/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getSensorDataByName)), function SensorReadMethods_getSensorDataByName(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             name: { "in": "path", "name": "name", "required": true, "dataType": "string" },
@@ -379,7 +379,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/sensor/data/latest/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getLatestSensorData)), function SensorReadMethods_getLatestSensorData(request, response, next) {
+    app.get('/api/v1/sensor/data/latest/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getLatestSensorData)), function SensorReadMethods_getLatestSensorData(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -394,7 +394,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/sensor/:name/data/latest/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getLatestSensorDataByName)), function SensorReadMethods_getLatestSensorDataByName(request, response, next) {
+    app.get('/api/v1/sensor/:name/data/latest/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getLatestSensorDataByName)), function SensorReadMethods_getLatestSensorDataByName(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             name: { "in": "path", "name": "name", "required": true, "dataType": "string" },
@@ -410,7 +410,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/sensor/snapshot/:runNumber/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getSensorDataRunSnapshot)), function SensorReadMethods_getSensorDataRunSnapshot(request, response, next) {
+    app.get('/api/v1/sensor/snapshot/:runNumber/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorReadMethods_1.SensorReadMethods.prototype.getSensorDataRunSnapshot)), function SensorReadMethods_getSensorDataRunSnapshot(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             runNumber: { "in": "path", "name": "runNumber", "required": true, "dataType": "double" },
@@ -426,7 +426,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/systemCommand/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandReadMethods_1.SystemCommandReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandReadMethods_1.SystemCommandReadMethods.prototype.getSystemCommands)), function SystemCommandReadMethods_getSystemCommands(request, response, next) {
+    app.get('/api/v1/systemCommand/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandReadMethods_1.SystemCommandReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandReadMethods_1.SystemCommandReadMethods.prototype.getSystemCommands)), function SystemCommandReadMethods_getSystemCommands(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -441,7 +441,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/systemCommand/proposed/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandReadMethods_1.SystemCommandReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandReadMethods_1.SystemCommandReadMethods.prototype.getProposedSystemCommands)), function SystemCommandReadMethods_getProposedSystemCommands(request, response, next) {
+    app.get('/api/v1/systemCommand/proposed/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandReadMethods_1.SystemCommandReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandReadMethods_1.SystemCommandReadMethods.prototype.getProposedSystemCommands)), function SystemCommandReadMethods_getProposedSystemCommands(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -456,7 +456,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/log/sensor/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods.prototype.getSensorLogs)), function SystemLogsReadMethods_getSensorLogs(request, response, next) {
+    app.get('/api/v1/log/sensor/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods.prototype.getSensorLogs)), function SystemLogsReadMethods_getSensorLogs(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -471,7 +471,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/log/actuator/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods.prototype.getActuatorLogs)), function SystemLogsReadMethods_getActuatorLogs(request, response, next) {
+    app.get('/api/v1/log/actuator/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods.prototype.getActuatorLogs)), function SystemLogsReadMethods_getActuatorLogs(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -486,7 +486,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.get('/api/v1/log/systemCommand/get', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods.prototype.getSystemCommandLogs)), function SystemLogsReadMethods_getSystemCommandLogs(request, response, next) {
+    app.get('/api/v1/log/systemCommand/get', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsReadMethods_1.SystemLogsReadMethods.prototype.getSystemCommandLogs)), function SystemLogsReadMethods_getSystemCommandLogs(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -501,7 +501,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/actuator/add', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods.prototype.addActuator)), function ActuatorWriteMethods_addActuator(request, response, next) {
+    app.post('/api/v1/actuator/add', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods.prototype.addActuator)), function ActuatorWriteMethods_addActuator(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             actuator: { "in": "body-prop", "name": "actuator", "required": true, "ref": "Actuator" },
@@ -517,7 +517,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.patch('/api/v1/actuator/update', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods.prototype.updateActuator)), function ActuatorWriteMethods_updateActuator(request, response, next) {
+    app.patch('/api/v1/actuator/update', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods.prototype.updateActuator)), function ActuatorWriteMethods_updateActuator(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             actuator: { "in": "body-prop", "name": "actuator", "required": true, "ref": "UpdatingActuator" },
@@ -533,7 +533,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/actuator/:actuatorName/config/update', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods.prototype.updateActuatorConfig)), function ActuatorWriteMethods_updateActuatorConfig(request, response, next) {
+    app.post('/api/v1/actuator/:actuatorName/config/update', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods.prototype.updateActuatorConfig)), function ActuatorWriteMethods_updateActuatorConfig(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             actuatorName: { "in": "path", "name": "actuatorName", "required": true, "dataType": "string" },
@@ -550,7 +550,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.patch('/api/v1/actuator/:actuatorName/config/proposed/update', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods.prototype.updateProposedActuatorConfig)), function ActuatorWriteMethods_updateProposedActuatorConfig(request, response, next) {
+    app.patch('/api/v1/actuator/:actuatorName/config/proposed/update', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(actuatorWriteMethods_1.ActuatorWriteMethods.prototype.updateProposedActuatorConfig)), function ActuatorWriteMethods_updateProposedActuatorConfig(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             actuatorName: { "in": "path", "name": "actuatorName", "required": true, "dataType": "string" },
@@ -567,7 +567,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.patch('/api/v1/snapshot/sensor/:runNumber/delete', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods.prototype.deleteSensorSnapshot)), function DataSavingWriteMethods_deleteSensorSnapshot(request, response, next) {
+    app.patch('/api/v1/snapshot/sensor/:runNumber/delete', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods.prototype.deleteSensorSnapshot)), function DataSavingWriteMethods_deleteSensorSnapshot(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             runNumber: { "in": "path", "name": "runNumber", "required": true, "dataType": "double" },
@@ -583,7 +583,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/snapshot/sensor/save', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods.prototype.saveSensorSnapshot)), function DataSavingWriteMethods_saveSensorSnapshot(request, response, next) {
+    app.post('/api/v1/snapshot/sensor/save', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(dataSavingWriteMethods_1.DataSavingWriteMethods.prototype.saveSensorSnapshot)), function DataSavingWriteMethods_saveSensorSnapshot(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -598,7 +598,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/sensor/add', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods.prototype.addSensor)), function SensorWriteMethods_addSensor(request, response, next) {
+    app.post('/api/v1/sensor/add', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods.prototype.addSensor)), function SensorWriteMethods_addSensor(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             sensor: { "in": "body-prop", "name": "sensor", "required": true, "ref": "Sensor" },
@@ -614,7 +614,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.patch('/api/v1/sensor/update', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods.prototype.updateSensor)), function SensorWriteMethods_updateSensor(request, response, next) {
+    app.patch('/api/v1/sensor/update', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods.prototype.updateSensor)), function SensorWriteMethods_updateSensor(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             sensor: { "in": "body-prop", "name": "sensor", "required": true, "ref": "UpdatingSensor" },
@@ -630,7 +630,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/sensor/:sensorName/data/add', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods.prototype.addSensorData)), function SensorWriteMethods_addSensorData(request, response, next) {
+    app.post('/api/v1/sensor/:sensorName/data/add', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods.prototype.addSensorData)), function SensorWriteMethods_addSensorData(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             sensorName: { "in": "path", "name": "sensorName", "required": true, "dataType": "string" },
@@ -647,7 +647,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/sensor/data/addAll', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods.prototype.addSensorDataByBundle)), function SensorWriteMethods_addSensorDataByBundle(request, response, next) {
+    app.post('/api/v1/sensor/data/addAll', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(sensorWriteMethods_1.SensorWriteMethods.prototype.addSensorDataByBundle)), function SensorWriteMethods_addSensorDataByBundle(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             sensorData: { "in": "body-prop", "name": "sensorData", "required": true, "dataType": "array", "array": { "dataType": "refObject", "ref": "DatabaseSensorData" } },
@@ -663,7 +663,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/systemCommand/startSystem', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.startSystem)), function SystemCommandWriteMethods_startSystem(request, response, next) {
+    app.post('/api/v1/systemCommand/startSystem', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.startSystem)), function SystemCommandWriteMethods_startSystem(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -678,7 +678,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/systemCommand/pauseSystem', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.pauseSystem)), function SystemCommandWriteMethods_pauseSystem(request, response, next) {
+    app.post('/api/v1/systemCommand/pauseSystem', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.pauseSystem)), function SystemCommandWriteMethods_pauseSystem(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -693,7 +693,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/systemCommand/stopSystem', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.stopSystem)), function SystemCommandWriteMethods_stopSystem(request, response, next) {
+    app.post('/api/v1/systemCommand/stopSystem', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.stopSystem)), function SystemCommandWriteMethods_stopSystem(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -708,7 +708,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/systemCommand/restartSystem', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.restartSystem)), function SystemCommandWriteMethods_restartSystem(request, response, next) {
+    app.post('/api/v1/systemCommand/restartSystem', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.restartSystem)), function SystemCommandWriteMethods_restartSystem(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
         };
@@ -723,7 +723,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/systemCommand/flags/commit', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.commitSystemFlags)), function SystemCommandWriteMethods_commitSystemFlags(request, response, next) {
+    app.post('/api/v1/systemCommand/flags/commit', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemCommandWriteMethods_1.SystemCommandWriteMethods.prototype.commitSystemFlags)), function SystemCommandWriteMethods_commitSystemFlags(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             flags: { "in": "body-prop", "name": "flags", "required": true, "ref": "SystemCommand" },
@@ -739,7 +739,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/log/sensor/add', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods.prototype.addSensorLog)), function SystemLogsWriteMethods_addSensorLog(request, response, next) {
+    app.post('/api/v1/log/sensor/add', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods.prototype.addSensorLog)), function SystemLogsWriteMethods_addSensorLog(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             logContent: { "in": "body-prop", "name": "logContent", "required": true, "dataType": "string" },
@@ -755,7 +755,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/log/actuator/add', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods.prototype.addActuatorLog)), function SystemLogsWriteMethods_addActuatorLog(request, response, next) {
+    app.post('/api/v1/log/actuator/add', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods.prototype.addActuatorLog)), function SystemLogsWriteMethods_addActuatorLog(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             logContent: { "in": "body-prop", "name": "logContent", "required": true, "dataType": "string" },
@@ -771,7 +771,7 @@ function RegisterRoutes(app) {
             return next(err);
         }
     });
-    app.post('/api/v1/log/systemCommand/add', authenticateMiddleware([{ "jwt": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods.prototype.addSystemCommandLog)), function SystemLogsWriteMethods_addSystemCommandLog(request, response, next) {
+    app.post('/api/v1/log/systemCommand/add', authenticateMiddleware([{ "aes": [] }]), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods)), ...((0, runtime_1.fetchMiddlewares)(systemLogsWriteMethods_1.SystemLogsWriteMethods.prototype.addSystemCommandLog)), function SystemLogsWriteMethods_addSystemCommandLog(request, response, next) {
         const args = {
             accessToken: { "in": "query", "name": "accessToken", "required": true, "dataType": "string" },
             logContent: { "in": "body-prop", "name": "logContent", "required": true, "dataType": "string" },

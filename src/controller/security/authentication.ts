@@ -1,6 +1,6 @@
 import { Request } from "express";
 import FirebaseAuthService from "../database/firebase/services/firebaseAuthService";
-import { BaseKey } from "./token/baseKey";
+import { BaseKey, KeySchema } from "./token/baseKey";
 import { AESKey } from "./token/aesKey";
 import { JWTKey } from "./token/jwtToken";
 import { JwtPayload } from "jsonwebtoken";
@@ -30,7 +30,7 @@ export async function expressAuthentication(
   // to enhance the security of this application, scopes should be used to divide users into groups
   // that could use which service at a time
   let key: BaseKey;
-  if (securityName === "api_key") {
+  if (securityName === KeySchema.AES) {
     key = new AESKey()
 
     const unpacked = key.parseToken(token.toString())
@@ -47,7 +47,7 @@ export async function expressAuthentication(
     return await service.verifyApiKey(userId, apiKey)
   }
 
-  if(securityName === 'jwt') {
+  if(securityName === KeySchema.JWT) {
     key = new JWTKey()
 
     const unpacked = key.parseToken(token.toString()) as JwtPayload

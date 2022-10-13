@@ -57,9 +57,9 @@ function asymmetricKeyDecryption(data) {
     }
 }
 exports.asymmetricKeyDecryption = asymmetricKeyDecryption;
-const protectedHeader = { alg: "HS256", enc: "aes-256-cbc" };
+const protectedHeader = { alg: "RSA256", enc: "aes-256-cbc" };
 function formatKey(key) {
-    return key.replace("\n", "\r\n");
+    return key.replace("\\n", "\n");
 }
 function getJWE(payload, expiresIn) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -67,7 +67,7 @@ function getJWE(payload, expiresIn) {
             .setIssuer("lida-api")
             .setExpirationTime(expiresIn || 0)
             .encode();
-        const jweEnc = new jose_1.CompactEncrypt(Buffer.from(JSON.stringify(jwt)));
+        const jweEnc = new jose_1.CompactEncrypt(Buffer.from(jwt));
         jweEnc.setProtectedHeader(protectedHeader);
         return jweEnc.encrypt(yield (0, jose_1.importSPKI)(formatKey(constants_1.JWT_PUBLIC_KEY), "RS384"));
     });

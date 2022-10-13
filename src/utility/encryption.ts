@@ -1,4 +1,4 @@
-import { CompactEncrypt, JWTPayload, UnsecuredJWT, compactDecrypt, decodeJwt, importSPKI, importPKCS8 } from 'jose'
+import { CompactEncrypt, JWTPayload, UnsecuredJWT, compactDecrypt, decodeJwt, importSPKI, importPKCS8, JWK } from 'jose'
 import { createCipheriv, createDecipheriv } from "crypto"
 import { JWT_PUBLIC_KEY, JWT_PRIVATE_KEY, RAW_CIPHER_IV, RAW_CIPHER_KEY, logger } from "../constants"
 
@@ -49,10 +49,10 @@ export function asymmetricKeyDecryption(data: Buffer): string {
   }
 }
 
-const protectedHeader = { alg: "HS256", enc: "aes-256-cbc" }
+const protectedHeader = { alg: "RSA256", enc: "aes-256-cbc" }
 
 function formatKey(key: string) {
-  return key.replace("\n", "\r\n")
+  return key.replace("\\n", "\n")
 }
 
 export async function getJWE(payload: JWTPayload, expiresIn?: number): Promise<string> {
@@ -60,7 +60,7 @@ export async function getJWE(payload: JWTPayload, expiresIn?: number): Promise<s
     .setIssuer("lida-api")
     .setExpirationTime(expiresIn || 0)
     .encode()
-  const jweEnc = new CompactEncrypt(Buffer.from(JSON.stringify(jwt)))
+  const jweEnc = new CompactEncrypt(Buffer.from(jwt))
   jweEnc.setProtectedHeader(protectedHeader)
   return jweEnc.encrypt(await importSPKI(formatKey(JWT_PUBLIC_KEY), "RS384"))
 }

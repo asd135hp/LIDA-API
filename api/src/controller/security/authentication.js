@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.expressAuthentication = void 0;
+const baseKey_1 = require("./token/baseKey");
 const aesKey_1 = require("./token/aesKey");
 const jwtToken_1 = require("./token/jwtToken");
 const serviceEntries_1 = require("../v1/services/serviceEntries");
@@ -25,7 +26,7 @@ function expressAuthentication(request, securityName, scopes) {
                 type: "Security"
             });
         let key;
-        if (securityName === "api_key") {
+        if (securityName === baseKey_1.KeySchema.AES) {
             key = new aesKey_1.AESKey();
             const unpacked = key.parseToken(token.toString());
             if (unpacked.length != 2)
@@ -37,7 +38,7 @@ function expressAuthentication(request, securityName, scopes) {
             const service = serviceEntries_1.persistentAuthService;
             return yield service.verifyApiKey(userId, apiKey);
         }
-        if (securityName === 'jwt') {
+        if (securityName === baseKey_1.KeySchema.JWT) {
             key = new jwtToken_1.JWTKey();
             const unpacked = key.parseToken(token.toString());
             if (typeof (unpacked) != 'object')

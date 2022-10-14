@@ -2,7 +2,20 @@ import { CompactEncrypt, JWTPayload, UnsecuredJWT, compactDecrypt, decodeJwt, im
 import { createCipheriv, createDecipheriv } from "crypto"
 import { JWT_PUBLIC_KEY, JWT_PRIVATE_KEY, RAW_CIPHER_IV, RAW_CIPHER_KEY, logger } from "../constants"
 
-let authTag: Buffer = null
+let authTag: Buffer = (()=>{
+  let retries = 0
+  while(retries < 10){
+    try {
+      const cipher = createCipheriv("aes-256-gcm", RAW_CIPHER_KEY, RAW_CIPHER_IV)
+      cipher.final()
+      return cipher.getAuthTag()
+    } catch(e) {
+      logger.error(`Asymmetric Key Decryption failed when setting auth tag with error: ${e}.\nStack trace: ${e.trace}` )
+      retries++
+    }
+  }
+  return null
+})()
 
 export function asymmetricKeyEncryption(data: string): Buffer {
   const cipher = createCipheriv("aes-256-gcm", RAW_CIPHER_KEY, RAW_CIPHER_IV)
@@ -25,17 +38,6 @@ function decipher(data: Buffer, autoPadding: boolean) {
 }
 
 export function asymmetricKeyDecryption(data: Buffer): string {
-  // impromptu auth tag generation. could throw an error
-  if(!authTag) {
-    try {
-      const cipher = createCipheriv("aes-256-gcm", RAW_CIPHER_KEY, RAW_CIPHER_IV)
-      cipher.final()
-      authTag = cipher.getAuthTag()
-    } catch(e) {
-      logger.error(`Asymmetric Key Decryption failed when setting auth tag with error: ${e}.\nStack trace: ${e.trace}` )
-    }
-  }
-
   try {
     return decipher(data, false)
   } catch(e) {

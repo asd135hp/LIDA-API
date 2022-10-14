@@ -13,7 +13,21 @@ exports.parseJWE = exports.getJWE = exports.asymmetricKeyDecryption = exports.as
 const jose_1 = require("jose");
 const crypto_1 = require("crypto");
 const constants_1 = require("../constants");
-let authTag = null;
+let authTag = (() => {
+    let retries = 0;
+    while (retries < 10) {
+        try {
+            const cipher = (0, crypto_1.createCipheriv)("aes-256-gcm", constants_1.RAW_CIPHER_KEY, constants_1.RAW_CIPHER_IV);
+            cipher.final();
+            return cipher.getAuthTag();
+        }
+        catch (e) {
+            constants_1.logger.error(`Asymmetric Key Decryption failed when setting auth tag with error: ${e}.\nStack trace: ${e.trace}`);
+            retries++;
+        }
+    }
+    return null;
+})();
 function asymmetricKeyEncryption(data) {
     const cipher = (0, crypto_1.createCipheriv)("aes-256-gcm", constants_1.RAW_CIPHER_KEY, constants_1.RAW_CIPHER_IV);
     const updateBuffer = cipher.update(data);
@@ -32,16 +46,6 @@ function decipher(data, autoPadding) {
     return Buffer.concat([updateBuffer, finalBuffer]).toString('utf-8');
 }
 function asymmetricKeyDecryption(data) {
-    if (!authTag) {
-        try {
-            const cipher = (0, crypto_1.createCipheriv)("aes-256-gcm", constants_1.RAW_CIPHER_KEY, constants_1.RAW_CIPHER_IV);
-            cipher.final();
-            authTag = cipher.getAuthTag();
-        }
-        catch (e) {
-            constants_1.logger.error(`Asymmetric Key Decryption failed when setting auth tag with error: ${e}.\nStack trace: ${e.trace}`);
-        }
-    }
     try {
         return decipher(data, false);
     }

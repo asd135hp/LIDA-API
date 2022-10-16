@@ -9,10 +9,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JWTKey = void 0;
+exports.JWEKey = void 0;
 const encryption_1 = require("../../../utility/encryption");
 const baseKey_1 = require("./baseKey");
-class JWTKey extends baseKey_1.BaseKey {
+class JWEKey extends baseKey_1.BaseKey {
     getAPIKey(uid, renewalRetries = 3) {
         const _super = Object.create(null, {
             getAPIKey: { get: () => super.getAPIKey }
@@ -30,11 +30,15 @@ class JWTKey extends baseKey_1.BaseKey {
         });
     }
     generateToken(uid, apiKey) {
-        return Buffer.from((0, encryption_1.signJWT)({ uid, apiKey }));
+        let result = "";
+        (0, encryption_1.getJWE)({ uid, apiKey }).then(val => result = val);
+        return Buffer.from(result);
     }
     parseToken(token) {
-        return (0, encryption_1.parseJWT)(token);
+        let payload = {};
+        (0, encryption_1.parseJWE)(token).then(val => payload = val);
+        return payload;
     }
 }
-exports.JWTKey = JWTKey;
-//# sourceMappingURL=jwtToken.js.map
+exports.JWEKey = JWEKey;
+//# sourceMappingURL=jweToken.js.map

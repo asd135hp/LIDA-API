@@ -1,6 +1,7 @@
-import { CompactEncrypt, JWTPayload, UnsecuredJWT, compactDecrypt, decodeJwt, importSPKI, importPKCS8, JWK } from 'jose'
+import { CompactEncrypt, JWTPayload, UnsecuredJWT, compactDecrypt, decodeJwt, importSPKI, importPKCS8, JWK, SignJWT, jwtVerify } from 'jose'
 import { createCipheriv, createDecipheriv } from "crypto"
 import { JWT_PUBLIC_KEY, JWT_PRIVATE_KEY, RAW_CIPHER_IV, RAW_CIPHER_KEY, logger } from "../constants"
+import { Jwt, JwtPayload, Secret, sign, verify } from 'jsonwebtoken'
 
 let authTag: Buffer = (()=>{
   let retries = 0
@@ -80,4 +81,28 @@ export async function parseJWE(jwe: string): Promise<JWTPayload & { [name: strin
   unsecuredJwt = Buffer.from(jwt.plaintext).toString('utf-8')
 
   return decodeJwt(unsecuredJwt)
+}
+
+const jwtKey: Secret = (()=>{
+  return Buffer.from(JWT_PRIVATE_KEY)
+})()
+
+export function signJWT(payload: JwtPayload, expiresIn?: number): string {
+  return sign(payload, jwtKey, {
+    algorithm: "HS384",
+    issuer: "lida-api",
+    expiresIn: expiresIn || 3600 * 24 * 30
+  })
+}
+
+export function parseJWT(token: string, ignoreExpiration = true): JWTPayload{
+  const jwt = verify(token, jwtKey, {
+    ignoreExpiration,
+    algorithms: ["HS384", "HS512"],
+    issuer: "lida-api",
+    complete: true
+  })
+
+  if(typeof(jwt.payload) !== 'object') return {}
+  return jwt.payload
 }

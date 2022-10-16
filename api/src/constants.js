@@ -45,7 +45,7 @@ exports.firebasePathConfig = (() => {
     return constants_config_json_1.default.firebase.storage.test;
 })();
 exports.schemaName = constants_config_json_1.default.schemaName;
-exports.defaultKeySchema = baseKey_1.KeySchema.AES;
+exports.defaultKeySchema = baseKey_1.KeySchema.JWT;
 exports.DATABASE_TIMEZONE = constants_config_json_1.default.timezone || "Australia/Melbourne";
 exports.LOG_LINES = constants_config_json_1.default.limit.logLines;
 exports.SENSOR_LIMIT = constants_config_json_1.default.limit.sensor;

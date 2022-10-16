@@ -1,8 +1,8 @@
 import { JWTPayload } from "jose";
-import { parseJWT, signJWT } from "../../../utility/encryption";
+import { getJWE, parseJWE } from "../../../utility/encryption";
 import { BaseKey } from "./baseKey";
 
-export class JWTKey extends BaseKey {
+export class JWEKey extends BaseKey {
   async getAPIKey(uid: string, renewalRetries = 3): Promise<string> {
     return await super.getAPIKey(uid, renewalRetries)
   }
@@ -15,10 +15,14 @@ export class JWTKey extends BaseKey {
   }
 
   generateToken(uid: string, apiKey: string): Buffer {
-    return Buffer.from(signJWT({ uid, apiKey }))
+    let result = ""
+    getJWE({ uid, apiKey }).then(val => result = val)
+    return Buffer.from(result)
   }
   
   parseToken(token: string): JWTPayload {
-    return parseJWT(token)
+    let payload = {}
+    parseJWE(token).then(val => payload = val)
+    return payload
   }
 }

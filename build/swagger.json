@@ -536,7 +536,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -580,7 +580,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -632,7 +632,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -676,7 +676,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -717,7 +717,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -770,7 +770,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -814,7 +814,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -866,7 +866,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -929,7 +929,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1000,7 +1000,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1041,7 +1041,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1093,7 +1093,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1143,7 +1143,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1184,7 +1184,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1225,7 +1225,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1266,7 +1266,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1307,7 +1307,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1354,7 +1354,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1419,7 +1419,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1484,7 +1484,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1557,7 +1557,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1630,7 +1630,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1686,7 +1686,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1733,7 +1733,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1798,7 +1798,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1863,7 +1863,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1936,7 +1936,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -1998,7 +1998,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -2039,7 +2039,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -2080,7 +2080,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -2121,7 +2121,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -2162,7 +2162,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -2227,7 +2227,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -2292,7 +2292,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [
@@ -2357,7 +2357,7 @@
 				},
 				"security": [
 					{
-						"aes": []
+						"jwt": []
 					}
 				],
 				"parameters": [

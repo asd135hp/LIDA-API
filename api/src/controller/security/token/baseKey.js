@@ -79,5 +79,6 @@ var KeySchema;
 (function (KeySchema) {
     KeySchema["JWT"] = "jwt";
     KeySchema["AES"] = "aes";
+    KeySchema["JWE"] = "jwe";
 })(KeySchema = exports.KeySchema || (exports.KeySchema = {}));
 //# sourceMappingURL=baseKey.js.map

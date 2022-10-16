@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseJWE = exports.getJWE = exports.asymmetricKeyDecryption = exports.asymmetricKeyEncryption = void 0;
+exports.parseJWT = exports.signJWT = exports.parseJWE = exports.getJWE = exports.asymmetricKeyDecryption = exports.asymmetricKeyEncryption = void 0;
 const jose_1 = require("jose");
 const crypto_1 = require("crypto");
 const constants_1 = require("../constants");
+const jsonwebtoken_1 = require("jsonwebtoken");
 let authTag = (() => {
     let retries = 0;
     while (retries < 10) {
@@ -92,4 +93,27 @@ function parseJWE(jwe) {
     });
 }
 exports.parseJWE = parseJWE;
+const jwtKey = (() => {
+    return Buffer.from(constants_1.JWT_PRIVATE_KEY);
+})();
+function signJWT(payload, expiresIn) {
+    return (0, jsonwebtoken_1.sign)(payload, jwtKey, {
+        algorithm: "HS384",
+        issuer: "lida-api",
+        expiresIn: expiresIn || 3600 * 24 * 30
+    });
+}
+exports.signJWT = signJWT;
+function parseJWT(token, ignoreExpiration = true) {
+    const jwt = (0, jsonwebtoken_1.verify)(token, jwtKey, {
+        ignoreExpiration,
+        algorithms: ["HS384", "HS512"],
+        issuer: "lida-api",
+        complete: true
+    });
+    if (typeof (jwt.payload) !== 'object')
+        return {};
+    return jwt.payload;
+}
+exports.parseJWT = parseJWT;
 //# sourceMappingURL=encryption.js.map

@@ -26,6 +26,7 @@ const constants_2 = require("../../../../constants");
 const helper_1 = require("../../../../utility/helper");
 const databaseDeleteEvent_1 = __importDefault(require("../../../../model/v1/events/databaseDeleteEvent"));
 const sensorServiceFacade_1 = require("../../../../model/v1/services/sensorServiceFacade");
+const convertTimestamp_1 = require("../../../../utility/convertTimestamp");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
 class SensorService extends sensorServiceFacade_1.SensorServiceFacade {
@@ -240,6 +241,7 @@ class SensorService extends sensorServiceFacade_1.SensorServiceFacade {
     }
     addSensorData(sensorName, sensorData) {
         return __awaiter(this, void 0, void 0, function* () {
+            sensorData.timeStamp = (0, convertTimestamp_1.convertTimeStampToSeconds)(sensorData.timeStamp);
             return yield (0, shorthandOps_1.createWriteEvent)({
                 data: Object.assign({ sensorName }, sensorData),
                 protectedMethods: {
@@ -269,6 +271,7 @@ class SensorService extends sensorServiceFacade_1.SensorServiceFacade {
     }
     addSensorDataByBundle(sensorData) {
         return __awaiter(this, void 0, void 0, function* () {
+            sensorData = sensorData.map(data => (Object.assign(Object.assign({}, data), { timeStamp: (0, convertTimestamp_1.convertTimeStampToSeconds)(data.timeStamp) })));
             return yield (0, shorthandOps_1.createWriteEvent)({
                 data: { numberOfSensorData: sensorData.length },
                 protectedMethods: {

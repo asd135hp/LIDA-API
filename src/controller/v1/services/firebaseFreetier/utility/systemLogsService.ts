@@ -4,6 +4,7 @@ import { PublisherImplementor } from "../../../../../model/patterns/subscription
 import DatabaseAddEvent from "../../../../../model/v1/events/databaseAddEvent"
 import DatabaseEvent from "../../../../../model/v1/events/databaseEvent"
 import { Log } from "../../../../../model/v1/write/systemLog"
+import { convertTimeStampToSeconds } from "../../../../../utility/convertTimestamp"
 import { createWriteEvent } from "../../../../../utility/firebase/shorthandOps"
 import { getQueryResult, getQueryResultAsArray } from "../../../../database/firebase/services/firebaseRealtimeService"
 import { CounterService, DataSavingService } from "../../serviceEntries"
@@ -24,7 +25,7 @@ export const pushLog = async(
   log: Log,
   publisher: PublisherImplementor<DatabaseEvent>
 ): Promise<DatabaseEvent> => {
-  log.timeStamp = log.timeStamp || DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
+  log.timeStamp = convertTimeStampToSeconds(log.timeStamp) || DateTime.now().setZone(DATABASE_TIMEZONE).toUnixInteger()
   
   return await createWriteEvent({
     data: log,

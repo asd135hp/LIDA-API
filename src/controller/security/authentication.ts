@@ -5,6 +5,16 @@ import { AESKey } from "./token/aesKey";
 import { JWTKey } from "./token/jwtToken";
 import { JwtPayload } from "jsonwebtoken";
 import { persistentAuthService } from "../v1/services/serviceEntries";
+import { firebasePathConfig } from "../../constants";
+
+function changeDatabase(data: any){
+  changeFirebaseDatabasePath(data)
+}
+
+function changeFirebaseDatabasePath(data: any){
+  const { deviceId } = data
+  
+}
 
 /**
  * Please extend this method since it is really insecure. Well, in the context of this project scope,
@@ -57,9 +67,13 @@ export async function expressAuthentication(
         type: "Security"
       })
 
-    const { uid, apiKey } = unpacked
+    const { uid, apiKey, deviceId } = unpacked
     const service = persistentAuthService as FirebaseAuthService
     // could add scope to the path of the file to read
-    return await service.verifyApiKey(uid, apiKey)
+    const verification = await service.verifyApiKey(uid, apiKey)
+    if(verification) {
+      changeDatabase(unpacked)
+    }
+    return verification
   }
 }

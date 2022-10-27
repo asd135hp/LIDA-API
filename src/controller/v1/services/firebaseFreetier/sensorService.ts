@@ -16,6 +16,7 @@ import FirebaseFirestoreService from "../../../database/firebase/services/fireba
 import DatabaseDeleteEvent from "../../../../model/v1/events/databaseDeleteEvent";
 import { CQRSError } from "../../../../model/v1/error";
 import { SensorServiceFacade } from "../../../../model/v1/services/sensorServiceFacade";
+import { convertTimeStampToSeconds } from "../../../../utility/convertTimestamp";
 
 const realtime = persistentFirebaseConnection.realtimeService
 const firestore = persistentFirebaseConnection.firestoreService
@@ -272,6 +273,7 @@ export default class SensorService extends SensorServiceFacade {
   }
 
   async addSensorData(sensorName: string, sensorData: SensorData): Promise<DatabaseEvent> {
+    sensorData.timeStamp = convertTimeStampToSeconds(sensorData.timeStamp)
     return await createWriteEvent({
       data: { sensorName, ...sensorData },
       protectedMethods: {
@@ -305,6 +307,7 @@ export default class SensorService extends SensorServiceFacade {
   }
 
   async addSensorDataByBundle(sensorData: DatabaseSensorData[]): Promise<DatabaseEvent> {
+    sensorData = sensorData.map(data => ({ ...data, timeStamp: convertTimeStampToSeconds(data.timeStamp) }))
     return await createWriteEvent({
       data: { numberOfSensorData: sensorData.length },
       protectedMethods: {

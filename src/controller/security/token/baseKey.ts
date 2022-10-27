@@ -105,5 +105,6 @@ export abstract class BaseKey {
 
 export enum KeySchema {
   JWT = "jwt",
-  AES = "aes"
+  AES = "aes",
+  JWE = "jwe"
 }

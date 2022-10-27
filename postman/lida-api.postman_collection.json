@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "6b33d03d-938e-42c5-a604-5bf34335e2d7",
+		"_postman_id": "e34e9c76-b3f7-4f33-bf02-3ebd2b6dbcb2",
 		"name": "lida-api",
 		"description": "This is a REST API utilising the CQRS design pattern being exposed via Google Clouds serverless functions.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -83,7 +83,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"sensor\": { \"name\": \"Temperature 1\", \"type\": \"Temperature\"}}",
+							"raw": "{\"sensor\": { \"name\": \"Temperature 10\", \"type\": \"Temperature\"}}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -198,7 +198,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\"sensorData\": { \"value\": 35.5, \"timeStamp\": 100 }}",
+							"raw": "{\"sensorData\": { \"value\": 35.5, \"timeStamp\": 1 }}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -215,6 +215,34 @@
 								"{{sensor_name}}",
 								"data",
 								"add"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Sensor Data By Bundle",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"sensorData\": [\r\n        {\r\n            \"sensorName\": \"Temperature 1\",\r\n            \"value\": \"100\",\r\n            \"timeStamp\": 12152\r\n        },\r\n        {\r\n            \"sensorName\": \"Temperature 2\",\r\n            \"value\": \"100\",\r\n            \"timeStamp\": 124542\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/sensor/data/addAll",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"sensor",
+								"data",
+								"addAll"
 							]
 						}
 					},
@@ -292,6 +320,18 @@
 								"sensor",
 								"data",
 								"fetchAll"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "1660348800",
+									"disabled": true
+								},
+								{
+									"key": "endDate",
+									"value": "1660348800",
+									"disabled": true
+								}
 							]
 						}
 					},
@@ -745,7 +785,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \"logContent\": \"abc\" }",
+							"raw": "{ }",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -843,41 +883,75 @@
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "System Command",
+			"item": [
 				{
-					"name": "Register",
+					"name": "Get Proposed System Command",
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{ \"email\": \"asd135hp1@gmail.com\", \"password\": \"123456789\" }",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{base_url}}/register",
+							"raw": "{{base_url}}/systemCommand/proposed/get",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"register"
+								"systemCommand",
+								"proposed",
+								"get"
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "Refresh credentials",
+					"name": "Get System Command",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/systemCommand/get",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"systemCommand",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Proposed System Command",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/systemCommand/startSystem",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"systemCommand",
+								"startSystem"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Upload System Command",
 					"request": {
 						"method": "POST",
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{ \"email\": \"asd135hp1@gmail.com\", \"password\": \"123456789\" }",
+							"raw": "{ \"flags\": { \"start\": true, \"stop\": false, \"restart\": false, \"pause\": false }}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -885,13 +959,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}/login/refresh",
+							"raw": "{{base_url}}/systemCommand/flags/commit",
 							"host": [
 								"{{base_url}}"
 							],
 							"path": [
-								"login",
-								"refresh"
+								"systemCommand",
+								"flags",
+								"commit"
 							]
 						}
 					},
@@ -940,7 +1015,7 @@
 					"    body: {",
 					"        mode: \"raw\",",
 					"        raw: JSON.stringify({",
-					"            email: \"testaccount@gmail.com\", ",
+					"            email: \"asd135hp1@gmail.com\", ",
 					"            password: \"123456789\"",
 					"        })",
 					"    }",

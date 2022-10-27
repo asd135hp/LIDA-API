@@ -16,6 +16,7 @@ exports.getLog = exports.pushLog = void 0;
 const luxon_1 = require("luxon");
 const constants_1 = require("../../../../../constants");
 const databaseAddEvent_1 = __importDefault(require("../../../../../model/v1/events/databaseAddEvent"));
+const convertTimestamp_1 = require("../../../../../utility/convertTimestamp");
 const shorthandOps_1 = require("../../../../../utility/firebase/shorthandOps");
 const firebaseRealtimeService_1 = require("../../../../database/firebase/services/firebaseRealtimeService");
 const serviceEntries_1 = require("../../serviceEntries");
@@ -23,7 +24,7 @@ const firebaseService_1 = require("../firebaseService");
 const realtime = firebaseService_1.persistentFirebaseConnection.realtimeService;
 const firestore = firebaseService_1.persistentFirebaseConnection.firestoreService;
 const pushLog = (path, log, publisher) => __awaiter(void 0, void 0, void 0, function* () {
-    log.timeStamp = log.timeStamp || luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger();
+    log.timeStamp = (0, convertTimestamp_1.convertTimeStampToSeconds)(log.timeStamp) || luxon_1.DateTime.now().setZone(constants_1.DATABASE_TIMEZONE).toUnixInteger();
     return yield (0, shorthandOps_1.createWriteEvent)({
         data: log,
         protectedMethods: {
